@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaos Park | chaospark.jp</title>
+    <style>
+        /* Liminal Space Design */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        h1 { font-size: 3rem; text-shadow: 0 0 10px #00f; }
+        #diag-btn {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            background: #ff00ff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px #ff00ff;
+            transition: 0.3s;
+        }
+        #diag-btn:hover { background: #fff; color: #ff00ff; }
+        footer { position: fixed; bottom: 20px; }
+        footer a { color: #aaa; margin: 0 10px; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <h1>G-Chaos Park</h1>
+    <button id="diag-btn" onclick="startDiagnosis()">入国試験：グルメ診断</button>
+    <p id="user-id-display"></p>
+
+    <footer>
+        <a href="#">利用規約</a> | <a href="#">プライバシーポリシー</a>
+    </footer>
+
+    <script>
+        // 住民ID発行処理
+        function startDiagnosis() {
+            let userId = localStorage.getItem('chaospark_id');
+            if (!userId) {
+                userId = 'ID-' + Math.floor(Math.random() * 90000 + 10000);
+                localStorage.setItem('chaospark_id', userId);
+            }
+            document.getElementById('user-id-display').innerText = '貴方は住民' + userId + 'として認識されました。診断を開始します...';
+            // ここから診断ロジックへ遷移
+        }
+    </script>
+</body>
+</html>
