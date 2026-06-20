@@ -9,18 +9,19 @@
         #diag-btn { padding: 20px 40px; font-size: 1.5rem; background: #ff00ff; border: none; cursor: pointer; box-shadow: 0 0 20px #ff00ff; transition: 0.3s; }
         #diag-btn:hover { background: #fff; color: #ff00ff; }
 
-        /* AKARIエリア：右寄せで縦並び */
+            /* AKARIエリア：左寄せで縦並び */
         #akari-container {
             position: fixed;
             bottom: 0;
-            right: 0; /* 右端へ */
+            left: 0;           /* ←ここを left にする！ */
             display: flex;
-            flex-direction: column; /* AKARIの下にセリフ */
-            align-items: flex-end; /* コンテナ内で右寄せ */
+            flex-direction: column;
+            align-items: flex-start; /* ←左寄せにする！ */
             z-index: 100;
             pointer-events: none;
-            padding-right: 20px; /* 右端から少し浮かす */
+            padding-left: 20px;    /* ←左端から浮かせる！ */
         }
+
         #akari-img {
             height: 60vh;
             filter: drop-shadow(0 0 10px rgba(255,0,255,0.5));
