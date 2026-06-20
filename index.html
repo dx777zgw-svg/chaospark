@@ -29,6 +29,7 @@
             transition: 0.3s;
         }
         #diag-btn:hover { background: #fff; color: #ff00ff; }
+        #akari-speech { margin-top: 20px; font-size: 1.2rem; color: #ffff00; font-weight: bold; }
         footer { position: fixed; bottom: 20px; }
         footer a { color: #aaa; margin: 0 10px; text-decoration: none; }
     </style>
@@ -38,21 +39,25 @@
     <h1>G-Chaos Park</h1>
     <button id="diag-btn" onclick="startDiagnosis()">入国試験：グルメ診断</button>
     <p id="user-id-display"></p>
+    <p id="akari-speech"></p>
 
     <footer>
         <a href="#">利用規約</a> | <a href="#">プライバシーポリシー</a>
     </footer>
 
     <script>
-        // 住民ID発行処理
         function startDiagnosis() {
+            // AKARIのスター宣言！！
+            const akariSpeech = "「ここはキミがスターになれる場所！ 腹が減ってるなら、まずは『グルメ診断』で自分をアピールするべ！」";
+            document.getElementById('akari-speech').innerText = akariSpeech;
+
+            // 住民ID発行処理
             let userId = localStorage.getItem('chaospark_id');
             if (!userId) {
                 userId = 'ID-' + Math.floor(Math.random() * 90000 + 10000);
                 localStorage.setItem('chaospark_id', userId);
             }
             document.getElementById('user-id-display').innerText = '貴方は住民' + userId + 'として認識されました。診断を開始します...';
-            // ここから診断ロジックへ遷移
         }
     </script>
 </body>
