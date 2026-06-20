@@ -8,26 +8,53 @@
         h1 { font-size: 3rem; text-shadow: 0 0 10px #00f; }
         #diag-btn { padding: 20px 40px; font-size: 1.5rem; background: #ff00ff; border: none; cursor: pointer; box-shadow: 0 0 20px #ff00ff; transition: 0.3s; }
         #diag-btn:hover { background: #fff; color: #ff00ff; }
-        #akari-container { position: fixed; bottom: 0; right: 0; z-index: 100; display: flex; align-items: flex-end; pointer-events: none; }
-        #akari-img { height: 70vh; margin-right: -20px; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); pointer-events: auto; }
-        #speech-bubble { background: rgba(0, 0, 0, 0.8); border: 2px solid #ff00ff; color: #fff; padding: 20px; border-radius: 15px; width: 300px; margin-bottom: 50px; position: relative; pointer-events: auto; }
+
+        /* AKARIエリア：右寄せで縦並び */
+        #akari-container {
+            position: fixed;
+            bottom: 0;
+            right: 20px; /* 右端に寄せる */
+            display: flex;
+            flex-direction: column; /* AKARIの下にセリフ */
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        #akari-img {
+            height: 60vh; /* 少し高さを調整してセリフ枠とバランスを取る */
+            filter: drop-shadow(0 0 10px rgba(255,0,255,0.5));
+            pointer-events: auto;
+        }
+        #speech-bubble {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff00ff;
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            width: 300px;
+            margin-bottom: 20px;
+            position: relative;
+            pointer-events: auto;
+            text-align: left;
+        }
         #akari-name { position: absolute; top: -15px; left: 10px; background: #ff00ff; padding: 2px 10px; font-weight: bold; font-size: 0.9rem; }
-        .food-btn { display: block; margin: 10px auto; padding: 8px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #ff00ff; }
+        .food-btn { display: block; margin: 10px 0; padding: 8px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #ff00ff; width: 100%; text-align: left; }
     </style>
 </head>
 <body>
 
     <h1>G-Chaos Park</h1>
     <button id="diag-btn" onclick="startDiagnosis()">入国試験：グルメ診断</button>
-    <p id="user-id-display"></p>
 
     <div id="akari-container">
+        <!-- 立ち絵を先に書くと上にくる -->
+        <img src="AKARI.png" id="akari-img" onerror="this.style.display='none'; alert('AKARI.png が見つからないべ！')">
+        
+        <!-- 下にセリフ枠 -->
         <div id="speech-bubble">
             <div id="akari-name">AKARI</div>
             <p id="akari-text">ここはキミがスターになれる場所！まずはグルメ診断で自分を証明するべ！</p>
         </div>
-        <!-- 画像ファイル名を修正したべ -->
-        <img src="AKARI.png" id="akari-img">
     </div>
 
     <script>
@@ -37,7 +64,6 @@
                 userId = 'ID-' + Math.floor(Math.random() * 90000 + 10000);
                 localStorage.setItem('chaospark_id', userId);
             }
-            
             document.getElementById('diag-btn').style.display = 'none';
             document.getElementById('akari-text').innerHTML = 'ID：' + userId + '<br>今の気分はどれだべ？<br>' + 
                 ['カレー', 'ハンバーグ', 'オムライス', 'ラーメン', 'チャーハン']
@@ -46,7 +72,6 @@
 
         function showResult(food) {
             document.getElementById('akari-text').innerText = 'あんたは「' + food + '」タイプだべ！最高にイカしてるべ！！';
-            // ここに診断結果の分岐ロジックを追加していくべ！
         }
     </script>
 </body>
