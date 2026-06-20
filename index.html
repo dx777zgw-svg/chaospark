@@ -13,15 +13,16 @@
         #akari-container {
             position: fixed;
             bottom: 0;
-            right: 20px; /* 右端に寄せる */
+            right: 0; /* 右端へ */
             display: flex;
             flex-direction: column; /* AKARIの下にセリフ */
-            align-items: center;
+            align-items: flex-end; /* コンテナ内で右寄せ */
             z-index: 100;
             pointer-events: none;
+            padding-right: 20px; /* 右端から少し浮かす */
         }
         #akari-img {
-            height: 60vh; /* 少し高さを調整してセリフ枠とバランスを取る */
+            height: 60vh;
             filter: drop-shadow(0 0 10px rgba(255,0,255,0.5));
             pointer-events: auto;
         }
@@ -47,10 +48,8 @@
     <button id="diag-btn" onclick="startDiagnosis()">入国試験：グルメ診断</button>
 
     <div id="akari-container">
-        <!-- 立ち絵を先に書くと上にくる -->
-       <img src="AKARI.png" id="akari-img" onerror="this.style.display='none'; alert('AKARI.pngが見つからないべ！');">
+        <img src="AKARI.png" id="akari-img" onerror="this.style.display='none';">
         
-        <!-- 下にセリフ枠 -->
         <div id="speech-bubble">
             <div id="akari-name">AKARI</div>
             <p id="akari-text">ここはキミがスターになれる場所！まずはグルメ診断で自分を証明するべ！</p>
