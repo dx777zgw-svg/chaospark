@@ -2,76 +2,73 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>G-Chaos Park | chaospark.jp</title>
+    <title>G-Chaos Park | Opening</title>
     <style>
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover; color: #fff; font-family: 'Arial', sans-serif; text-align: center; }
-        h1 { font-size: 3rem; text-shadow: 0 0 10px #00f; }
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('1000014457.png') no-repeat center center/cover; color: #fff; font-family: 'Arial', sans-serif; text-align: center; }
+        
+        /* 規約同意用モーダル */
+        #consent-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; display:flex; justify-content:center; align-items:center; }
+        .modal-content { background:#222; padding:30px; border:2px solid #ff00ff; color:#fff; width:80%; max-width:500px; }
+
         #diag-btn { padding: 20px 40px; font-size: 1.5rem; background: #ff00ff; border: none; cursor: pointer; box-shadow: 0 0 20px #ff00ff; transition: 0.3s; }
-        #diag-btn:hover { background: #fff; color: #ff00ff; }
-
-            /* AKARIエリア：左寄せで縦並び */
-        #akari-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;           /* ←ここを left にする！ */
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; /* ←左寄せにする！ */
-            z-index: 100;
-            pointer-events: none;
-            padding-left: 20px;    /* ←左端から浮かせる！ */
-        }
-
-        #akari-img {
-            height: 60vh;
-            filter: drop-shadow(0 0 10px rgba(255,0,255,0.5));
-            pointer-events: auto;
-        }
-        #speech-bubble {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #ff00ff;
-            color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            width: 300px;
-            margin-bottom: 20px;
-            position: relative;
-            pointer-events: auto;
-            text-align: left;
-        }
-        #akari-name { position: absolute; top: -15px; left: 10px; background: #ff00ff; padding: 2px 10px; font-weight: bold; font-size: 0.9rem; }
-        .food-btn { display: block; margin: 10px 0; padding: 8px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #ff00ff; width: 100%; text-align: left; }
+        
+        /* AKARIエリア（左寄せ） */
+        #akari-container { position: fixed; bottom: 0; left: 0; display: flex; flex-direction: column; align-items: flex-start; z-index: 100; pointer-events: none; padding-left: 20px; }
+        #akari-img { height: 60vh; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); pointer-events: auto; }
+        #speech-bubble { background: rgba(0, 0, 0, 0.8); border: 2px solid #ff00ff; color: #fff; padding: 20px; border-radius: 15px; width: 300px; margin-bottom: 20px; pointer-events: auto; text-align: left; position: relative; }
+        .food-btn { display: block; margin: 10px 0; padding: 8px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #ff00ff; width: 100%; }
     </style>
 </head>
 <body>
+
+    <div id="consent-modal">
+        <div class="modal-content">
+            <h2>治安維持官Licoからの通達</h2>
+            <p>このパークへ入国するなら、規約を守るべ。同意するならチェックするべ。</p>
+            <label><input type="checkbox" id="agree-check"> 規約とプライバシーポリシーに同意する</label><br><br>
+            <button id="enter-btn" disabled onclick="closeModal()">パークへ入国する</button>
+        </div>
+    </div>
 
     <h1>G-Chaos Park</h1>
     <button id="diag-btn" onclick="startDiagnosis()">入国試験：グルメ診断</button>
 
     <div id="akari-container">
-        <img src="AKARI.png" id="akari-img" onerror="this.style.display='none';">
-        
+        <img src="AKARI.png" id="akari-img">
         <div id="speech-bubble">
-            <div id="akari-name">AKARI</div>
             <p id="akari-text">ここはキミがスターになれる場所！まずはグルメ診断で自分を証明するべ！</p>
         </div>
     </div>
 
     <script>
+        // 同意チェック処理
+        document.getElementById('agree-check').addEventListener('change', (e) => {
+            document.getElementById('enter-btn').disabled = !e.target.checked;
+        });
+
+        function closeModal() {
+            document.getElementById('consent-modal').style.display = 'none';
+        }
+
+        // 診断＆ID発行処理
         function startDiagnosis() {
             let userId = localStorage.getItem('chaospark_id');
             if (!userId) {
                 userId = 'ID-' + Math.floor(Math.random() * 90000 + 10000);
                 localStorage.setItem('chaospark_id', userId);
+                document.getElementById('akari-text').innerHTML = '初めまして！あんたのIDは「' + userId + '」だべ！';
+            } else {
+                document.getElementById('akari-text').innerHTML = 'おかえり！あんたのIDは「' + userId + '」だべ！';
             }
+            
             document.getElementById('diag-btn').style.display = 'none';
-            document.getElementById('akari-text').innerHTML = 'ID：' + userId + '<br>今の気分はどれだべ？<br>' + 
+            document.getElementById('akari-text').innerHTML += '<br>今の気分は？<br>' + 
                 ['カレー', 'ハンバーグ', 'オムライス', 'ラーメン', 'チャーハン']
                 .map(food => `<button class="food-btn" onclick="showResult('${food}')">${food}</button>`).join('');
         }
 
         function showResult(food) {
-            document.getElementById('akari-text').innerText = 'あんたは「' + food + '」タイプだべ！最高にイカしてるべ！！';
+            document.getElementById('akari-text').innerText = 'あんたは「' + food + '」タイプだべ！最高だべ！！';
         }
     </script>
 </body>
