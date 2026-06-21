@@ -62,10 +62,28 @@
 </div>
 
 <div id="opening-layer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #000;">
-    <video id="op-video" width="100%" height="100%" playsinline muted onended="hideMovie()">
+    <video id="op-video" width="100%" height="100%" playsinline onended="hideMovie()">
         <source src="opening.mp4" type="video/mp4">
     </video>
 </div>
+
+<script>
+    function startExperience() {
+        // 警告画面を消す
+        document.getElementById('volume-warning').style.display = 'none';
+        
+        // オープニングレイヤーを表示
+        document.getElementById('opening-layer').style.display = 'block';
+        
+        // 動画を取得して強制再生だべ
+        const video = document.getElementById('op-video');
+        video.muted = false; // 音声を有効にする
+        video.play().catch(function(error) {
+            console.log("再生失敗だべ…でもこれがブラウザの壁だべ: " + error);
+        });
+    }
+    
+    // hideMovieなどはその下に続くべ
 
 <script>
     function startExperience() {
