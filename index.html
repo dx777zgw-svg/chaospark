@@ -80,3 +80,20 @@
         document.getElementById('terms-link-btn').style.display = "block";
     }
 </script>
+
+<div id="volume-warning" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:10000; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center;">
+    <p style="font-size: 1.5rem; color: #ff00ff; border: 1px solid #ff00ff; padding: 20px;">
+        ⚠️ 警告：この先、音が出ます。<br>音量にご注意ください。
+    </p>
+    <button onclick="startExperience()" style="padding: 15px 30px; background:#ff00ff; color:#fff; border:none; cursor:pointer; font-size:1.2rem;">
+        音量を確認して入国する
+    </button>
+</div>
+
+<script>
+    function startExperience() {
+        document.getElementById('volume-warning').style.display = 'none';
+        // ここでムービーを自動再生させるべ！
+        document.getElementById('op-video').play();
+    }
+</script>
