@@ -1,10 +1,54 @@
+<style>
+    /* ゲート背景をmon.pngに設定だべ */
+    #gate-screen {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('mon.png') no-repeat center center/cover;
+        color: #fff;
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+    }
+
+    #lico-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        z-index: 100;
+        padding-left: 20px;
+    }
+
+    #lico-img {
+        height: 60vh;
+        filter: drop-shadow(0 0 10px rgba(255,0,255,0.5));
+    }
+
+    #speech-bubble {
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid #ff00ff;
+        color: #fff;
+        padding: 20px;
+        border-radius: 15px;
+        width: 300px;
+        margin-bottom: 20px;
+        text-align: left;
+        position: relative;
+    }
+</style>
+
 <div id="gate-screen">
     <h1>G-Chaos Park 入国審査ゲート</h1>
 
     <div id="lico-container">
         <img src="LICO.png" id="lico-img" onerror="this.style.display='none';">
         <div id="speech-bubble">
-            <div id="lico-name">Lico</div>
+            <div id="lico-name" style="background:#ff00ff; padding:2px 10px; font-weight:bold;">Lico</div>
             <p id="lico-text">……ゲートへようこそ。入国には審査が必要よ。</p>
             
             <div id="name-input-area" style="display:none;">
@@ -14,14 +58,12 @@
 
             <button id="start-btn" onclick="startProcess()">審査を開始する</button>
             
-            <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none;" onclick="showNext()">規約を確認して同意する</a>
+            <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none; color:#ff00ff; font-weight:bold;">規約を確認して同意する</a>
         </div>
     </div>
 </div>
 
 <script>
-    let step = 0;
-
     function startProcess() {
         document.getElementById('lico-text').innerText = "はじめてみる顔ね！あなたの名前は？";
         document.getElementById('start-btn').style.display = "none";
@@ -37,6 +79,4 @@
         document.getElementById('name-input-area').style.display = "none";
         document.getElementById('terms-link-btn').style.display = "block";
     }
-
-    // 規約ページから戻ってきた後の挙動は、lounge.html側でID発行と合わせてやるべ！
 </script>
