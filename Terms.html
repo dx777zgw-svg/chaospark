@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaos Park | 利用規約・プライバシーポリシー</title>
+    <style>
+        body { background: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px; line-height: 1.8; }
+        .container { max-width: 800px; margin: auto; border: 1px solid #333; padding: 40px; background: #111; }
+        h1 { color: #fff; border-bottom: 2px solid #ff00ff; padding-bottom: 10px; }
+        h2 { color: #ff00ff; margin-top: 30px; }
+        .btn-close { display: block; margin: 40px auto; padding: 15px 30px; background: #ff00ff; color: #fff; border: none; cursor: pointer; font-size: 1rem; border-radius: 5px; }
+        .btn-close:hover { background: #fff; color: #ff00ff; }
+        .btn-close:disabled { background: #555; color: #aaa; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>G-Chaos Park 利用規約・プライバシーポリシー</h1>
+        
+        <h2>第1条（目的）</h2>
+        <p>本規約は、当パークが提供するWebコミュニティの利用条件を定めるものです。利用者は、本規約に同意したものとみなされます。</p>
+        
+        <h2>第2条（住民IDと管理）</h2>
+        <p>利用者は、本パーク利用時にブラウザのローカルストレージを用いた一意の「住民ID」を発行するものとします。データ紛失時の復旧責任は利用者が負うものとします。</p>
+
+        <h2>第3条（パーク内経済）</h2>
+        <p>「カオスポイント」「作者マイレージ」は、パーク内専用のデータであり、現実通貨としての価値を有しません。ポイントの不正取得・操作は禁止します。</p>
+
+        <h2>第4条（治安維持・禁止事項）</h2>
+        <p>利用者は以下の行為を行ってはなりません。<br>
+        1. 他者への誹謗中傷・荒らし行為。<br>
+        2. システムの脆弱性を突く不正アクセス・ツール利用。<br>
+        3. 対戦中の意図的な通信切断（AI代行への妨害）。<br>
+        4. 運営およびAIキャラクターの業務を妨害する行為。</p>
+
+        <h2>第5条（免責事項）</h2>
+        <p>当パークは、通信障害や不可抗力による損害について責任を負いません。また、規約は運営の判断により予告なく改定されることがあります。</p>
+
+        <h2>プライバシーポリシー</h2>
+        <p>当パークは、利用者のIDおよび行動ログを、パーク内の経済循環の最適化および不正検知の目的で収集・利用します。これらは法令に基づかない限り第三者に開示されません。</p>
+
+        <div style="margin-top: 30px; padding: 20px; border: 1px solid #ff00ff; background: #222; text-align: center;">
+            <label>
+                <input type="checkbox" id="term-agree" onchange="toggleButton()"> 
+                <span style="color: #fff;">上記の利用規約とプライバシーポリシーに同意して入国する</span>
+            </label>
+            <br><br>
+            <button id="close-btn" class="btn-close" disabled onclick="window.close()">入国へ戻る</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleButton() {
+            const checkbox = document.getElementById('term-agree');
+            const button = document.getElementById('close-btn');
+            button.disabled = !checkbox.checked;
+            
+            if(checkbox.checked) {
+                button.style.background = "#00ff00";
+                button.style.color = "#000";
+            } else {
+                button.style.background = "#ff00ff";
+                button.style.color = "#fff";
+            }
+        }
+    </script>
+</body>
+</html>
