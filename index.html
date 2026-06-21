@@ -36,14 +36,15 @@
 </style>
 
 <script>
+    // --- 1. 入国審査開始（警告ボタン） ---
     function startExperience() {
         // 警告画面を消して、動画レイヤーを表示
         document.getElementById('volume-warning').style.display = 'none';
         document.getElementById('opening-layer').style.display = 'block';
         
-        // 動画を取得して再生
+        // 動画を取得して強制再生
         const video = document.getElementById('op-video');
-        video.muted = false; // 音声有効化！
+        video.muted = false; // 音声を有効にする！
         
         // 再生命令だべ
         video.play().catch(function(error) {
@@ -51,42 +52,19 @@
         });
     }
 
+    // --- 2. 動画終了時のゲート表示 ---
     function hideMovie() {
         document.getElementById('opening-layer').style.display = 'none';
         document.getElementById('gate-screen').style.display = 'flex';
     }
 
+    // --- 3. 入国審査の対話プロセス ---
     function startProcess() {
         document.getElementById('lico-text').innerText = "はじめてみる顔ね！あなたの名前は？";
         document.getElementById('start-btn').style.display = "none";
         document.getElementById('name-input-area').style.display = "block";
     }
 
-    function checkName() {
-        let name = document.getElementById('user-name').value;
-        if (!name) return alert('名前をちょうだい。');
-        sessionStorage.setItem('userName', name);
-        document.getElementById('lico-text').innerText = name + "さんね！まずは規約を読んでくれる？";
-        document.getElementById('name-input-area').style.display = "none";
-        document.getElementById('terms-link-btn').style.display = "block";
-    }
-</script>
-
-<script>
-    function startExperience() {
-        document.getElementById('volume-warning').style.display = 'none';
-        document.getElementById('opening-layer').style.display = 'block';
-        document.getElementById('op-video').play();
-    }
-    function hideMovie() {
-        document.getElementById('opening-layer').style.display = 'none';
-        document.getElementById('gate-screen').style.display = 'flex';
-    }
-    function startProcess() {
-        document.getElementById('lico-text').innerText = "はじめてみる顔ね！あなたの名前は？";
-        document.getElementById('start-btn').style.display = "none";
-        document.getElementById('name-input-area').style.display = "block";
-    }
     function checkName() {
         let name = document.getElementById('user-name').value;
         if (!name) return alert('名前をちょうだい。');
