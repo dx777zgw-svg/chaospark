@@ -90,10 +90,24 @@
     </button>
 </div>
 
+<div id="opening-layer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #000;">
+    <video id="op-video" width="100%" height="100%" playsinline onended="hideMovie()">
+        <source src="opening.mp4" type="video/mp4">
+    </video>
+</div>
+
 <script>
-    function startExperience() {
+    function startExperience()     
         document.getElementById('volume-warning').style.display = 'none';
+        document.getElementById('opening-layer').style.display = 'block';
         // ここでムービーを自動再生させるべ！
         document.getElementById('op-video').play();
     }
+
+    function hideMovie() {
+        document.getElementById('opening-layer').style.display = 'none';
+        document.getElementById('gate-screen').style.display = 'block';
+    }
+ 
+    
 </script>
