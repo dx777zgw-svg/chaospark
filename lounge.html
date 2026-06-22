@@ -26,7 +26,7 @@
         #legal-links a { color: #ffffff; text-decoration: none; margin-right: 15px; }
         #legal-links a:hover { text-decoration: underline; }
 
-        /* 追加：マイページリンクの特別装飾 */
+        /* マイページリンクの特別装飾 */
         #mypage-panel { border-color: #ffd700; text-align: center; background: #1a1a00; }
         #mypage-link { color: #ffd700; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #mypage-link:hover { background: #333300; border-radius: 5px; }
@@ -63,6 +63,10 @@
         <div class="panel">
             <a href="park.html">公園へ</a> | <a href="gacha.html">ガチャへ</a>
         </div>
+
+        <div class="panel" style="border-color: #ff003c; text-align: center; background: #1a0005;">
+            <button onclick="localStorage.clear(); alert('住民権（ID）を破棄したべ！審査ゲートに戻るべ！'); window.location.href='index.html';" style="background: #ff003c; color: #fff; border: none; padding: 10px; font-weight: bold; cursor: pointer; width: 100%; font-family: monospace;">⚙️ RESET USER DATA</button>
+        </div>
     </section>
 
     <div id="legal-links">
@@ -83,9 +87,7 @@
         // ユーザー名の取得と各所への反映
         const userName = localStorage.getItem('userName');
         if(userName) {
-            // AKARIの挨拶に反映
             document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
-            // マイページリンクに名前を反映
             document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
         } else {
             document.getElementById('mypage-link').innerText = `🚪 ゲストのマイページへ`;
