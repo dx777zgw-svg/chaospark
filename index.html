@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>G-Chaos Park</title>
     <style>
-        /* 画面全体のデフォルトの余白を消すべ */
         body { margin: 0; padding: 0; background-color: #000; }
 
-        /* ゲート背景をmon.pngに設定だべ */
         #gate-screen {
             margin: 0;
             height: 100vh;
-            display: none; /* 最初は隠しておくべ */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -58,7 +56,10 @@
                     <button onclick="checkName()">送信</button>
                 </div>
                 <button id="start-btn" onclick="startProcess()">審査を開始する</button>
-                <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none; color:#ff00ff; font-weight:bold;">規約を確認して同意する</a>
+                
+                <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none; color:#ff00ff; font-weight:bold; cursor:pointer;" onclick="showCompleteBtn()">規約を確認する</a>
+                
+                <button id="complete-btn" style="display:none; margin-top:10px;" onclick="completeImmigration()">確認した。入国する！</button>
             </div>
         </div>
     </div>
@@ -79,35 +80,76 @@
     </div>
 
     <script>
+        // ----------------------------------------------------
+        // 1. ページ開始＆動画再生
+        // ----------------------------------------------------
         function startExperience() {
             document.getElementById('volume-warning').style.display = 'none';
             document.getElementById('opening-layer').style.display = 'block';
             
             const video = document.getElementById('op-video');
-            video.muted = false; // 音を出すべ！
+            video.muted = false; 
             video.play().catch(function(e) { 
                 console.log("再生ブロックされたべ: " + e); 
             });
         }
 
+        // ----------------------------------------------------
+        // 2. 動画終了時の分岐（検問システム）
+        // ----------------------------------------------------
         function hideMovie() {
             document.getElementById('opening-layer').style.display = 'none';
+
+            // 既にIDがある（永続記憶がある）場合は、審査をスキップしてラウンジへ直行！
+            if (localStorage.getItem('userId')) {
+                window.location.href = 'lounge.html';
+                return;
+            }
+
+            // IDがない人だけゲートを開く
             document.getElementById('gate-screen').style.display = 'flex';
         }
 
+        // ----------------------------------------------------
+        // 3. Licoの審査プロセス
+        // ----------------------------------------------------
         function startProcess() {
             document.getElementById('lico-text').innerText = "はじめてみる顔ね！あなたの名前は？";
             document.getElementById('start-btn').style.display = "none";
             document.getElementById('name-input-area').style.display = "block";
         }
 
+        // ----------------------------------------------------
+        // 4. 名前入力＆ID発行（永続化）
+        // ----------------------------------------------------
         function checkName() {
             let name = document.getElementById('user-name').value;
             if (!name) return alert('名前をちょうだい。');
-            sessionStorage.setItem('userName', name);
+            
+            // 永続IDを発行して記憶！（sessionStorage から localStorage に変更）
+            const uniqueId = 'uid_' + Date.now(); 
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userId', uniqueId); 
+            
             document.getElementById('lico-text').innerText = name + "さんね！まずは規約を読んでくれる？";
             document.getElementById('name-input-area').style.display = "none";
             document.getElementById('terms-link-btn').style.display = "block";
+        }
+
+        // ----------------------------------------------------
+        // 5. 規約確認＆ワープ
+        // ----------------------------------------------------
+        // 規約リンクをクリックしたら、「入国する」ボタンを表示させる
+        function showCompleteBtn() {
+            document.getElementById('lico-text').innerText = "確認できた？じゃあ、中へどうぞ。";
+            document.getElementById('terms-link-btn').style.display = "none";
+            document.getElementById('complete-btn').style.display = "block";
+        }
+
+        // 最後のワープ処理！
+        function completeImmigration() {
+            // ラウンジへワープだべ！
+            window.location.href = 'lounge.html';
         }
     </script>
 
