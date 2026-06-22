@@ -30,6 +30,23 @@
         #mypage-panel { border-color: #ffd700; text-align: center; background: #1a1a00; }
         #mypage-link { color: #ffd700; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #mypage-link:hover { background: #333300; border-radius: 5px; }
+
+        /* ステータス（お財布）パネルの装飾 */
+        #status-panel { border-color: #00ff41; background: #001a05; }
+        .status-item { font-size: 1.1em; font-weight: bold; margin: 5px 0; }
+
+        /* チュートリアルポップアップの装飾 */
+        #tutorial-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 9999; justify-content: center; align-items: center;
+        }
+        #tutorial-content {
+            background: #121212; border: 2px solid #ff00ff; padding: 30px; text-align: center; border-radius: 10px; width: 400px;
+        }
+        .btn-neon {
+            background: #ff00ff; color: #fff; border: none; padding: 12px 24px; font-size: 1.2em; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px; width: 100%;
+        }
+        .btn-neon:hover { background: #cc00cc; }
     </style>
 </head>
 <body>
@@ -41,18 +58,41 @@
         }
     </script>
 
+    <div id="tutorial-modal">
+        <div id="tutorial-content">
+            <h2 style="color: #ff00ff;">🎉 初回入国ボーナス！</h2>
+            <!-- 修正：AKARI.png を指定 -->
+            <img src="AKARI.png" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 2px solid #ff00ff;" onerror="this.style.display='none';">
+            <p><strong>AKARI</strong><br>「初めての入国じゃん！<br>パークで遊ぶための資金、渡しとくね！」</p>
+            
+            <div style="background: #000; padding: 15px; margin: 20px 0; border: 1px solid #333;">
+                <div style="font-size: 1.4em; color: #00ff41;">🌀 カオスポイント: 100 P</div>
+                <div style="font-size: 1.4em; color: #ffd700; margin-top: 10px;">💎 作者マイレージ: 50 P</div>
+            </div>
+            
+            <button class="btn-neon" onclick="closeTutorial()">受け取って遊ぶ！</button>
+        </div>
+    </div>
+
     <aside id="akari-zone" class="panel">
-        <img src="1000014456.png" id="akari-move" alt="AKARI" onerror="this.src='fallback_akari.png';">
+        <!-- 修正：AKARI.png を指定、エラー時は非表示に -->
+        <img src="AKARI.png" id="akari-move" alt="AKARI" onerror="this.style.display='none';">
         <div id="akari-speech">おいっす～！</div>
     </aside>
 
     <main id="core-zone" class="panel">
         <h1>診断制作所</h1>
         <p>カオスポイントを生成せよ</p>
-        <button id="start-btn">診断を始める</button>
+        <button id="start-btn" style="padding: 15px 30px; font-size: 1.2em; cursor: pointer;">診断を始める</button>
     </main>
 
     <section id="utility-zone">
+        <div class="panel" id="status-panel">
+            <h3 style="margin-top: 0; color: #00ff41; border-bottom: 1px solid #00ff41; padding-bottom: 5px;">📊 所持ステータス</h3>
+            <div class="status-item" style="color: #00ff41;">🌀 カオス: <span id="cp-display">0</span> P</div>
+            <div class="status-item" style="color: #ffd700;">💎 マイレージ: <span id="cm-display">0</span> P</div>
+        </div>
+
         <div class="panel" id="mypage-panel">
             <a href="mypage.html" id="mypage-link">マイページへ</a>
         </div>
@@ -75,7 +115,38 @@
     </div>
 
     <script type="module">
-        // AKARIのランダムセリフ機能
+        const userName = localStorage.getItem('userName') || 'ゲスト';
+        
+        function checkTutorial() {
+            if (!localStorage.getItem('isTutorialDone')) {
+                document.getElementById('tutorial-modal').style.display = 'flex';
+            } else {
+                document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
+            }
+            updateStatusDisplay();
+        }
+
+        window.closeTutorial = function() {
+            localStorage.setItem('chaosPoint', 100);
+            localStorage.setItem('creatorMileage', 50);
+            localStorage.setItem('isTutorialDone', 'true');
+            
+            document.getElementById('tutorial-modal').style.display = 'none';
+            document.getElementById('akari-speech').innerText = `ボーナス使って、ガンガン遊んできな！`;
+            updateStatusDisplay();
+        };
+
+        function updateStatusDisplay() {
+            const cp = localStorage.getItem('chaosPoint') || 0;
+            const cm = localStorage.getItem('creatorMileage') || 0;
+            document.getElementById('cp-display').innerText = cp;
+            document.getElementById('cm-display').innerText = cm;
+        }
+
+        checkTutorial();
+
+        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
+
         const messages = [
             "おいっす～！", 
             "何して遊ぶべ？", 
@@ -83,18 +154,10 @@
             "カオスポイントは足りてるかべ？",
             "診断してカオスポイント稼ぐべ～"
         ];
-        
-        // ユーザー名の取得と各所への反映
-        const userName = localStorage.getItem('userName');
-        if(userName) {
-            document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
-            document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
-        } else {
-            document.getElementById('mypage-link').innerText = `🚪 ゲストのマイページへ`;
-        }
-
         setInterval(() => {
-            document.getElementById('akari-speech').innerText = messages[Math.floor(Math.random() * messages.length)];
+            if(document.getElementById('tutorial-modal').style.display === 'none') {
+                document.getElementById('akari-speech').innerText = messages[Math.floor(Math.random() * messages.length)];
+            }
         }, 5000);
     </script>
 </body>
