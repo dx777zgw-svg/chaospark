@@ -22,16 +22,27 @@
         
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* 左下の規約・プライバシーポリシー（一切の演出なし・真面目な白） */
         #legal-links { position: fixed; bottom: 10px; left: 15px; font-family: sans-serif; font-size: 11px; z-index: 100; }
         #legal-links a { color: #ffffff; text-decoration: none; margin-right: 15px; }
-        #legal-links a:hover { text-decoration: underline; } /* 普通のWebリンクの挙動だべ */
+        #legal-links a:hover { text-decoration: underline; }
+
+        /* 追加：マイページリンクの特別装飾 */
+        #mypage-panel { border-color: #ffd700; text-align: center; background: #1a1a00; }
+        #mypage-link { color: #ffd700; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
+        #mypage-link:hover { background: #333300; border-radius: 5px; }
     </style>
 </head>
 <body>
 
+    <script>
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「ゲートを通ってから出直してきなさい！」");
+            window.location.href = 'index.html';
+        }
+    </script>
+
     <aside id="akari-zone" class="panel">
-        <img src="1000014456.png" id="akari-move" alt="AKARI">
+        <img src="1000014456.png" id="akari-move" alt="AKARI" onerror="this.src='fallback_akari.png';">
         <div id="akari-speech">おいっす～！</div>
     </aside>
 
@@ -42,6 +53,10 @@
     </main>
 
     <section id="utility-zone">
+        <div class="panel" id="mypage-panel">
+            <a href="mypage.html" id="mypage-link">マイページへ</a>
+        </div>
+
         <div class="panel">ミニゲームブース</div>
         <div class="panel">ランキングボード<br>・作者ランキング<br>・ルーキー作者</div>
         <div class="panel">お知らせ掲示板</div>
@@ -64,6 +79,18 @@
             "カオスポイントは足りてるかべ？",
             "診断してカオスポイント稼ぐべ～"
         ];
+        
+        // ユーザー名の取得と各所への反映
+        const userName = localStorage.getItem('userName');
+        if(userName) {
+            // AKARIの挨拶に反映
+            document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
+            // マイページリンクに名前を反映
+            document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
+        } else {
+            document.getElementById('mypage-link').innerText = `🚪 ゲストのマイページへ`;
+        }
+
         setInterval(() => {
             document.getElementById('akari-speech').innerText = messages[Math.floor(Math.random() * messages.length)];
         }, 5000);
