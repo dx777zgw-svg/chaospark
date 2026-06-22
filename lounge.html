@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | Main Lounge</title>
+    <style>
+        body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; height: 100vh; display: grid; grid-template-columns: 320px 1fr 300px; gap: 20px; padding: 20px; box-sizing: border-box; }
+        
+        /* エリア共通枠 */
+        .panel { border: 1px solid #333; padding: 20px; background: #121212; }
+        
+        /* 左：AKARIエリア */
+        #akari-zone { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+        #akari-move { width: 100%; animation: float 4s ease-in-out infinite; }
+        #akari-speech { border: 1px solid #00ff41; color: #00ff41; padding: 15px; margin-top: 15px; width: 100%; text-align: center; }
+        
+        /* 真ん中：核エリア */
+        #core-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #00ff41; }
+        
+        /* 右： utilityエリア */
+        #utility-zone { display: flex; flex-direction: column; gap: 15px; }
+        
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* 左下の規約・プライバシーポリシー（一切の演出なし・真面目な白） */
+        #legal-links { position: fixed; bottom: 10px; left: 15px; font-family: sans-serif; font-size: 11px; z-index: 100; }
+        #legal-links a { color: #ffffff; text-decoration: none; margin-right: 15px; }
+        #legal-links a:hover { text-decoration: underline; } /* 普通のWebリンクの挙動だべ */
+    </style>
+</head>
+<body>
+
+    <aside id="akari-zone" class="panel">
+        <img src="1000014456.png" id="akari-move" alt="AKARI">
+        <div id="akari-speech">おいっす～！</div>
+    </aside>
+
+    <main id="core-zone" class="panel">
+        <h1>診断制作所</h1>
+        <p>カオスポイントを生成せよ</p>
+        <button id="start-btn">診断を始める</button>
+    </main>
+
+    <section id="utility-zone">
+        <div class="panel">ミニゲームブース</div>
+        <div class="panel">ランキングボード<br>・作者ランキング<br>・ルーキー作者</div>
+        <div class="panel">お知らせ掲示板</div>
+        <div class="panel">
+            <a href="park.html">公園へ</a> | <a href="gacha.html">ガチャへ</a>
+        </div>
+    </section>
+
+    <div id="legal-links">
+        <a href="terms.html">利用規約</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+    </div>
+
+    <script type="module">
+        // AKARIのランダムセリフ機能
+        const messages = [
+            "おいっす～！", 
+            "何して遊ぶべ？", 
+            "楽しんでるか～", 
+            "カオスポイントは足りてるかべ？",
+            "診断してカオスポイント稼ぐべ～"
+        ];
+        setInterval(() => {
+            document.getElementById('akari-speech').innerText = messages[Math.floor(Math.random() * messages.length)];
+        }, 5000);
+    </script>
+</body>
+</html>
