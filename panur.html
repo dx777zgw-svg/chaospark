@@ -4,245 +4,59 @@
     <meta charset="UTF-8">
     <title>G-Chaospark | パンツ占い</title>
     <style>
-        body {
-            margin: 0; background: #050505; color: #d1d1d1;
-            font-family: 'Courier New', Courier, monospace; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-            background-image: radial-gradient(circle at center, #1a001a 0%, #000 100%);
-        }
-
-        .fortune-box {
-            background: rgba(18, 18, 18, 0.9); border: 1px solid #333; 
-            border-top: 4px solid #ff00ff; padding: 30px; border-radius: 8px;
-            width: 100%; max-width: 500px; box-sizing: border-box;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.15);
-            text-align: center;
-            position: relative; /* ロック画面用に追加 */
-        }
-
-        h1 { color: #ff00ff; margin-top: 0; font-size: 24px; border-bottom: 1px dashed #555; padding-bottom: 10px; }
-        
-        .desc { font-size: 14px; color: #aaa; margin-bottom: 20px; line-height: 1.6; }
-
-        /* ウォレット（お財布）表示 */
-        .wallet {
-            display: flex; justify-content: space-around; background: #000;
-            border: 1px solid #333; padding: 15px; margin-bottom: 20px; border-radius: 5px;
-        }
-        .wallet-item { font-size: 16px; font-weight: bold; }
-        .cp-text { color: #00ff41; }
-        .cm-text { color: #ffd700; }
-
-        /* 残り回数表示 */
-        .limit-board {
-            background: #111; border: 1px solid #ff00ff; color: #ff00ff;
-            padding: 10px; margin-bottom: 30px; font-weight: bold; letter-spacing: 1px;
-            border-radius: 4px;
-        }
-        .limit-reached-text { color: #ff003c; border-color: #ff003c; }
-
-        /* 占いボタン */
-        #draw-btn {
-            width: 100%; background: transparent; color: #ff00ff; border: 2px solid #ff00ff;
-            padding: 15px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s;
-            border-radius: 5px; letter-spacing: 2px;
-        }
-        #draw-btn:hover:not(:disabled) { background: #ff00ff; color: #000; box-shadow: 0 0 15px #ff00ff; }
-        #draw-btn:disabled { border-color: #555; color: #555; cursor: not-allowed; background: #111; }
-
-        /* 結果表示エリア */
-        #result-area {
-            display: none; margin-top: 30px; padding: 25px 15px; 
-            background: #111; border: 2px solid #fff; border-radius: 5px;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .rank-text { font-size: 40px; font-weight: bold; margin-bottom: 10px; text-shadow: 0 0 10px currentColor; }
-        .pants-name { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 15px; }
-        .reward-text { font-size: 18px; font-weight: bold; }
-        
-        /* ランクごとの色 */
-        .rank-S { color: #ffd700; border-color: #ffd700 !important; }
-        .rank-A { color: #ff007f; border-color: #ff007f !important; }
-        .rank-B { color: #00e5ff; border-color: #00e5ff !important; }
-        .rank-C { color: #00ff41; border-color: #00ff41 !important; }
-        .rank-D { color: #777777; border-color: #777777 !important; }
-
-        /* 回数制限オーバー時のロック画面 */
-        #lock-overlay {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); flex-direction: column; align-items: center;
-            justify-content: center; z-index: 10; border: 2px solid #ff003c; box-sizing: border-box;
-            border-radius: 8px;
-        }
-        #lock-overlay h2 { color: #ff003c; letter-spacing: 3px; text-align: center; margin-top: 0;}
-
-        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; }
-        .back-link:hover { color: #ff00ff; }
+        body { margin: 0; background: #1a0033; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 50px; }
+        .crystal-ball { font-size: 80px; cursor: pointer; transition: 0.3s; margin: 20px; }
+        .crystal-ball:hover { transform: scale(1.1); text-shadow: 0 0 20px #ff00ff; }
+        .fortune-paper { background: #fff; color: #000; padding: 20px; max-width: 400px; margin: 20px auto; border: 3px solid #ff00ff; display: none; font-weight: bold; font-size: 18px; border-radius: 5px; }
+        .back-btn { display: inline-block; margin-top: 30px; padding: 10px 20px; border: 1px solid #ffd700; color: #ffd700; text-decoration: none; }
     </style>
 </head>
 <body>
+    <h1 style="color: #ffd700;">🔮 パンツ占い 🔮</h1>
+    <h2 style="color: #00ff41;">所持CP: <span id="cp-display"></span> | 所持CM: <span id="cm-display"></span></h2>
+    
+    <p>5 CPを奉納して、天の啓示（とマイレージ）を受け取るべ！<br>下の水晶玉をクリックだべ。</p>
+
+    <div class="crystal-ball" onclick="drawFortune()">🔮</div>
+
+    <div id="fortune-result" class="fortune-paper"></div>
+
+    <a href="gamebooth.html" class="back-btn">▶ ブースへ戻る</a>
 
     <script>
-        if (!localStorage.getItem('userId')) {
-            alert("Lico「ゲートを通ってから出直してきなさい！」");
-            window.location.href = 'index.html';
+        function updateStatus() {
+            document.getElementById('cp-display').innerText = localStorage.getItem('chaosPoint') || 0;
+            document.getElementById('cm-display').innerText = localStorage.getItem('creatorMileage') || 0;
         }
-    </script>
+        updateStatus();
 
-    <div class="fortune-box">
-        
-        <div id="lock-overlay">
-            <h2>[ 本日分終了 ]</h2>
-            <p style="color: #aaa; font-size: 14px; line-height: 1.6;">
-                本日の占い制限（20回）に達したべ。<br>
-                これ以上パンツを引きずり出すのは<br>システムに負荷がかかるべ。<br><br>
-                明日また来るべ。
-            </p>
-        </div>
-
-        <h1>[ 今日のパンツ占い ]</h1>
-        <p class="desc">
-            1回 <strong>10 CP</strong> を消費して、本日のパンツを占うべ。<br>
-            結果に応じて、作者マイレージ(CM)が手に入るカオスな儀式だべ！
-        </p>
-
-        <div class="wallet">
-            <div class="wallet-item cp-text">🌀 CP: <span id="cp-val">0</span></div>
-            <div class="wallet-item cm-text">💎 CM: <span id="cm-val">0</span></div>
-        </div>
-
-        <div class="limit-board" id="limit-board">
-            ⏳ 本日の残り回数: 20 / 20
-        </div>
-
-        <button id="draw-btn" onclick="drawPants()">10 CPでパンツを引く</button>
-
-        <div id="result-area">
-            <div class="rank-text" id="result-rank">S</div>
-            <div class="pants-name" id="result-name">伝説の黄金ブリーフ</div>
-            <div class="reward-text" id="result-reward">💎 マイレージ +10P</div>
-        </div>
-    </div>
-
-    <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
-
-    <script>
-        // お財布とガチャ回数データの読み込み
-        let currentCP = parseInt(localStorage.getItem('chaosPoint')) || 0;
-        let currentCM = parseInt(localStorage.getItem('creatorMileage')) || 0;
-        
-        // --- ガチャの制限管理システム ---
-        const MAX_DRAWS = 20;
-        const today = new Date().toLocaleDateString(); // 「今日の日付」を取得（例: "2026/06/23"）
-        let savedDate = localStorage.getItem('pantsDate');
-        let drawCount = parseInt(localStorage.getItem('pantsCount')) || 0;
-
-        // 日付が変わっていたら回数をリセット！
-        if (savedDate !== today) {
-            drawCount = 0;
-            localStorage.setItem('pantsDate', today);
-            localStorage.setItem('pantsCount', 0);
-        }
-
-        // UIにお財布と制限回数を反映
-        function updateUI() {
-            document.getElementById('cp-val').innerText = currentCP;
-            document.getElementById('cm-val').innerText = currentCM;
-            
-            const limitBoard = document.getElementById('limit-board');
-            const drawBtn = document.getElementById('draw-btn');
-            const lockOverlay = document.getElementById('lock-overlay');
-            const remains = MAX_DRAWS - drawCount;
-
-            limitBoard.innerText = `⏳ 本日の残り回数: ${remains} / ${MAX_DRAWS}`;
-
-            // 制限回数（20回）に達したか？
-            if (drawCount >= MAX_DRAWS) {
-                limitBoard.classList.add('limit-reached-text');
-                limitBoard.innerText = `🚫 本日の上限に到達`;
-                lockOverlay.style.display = 'flex'; // ロック画面を表示
-                drawBtn.disabled = true;
-                return;
-            }
-
-            // CPが足りているか？
-            if (currentCP < 10) {
-                drawBtn.disabled = true;
-                drawBtn.innerText = "CPが足りないべ！(10CP必要)";
-            } else {
-                drawBtn.disabled = false;
-                drawBtn.innerText = "10 CPでパンツを引く";
-            }
-        }
-
-        // 初期表示
-        updateUI();
-
-        // ガチャの中身と確率テーブル
-        const gachaTable = [
-            { rank: 'S', name: '伝説の黄金ブリーフ', reward: 10, prob: 5, colorClass: 'rank-S' },
-            { rank: 'A', name: 'ネオン発光・サイバーボクサー', reward: 8, prob: 15, colorClass: 'rank-A' },
-            { rank: 'B', name: 'どこにでもある普通のトランクス', reward: 5, prob: 30, colorClass: 'rank-B' },
-            { rank: 'C', name: 'ちょっとゴムが緩んだパンツ', reward: 1, prob: 30, colorClass: 'rank-C' },
-            { rank: 'D', name: '穴の開いたボロボロの布切れ', reward: 0, prob: 20, colorClass: 'rank-D' }
+        const fortunes = [
+            "大吉だべ！今日は赤いパンツを被って歩くと運気アップ！",
+            "中吉だべ。ズボンのチャックはしっかり確認するべ。",
+            "小吉だべ。洗濯機の中に靴下が片方消える呪いがかかっているべ。",
+            "凶だべ…。ノーパンツで出歩かないよう注意するべ！",
+            "カオス吉だべ！！全てを脱ぎ捨てて3Dパークを走り回るべ！！"
         ];
 
-        // ガチャ実行処理
-        function drawPants() {
-            if (currentCP < 10 || drawCount >= MAX_DRAWS) return;
+        function drawFortune() {
+            let cp = parseInt(localStorage.getItem('chaosPoint')) || 0;
+            let cm = parseInt(localStorage.getItem('creatorMileage')) || 0;
 
-            // 1. CP消費と回数増加
-            currentCP -= 10;
-            drawCount++;
+            if (cp < 5) return alert("CPが足りないべ！神聖な占いを舐めるなべ！");
+
+            cp -= 5;
+            let gainCM = Math.floor(Math.random() * 5) + 1; // 1〜5 CMを獲得
+            cm += gainCM;
+
+            let randomText = fortunes[Math.floor(Math.random() * fortunes.length)];
             
-            // 2. 確率計算（0〜99の乱数）
-            const rand = Math.floor(Math.random() * 100);
-            let cumulativeProb = 0;
-            let result = gachaTable[gachaTable.length - 1]; // デフォルトは最低ランク
+            const paper = document.getElementById('fortune-result');
+            paper.style.display = 'block';
+            paper.innerHTML = `${randomText}<br><br><span style='color: #ff00ff;'>✨ 啓示ボーナス: +${gainCM} CM 獲得！ ✨</span>`;
 
-            for (let item of gachaTable) {
-                cumulativeProb += item.prob;
-                if (rand < cumulativeProb) {
-                    result = item;
-                    break;
-                }
-            }
-
-            // 3. CMを付与
-            currentCM += result.reward;
-
-            // 4. ローカルストレージに保存
-            localStorage.setItem('chaosPoint', currentCP);
-            localStorage.setItem('creatorMileage', currentCM);
-            localStorage.setItem('pantsCount', drawCount);
-
-            // 5. 画面の更新（ウォレットと残り回数）
-            updateUI();
-
-            // 6. 結果の演出表示
-            const resultArea = document.getElementById('result-area');
-            const resultRank = document.getElementById('result-rank');
-            const resultName = document.getElementById('result-name');
-            const resultReward = document.getElementById('result-reward');
-
-            resultArea.style.display = 'none';
-            resultArea.className = '';
-            resultArea.classList.add(result.colorClass);
-            resultRank.className = 'rank-text ' + result.colorClass;
-
-            resultRank.innerText = `[ ${result.rank} RANK ]`;
-            resultName.innerText = result.name;
-            resultReward.innerText = `💎 マイレージ +${result.reward}P`;
-            resultReward.style.color = (result.reward > 0) ? '#ffd700' : '#777';
-
-            setTimeout(() => {
-                resultArea.style.display = 'block';
-            }, 50);
+            localStorage.setItem('chaosPoint', cp);
+            localStorage.setItem('creatorMileage', cm);
+            updateStatus();
         }
     </script>
 </body>
