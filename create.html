@@ -2,157 +2,260 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>G-Chaospark | 観測実行</title>
+    <title>G-Chaospark | 診断アトリエ</title>
     <style>
         body {
-            margin: 0; background: #050505; color: #d1d1d1;
-            font-family: 'Courier New', Courier, monospace; padding: 20px;
+            margin: 0; background: #0a0a0a; color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace; padding: 30px;
             display: flex; flex-direction: column; align-items: center;
-            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 65, 0.03) 2px, rgba(0, 255, 65, 0.03) 4px);
+        }
+        
+        .atelier-box {
+            background: #121212; border: 1px solid #333; padding: 30px;
+            width: 100%; max-width: 600px; box-sizing: border-box; position: relative;
         }
 
-        /* メインのプレイパネル */
-        .play-box {
-            background: rgba(18, 18, 18, 0.9); border: 1px solid #333; 
-            border-top: 4px solid #00ff41; padding: 30px; border-radius: 5px;
-            width: 100%; max-width: 600px; box-sizing: border-box;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        h1 { color: #00ff41; text-align: center; margin-top: 0; border-bottom: 1px dashed #333; padding-bottom: 15px; }
+        
+        .status-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        
+        .mileage-display {
+            background: #1a1a1a; border-left: 4px solid #ffd700; color: #ffd700;
+            padding: 10px; font-weight: bold; letter-spacing: 1px; flex: 1; margin-right: 10px;
         }
 
-        #diag-title { color: #00ff41; margin-top: 0; font-size: 24px; border-bottom: 1px dashed #333; padding-bottom: 10px; }
-        #diag-author { color: #888; font-size: 12px; text-align: right; margin-bottom: 20px; }
-        #diag-desc { font-size: 14px; color: #aaa; margin-bottom: 30px; line-height: 1.6; }
-
-        /* 入力エリア */
-        .input-area { background: #0a0a0a; padding: 20px; border: 1px solid #222; margin-bottom: 20px; text-align: center; }
-        .input-area label { display: block; color: #fff; margin-bottom: 10px; font-weight: bold; }
-        .input-area input[type="text"] {
-            width: 80%; background: #000; border: 1px solid #444; color: #fff;
-            padding: 12px; font-size: 16px; text-align: center; font-family: inherit; transition: 0.3s;
+        .limit-display {
+            background: #1a1a1a; border-left: 4px solid #00ff41; color: #00ff41;
+            padding: 10px; font-weight: bold; letter-spacing: 1px; flex: 1; text-align: right;
         }
-        .input-area input[type="text"]:focus { border-color: #00ff41; outline: none; box-shadow: 0 0 10px rgba(0, 255, 65, 0.3); }
+        
+        .limit-reached { border-left-color: #ff003c !important; color: #ff003c !important; }
 
-        /* 実行ボタン */
-        #execute-btn {
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-weight: bold; }
+        .required { color: #ff003c; font-size: 12px; margin-left: 5px; }
+        
+        input[type="text"], textarea {
+            width: 100%; background: #000; border: 1px solid #444; color: #fff;
+            padding: 10px; box-sizing: border-box; font-family: inherit; transition: 0.3s;
+        }
+        input[type="text"]:focus, textarea:focus { border-color: #00ff41; outline: none; }
+        textarea { resize: vertical; height: 100px; }
+
+        .tag-container { display: flex; gap: 10px; }
+        .tag-container input { flex: 1; }
+
+        #ng-warning {
+            display: none; background: #ff003c; color: #fff; font-weight: bold;
+            padding: 15px; margin-bottom: 20px; text-align: center; border-radius: 3px;
+            animation: flash 1s infinite alternate;
+        }
+        @keyframes flash { from { opacity: 1; } to { opacity: 0.8; } }
+
+        #publish-btn {
             width: 100%; background: transparent; color: #00ff41; border: 2px solid #00ff41;
-            padding: 15px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; letter-spacing: 2px;
+            padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-        #execute-btn:hover { background: #00ff41; color: #000; }
-        #execute-btn:disabled { border-color: #555; color: #555; cursor: wait; background: #111; }
+        #publish-btn:hover:not(:disabled) { background: #00ff41; color: #000; }
+        #publish-btn:disabled { border-color: #555; color: #555; cursor: not-allowed; background: #111; }
 
-        /* 結果表示エリア（最初は隠す） */
-        #result-area {
-            display: none; margin-top: 30px; padding: 20px; 
-            background: #001a05; border: 1px solid #00ff41; color: #fff;
-            animation: glitch 0.3s 2;
+        #lock-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); flex-direction: column; align-items: center;
+            justify-content: center; z-index: 10; border: 2px solid #ff003c; box-sizing: border-box;
         }
-        @keyframes glitch {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
+        #lock-overlay h2 { color: #ff003c; letter-spacing: 3px; text-align: center; }
+        
+        #cooldown-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); flex-direction: column; align-items: center;
+            justify-content: center; z-index: 9; border: 2px solid #ffd700; box-sizing: border-box;
         }
-        #result-text { font-size: 18px; line-height: 1.8; font-weight: bold; text-align: center; }
+        #cooldown-overlay h2 { color: #ffd700; letter-spacing: 3px; text-align: center; }
+        #cooldown-overlay p { color: #aaa; text-align: center; }
+        #timer-display { font-size: 32px; color: #fff; font-weight: bold; margin-top: 10px; font-family: monospace; }
 
-        /* シェア＆アクション */
-        .action-bar { display: none; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #333; }
-        .action-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 10px 15px; cursor: pointer; transition: 0.3s; flex: 1; margin: 0 5px; }
-        .action-btn:hover { background: #222; color: #fff; border-color: #00ff41; }
-
-        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #444; text-decoration: none; }
         .back-link:hover { color: #00ff41; }
     </style>
 </head>
 <body>
 
-    <div class="play-box">
-        <!-- 診断の情報（JSで書き換えるべ） -->
-        <h1 id="diag-title">Loading...</h1>
-        <div id="diag-author">Author: Loading...</div>
-        <div id="diag-desc">Loading...</div>
+    <script>
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「ゲートを通ってから出直してきなさい！」");
+            window.location.href = 'index.html';
+        }
+    </script>
 
-        <!-- プレイヤーの入力エリア -->
-        <div class="input-area">
-            <label>観測対象の名前を入力せよ</label>
-            <input type="text" id="player-name" placeholder="名前を入力...">
+    <div class="atelier-box" id="atelier-box">
+        
+        <div id="lock-overlay">
+            <h2>[ ACCESS DENIED ]</h2>
+            <p style="color: #aaa;">本日のシステム干渉枠（5回）を使い切ったべ。<br>明日また来るべ。</p>
         </div>
 
-        <button id="execute-btn" onclick="executeDiag()">観測を開始する</button>
-
-        <!-- 結果表示エリア -->
-        <div id="result-area">
-            <div style="color: #00ff41; font-size: 12px; margin-bottom: 10px; text-align: center;">[ 観測結果 ]</div>
-            <div id="result-text"></div>
+        <div id="cooldown-overlay">
+            <h2>[ SYSTEM COOLING ]</h2>
+            <p>連続干渉を防ぐため、回路を冷却中だべ。<br>他の診断をプレイして待つべ。</p>
+            <div id="timer-display">10:00</div>
         </div>
 
-        <!-- 評価＆シェア -->
-        <div class="action-bar" id="action-bar">
-            <button class="action-btn" onclick="alert('❤ いいねしたべ！')">❤ いいね</button>
-            <button class="action-btn" onclick="alert('🔃 おすすめ権を使ったべ！')">🔃 おすすめ</button>
-            <button class="action-btn" style="color: #1da1f2; border-color: #1da1f2;" onclick="alert('X(Twitter)に結果をシェアする画面が開くべ！')">Xでシェア</button>
+        <h1>[ 診断アトリエ ]</h1>
+        
+        <div class="status-header">
+            <div class="mileage-display">💎 マイレージ: <span id="mileage-val">0</span> pt</div>
+            <div class="limit-display" id="limit-display">⏳ 残り制作枠: 5 回</div>
         </div>
+
+        <div id="ng-warning">⚠️ 警告：システム規定に違反する単語（禁止ワード）を検知したべ！修正しろべ！</div>
+
+        <div class="form-group">
+            <label>診断タイトル<span class="required">(必須)</span></label>
+            <input type="text" id="diag-title" class="check-ng" placeholder="狂気のタイトルを入力..." required>
+        </div>
+
+        <div class="form-group">
+            <label>説明<span class="required">(必須)</span></label>
+            <textarea id="diag-desc" class="check-ng" placeholder="この診断が何をもたらすのか説明しろべ..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>結果のパターン<span class="required">(必須)</span></label>
+            <textarea id="diag-result" class="check-ng" placeholder="例：[名前]の戦闘力は53万だべ！" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>タグ (最大3つまで任意)</label>
+            <div class="tag-container">
+                <input type="text" class="check-ng" placeholder="#タグ1">
+                <input type="text" class="check-ng" placeholder="#タグ2">
+                <input type="text" class="check-ng" placeholder="#タグ3">
+            </div>
+        </div>
+
+        <button id="publish-btn" disabled>システムに公開する (+5 pt)</button>
     </div>
 
-    <a href="park.html" class="back-link">▶ 公園(プレイエリア)へ戻る</a>
+    <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
     <script>
-        // ----------------------------------------------------
-        // 1. 診断データの読み込み（ダミーデータ or maker.htmlで作ったデータ）
-        // ----------------------------------------------------
-        // ※本来はDBからIDで引っ張ってくるが、今回はオフラインテスト用の仕組みだべ！
-        const dummyTitle = localStorage.getItem('testDiagTitle') || "視界のノイズ診断";
-        const dummyDesc = localStorage.getItem('testDiagDesc') || "最近、見えないはずのものが見えていませんか？\nあなたの視界のバグレベルを測定します。";
-        const dummyResultPattern = localStorage.getItem('testDiagResult') || "【観測結果】\n[名前]の視界バグレベルは「限界突破」です。\n直ちに後ろを振り返らないでください。";
+        const bannedWords = ["死ね", "殺す", "犯罪", "爆破", "違法"];
+        const inputs = document.querySelectorAll('.check-ng');
+        const warningBox = document.getElementById('ng-warning');
+        const publishBtn = document.getElementById('publish-btn');
         
-        // ローカルストレージの名前を初期値にする
-        const savedUserName = localStorage.getItem('userName') || '';
-        document.getElementById('player-name').value = savedUserName;
+        const MAX_POSTS = 5;
+        const COOLDOWN_MS = 10 * 60 * 1000; 
+        const today = new Date().toLocaleDateString();
+        
+        let savedDate = localStorage.getItem('lastPostDate');
+        let postCount = parseInt(localStorage.getItem('postCount')) || 0;
+        let lastPostTime = parseInt(localStorage.getItem('lastPostTime')) || 0; 
+        
+        let creatorMileage = parseInt(localStorage.getItem('creatorMileage')) || 0;
+        document.getElementById('mileage-val').innerText = creatorMileage;
 
-        // 画面に診断情報をセット
-        document.getElementById('diag-title').innerText = dummyTitle;
-        document.getElementById('diag-author').innerText = "Author: " + (localStorage.getItem('userName') || "謎の観測者");
-        document.getElementById('diag-desc').innerText = dummyDesc;
+        if (savedDate !== today) {
+            postCount = 0;
+            localStorage.setItem('lastPostDate', today);
+            localStorage.setItem('postCount', 0);
+        }
 
-        // ----------------------------------------------------
-        // 2. 診断の実行（演出付き）
-        // ----------------------------------------------------
-        function executeDiag() {
-            const nameInput = document.getElementById('player-name').value.trim();
-            if(!nameInput) {
-                alert("名前を入力しろべ！");
+        function updateUI() {
+            const limitDisplay = document.getElementById('limit-display');
+            limitDisplay.innerText = `⏳ 残り制作枠: ${MAX_POSTS - postCount} 回`;
+
+            if (postCount >= MAX_POSTS) {
+                document.getElementById('lock-overlay').style.display = 'flex';
+                document.getElementById('cooldown-overlay').style.display = 'none';
+                limitDisplay.classList.add('limit-reached');
+                limitDisplay.innerText = `🚫 制限到達`;
                 return;
             }
 
-            const btn = document.getElementById('execute-btn');
-            const resultArea = document.getElementById('result-area');
-            const actionBar = document.getElementById('action-bar');
-            
-            // UIを計算中（ローディング）に変更
-            btn.disabled = true;
-            btn.innerText = "システム干渉中... (Calculating...)";
-            resultArea.style.display = 'none';
-            actionBar.style.display = 'none';
+            const now = new Date().getTime();
+            const timeDiff = now - lastPostTime;
 
-            // カオスな雰囲気を出すために2秒遅らせるべ！
-            setTimeout(() => {
-                // [名前] という文字列を、入力された名前に置き換える処理
-                let finalResult = dummyResultPattern.replace(/\[名前\]/g, nameInput).replace(/\[name\]/gi, nameInput);
-                
-                // 改行をHTMLの<br>に変換
-                finalResult = finalResult.replace(/\n/g, '<br>');
-
-                // 結果を表示！
-                document.getElementById('result-text').innerHTML = finalResult;
-                resultArea.style.display = 'block';
-                actionBar.style.display = 'flex';
-                
-                btn.innerText = "再観測する";
-                btn.disabled = false;
-            }, 2000); // 2秒後に表示
+            if (timeDiff < COOLDOWN_MS) {
+                document.getElementById('cooldown-overlay').style.display = 'flex';
+                const remainingMs = COOLDOWN_MS - timeDiff;
+                const minutes = Math.floor(remainingMs / 60000);
+                const seconds = Math.floor((remainingMs % 60000) / 1000);
+                document.getElementById('timer-display').innerText = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                document.getElementById('cooldown-overlay').style.display = 'none';
+            }
         }
+
+        setInterval(updateUI, 1000);
+        updateUI();
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (postCount >= MAX_POSTS || (new Date().getTime() - lastPostTime) < COOLDOWN_MS) return;
+
+                let isViolating = false;
+                let isAllFilled = document.getElementById('diag-title').value.trim() !== "" &&
+                                  document.getElementById('diag-desc').value.trim() !== "" &&
+                                  document.getElementById('diag-result').value.trim() !== "";
+
+                inputs.forEach(field => {
+                    bannedWords.forEach(word => {
+                        if (field.value.includes(word)) isViolating = true;
+                    });
+                });
+
+                if (isViolating) {
+                    warningBox.style.display = 'block';
+                    publishBtn.disabled = true;
+                    publishBtn.innerText = "公開不可（禁止ワード検知）";
+                    publishBtn.style.borderColor = "#ff003c";
+                    publishBtn.style.color = "#ff003c";
+                } else {
+                    warningBox.style.display = 'none';
+                    publishBtn.style.borderColor = "#00ff41";
+                    publishBtn.style.color = "#00ff41";
+                    
+                    if (isAllFilled) {
+                        publishBtn.disabled = false;
+                        publishBtn.innerText = "システムに公開する (+5 pt)";
+                    } else {
+                        publishBtn.disabled = true;
+                        publishBtn.innerText = "必須項目を埋めろべ";
+                    }
+                }
+            });
+        });
+
+        // 公開ボタン押下
+        publishBtn.addEventListener('click', () => {
+            if (postCount < MAX_POSTS) {
+                postCount++;
+                lastPostTime = new Date().getTime(); 
+                
+                creatorMileage += 5;
+                localStorage.setItem('creatorMileage', creatorMileage);
+                document.getElementById('mileage-val').innerText = creatorMileage;
+                
+                localStorage.setItem('postCount', postCount);
+                localStorage.setItem('lastPostTime', lastPostTime);
+
+                // 🔥【超重要】入力欄を空っぽにする「前」に、play.html用にデータを保存するべ！！
+                localStorage.setItem('testDiagTitle', document.getElementById('diag-title').value);
+                localStorage.setItem('testDiagDesc', document.getElementById('diag-desc').value);
+                localStorage.setItem('testDiagResult', document.getElementById('diag-result').value);
+                
+                alert(`「${document.getElementById('diag-title').value}」を公開したべ！\n作者マイレージ +5pt 獲得！`);
+                
+                // ここで入力欄を空っぽにする
+                inputs.forEach(input => input.value = '');
+                publishBtn.disabled = true;
+                publishBtn.innerText = "必須項目を埋めろべ";
+                updateUI(); 
+            }
+        });
     </script>
 </body>
 </html>
