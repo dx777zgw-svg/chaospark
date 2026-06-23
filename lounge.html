@@ -26,22 +26,20 @@
         #legal-links a { color: #ffffff; text-decoration: none; margin-right: 15px; }
         #legal-links a:hover { text-decoration: underline; }
 
-        /* マイページリンクの特別装飾 */
+        /* 各種リンクの特別装飾 */
         #mypage-panel { border-color: #ffd700; text-align: center; background: #1a1a00; }
         #mypage-link { color: #ffd700; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #mypage-link:hover { background: #333300; border-radius: 5px; }
 
-        /* ミニゲームブースリンクの特別装飾 */
         #gamebooth-panel { border-color: #00e5ff; text-align: center; background: #001a1f; }
         #gamebooth-link { color: #00e5ff; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #gamebooth-link:hover { background: #00333d; border-radius: 5px; }
 
-        /* 闇の換金所リンクの特別装飾 */
         #exchange-panel { border-color: #ff003c; text-align: center; background: #1a0005; }
         #exchange-link { color: #ff003c; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #exchange-link:hover { background: #33000a; border-radius: 5px; }
 
-        /* 🌳 3Dカオスパークへの特別装飾（追加！） 🌳 */
+        /* 🌳 3Dカオスパークへの特別装飾 🌳 */
         #park-panel { border-color: #32cd32; text-align: center; background: #002200; }
         #park-link { color: #32cd32; font-weight: bold; text-decoration: none; font-size: 1.2em; display: block; padding: 12px; }
         #park-link:hover { background: #004400; border-radius: 5px; transform: scale(1.02); transition: 0.2s; }
@@ -73,6 +71,7 @@
 <body>
 
     <script>
+        // IDがない場合は審査ゲートに弾き返す
         if (!localStorage.getItem('userId')) {
             alert("Lico「ゲートを通ってから出直してきなさい！」");
             window.location.href = 'index.html';
@@ -95,4 +94,89 @@
     </div>
 
     <aside id="akari-zone" class="panel">
-        <img src="
+        <img src="AKARI.png" id="akari-move" alt="AKARI" onerror="this.style.display='none';">
+        <div id="akari-speech">おいっす～！</div>
+    </aside>
+
+    <main id="core-zone" class="panel">
+        <h1 style="color: #00ff41; margin-top: 0;">診断制作所</h1>
+        <p>あなたのカオスを形にする場所</p>
+        <button id="start-btn" 
+                onclick="window.location.href='maker.html'" 
+                style="padding: 15px 30px; font-size: 1.2em; cursor: pointer; background: #00ff41; color: #000; border: none; font-weight: bold; border-radius: 4px; transition: 0.2s;">
+            ＞ 診断を制作する ＜
+        </button>
+        <p style="font-size: 0.8em; color: #555; margin-top: 20px;">※制作するとカオスポイントが貯まるべ！</p>
+    </main>
+
+    <section id="utility-zone">
+        <div class="panel" id="status-panel">
+            <h3 style="margin-top: 0; color: #00ff41; border-bottom: 1px solid #00ff41; padding-bottom: 5px;">📊 所持ステータス</h3>
+            <div class="status-item" style="color: #00ff41;">🌀 カオス: <span id="cp-display">0</span> P</div>
+            <div class="status-item" style="color: #ffd700;">💎 マイレージ: <span id="cm-display">0</span> P</div>
+        </div>
+
+        <div class="panel" id="mypage-panel">
+            <a href="mypage.html" id="mypage-link">マイページへ</a>
+        </div>
+
+        <div class="panel" id="gamebooth-panel">
+            <a href="gamebooth.html" id="gamebooth-link">🎮 ミニゲームブース</a>
+        </div>
+
+        <div class="panel" id="exchange-panel">
+            <a href="exchange.html" id="exchange-link">⚖️ 闇の換金所</a>
+        </div>
+
+        <div class="panel" id="park-panel">
+            <a href="park.html" id="park-link">🌳 3Dカオスパークへ入場</a>
+        </div>
+
+        <div class="panel">ランキングボード<br>・作者ランキング<br>・ルーキー作者</div>
+        <div class="panel">お知らせ掲示板</div>
+        <div class="panel" style="text-align: center;">
+            <a href="gacha.html" style="color: #ccc; text-decoration: none;">🎲 ガチャへ</a>
+        </div>
+
+        <div class="panel" style="border-color: #ff003c; text-align: center; background: #1a0005; margin-top: 20px;">
+            <button onclick="localStorage.clear(); alert('住民権（ID）を破棄したべ！審査ゲートに戻るべ！'); window.location.href='index.html';" style="background: #ff003c; color: #fff; border: none; padding: 10px; font-weight: bold; cursor: pointer; width: 100%; font-family: monospace;">⚙️ RESET USER DATA</button>
+        </div>
+    </section>
+
+    <div id="legal-links">
+        <a href="terms.html">利用規約</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+    </div>
+
+    <script type="module">
+        const userName = localStorage.getItem('userName') || 'ゲスト';
+        
+        function checkTutorial() {
+            if (!localStorage.getItem('isTutorialDone')) {
+                document.getElementById('tutorial-modal').style.display = 'flex';
+            } else {
+                document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
+            }
+            updateStatusDisplay();
+        }
+
+        window.closeTutorial = function() {
+            localStorage.setItem('chaosPoint', 100);
+            localStorage.setItem('creatorMileage', 50);
+            localStorage.setItem('isTutorialDone', 'true');
+            
+            document.getElementById('tutorial-modal').style.display = 'none';
+            document.getElementById('akari-speech').innerText = `ボーナス使って、ガンガン遊んできな！`;
+            updateStatusDisplay();
+        };
+
+        function updateStatusDisplay() {
+            const cp = localStorage.getItem('chaosPoint') || 0;
+            const cm = localStorage.getItem('creatorMileage') || 0;
+            document.getElementById('cp-display').innerText = cp;
+            document.getElementById('cm-display').innerText = cm;
+        }
+
+        checkTutorial();
+
+        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ
