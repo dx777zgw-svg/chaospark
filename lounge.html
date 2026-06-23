@@ -39,10 +39,9 @@
         #exchange-link { color: #ff003c; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #exchange-link:hover { background: #33000a; border-radius: 5px; }
 
-        /* 🌳 3Dカオスパークへの特別装飾 🌳 */
-        #park-panel { border-color: #32cd32; text-align: center; background: #002200; }
-        #park-link { color: #32cd32; font-weight: bold; text-decoration: none; font-size: 1.2em; display: block; padding: 12px; }
-        #park-link:hover { background: #004400; border-radius: 5px; transform: scale(1.02); transition: 0.2s; }
+        /* 🚧 建設中エリアの装飾 🚧 */
+        .construction-panel { border-color: #555; text-align: center; background: #111; opacity: 0.8; }
+        .construction-link { color: #888; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; cursor: not-allowed; }
 
         /* ステータス（お財布）パネルの装飾 */
         #status-panel { border-color: #00ff41; background: #001a05; }
@@ -86,7 +85,7 @@
             
             <div style="background: #000; padding: 15px; margin: 20px 0; border: 1px solid #333;">
                 <div style="font-size: 1.4em; color: #00ff41;">🌀 カオスポイント: 100 P</div>
-                <div style="font-size: 1.4em; color: #ffd700; margin-top: 10px;">💎 作者マイレージ: 50 P</div>
+                <div style="font-size: 1.4em; color: #ffd700; margin-top: 10px;">💎 作者マイレージ: 100 P</div>
             </div>
             
             <button class="btn-neon" onclick="closeTutorial()">受け取って遊ぶ！</button>
@@ -128,10 +127,23 @@
             <a href="exchange.html" id="exchange-link">⚖️ 闇の換金所</a>
         </div>
 
-        <div class="panel" id="park-panel">
-            <a href="park.html" id="park-link">🌳 3Dカオスパークへ入場</a>
+        <div class="panel construction-panel">
+            <a href="#" onclick="alert('🚧 【立入禁止】3Dカオスパークは現在、総統の力により絶賛空間構築中だべ！アップデートを待て！ 🚧'); return false;" class="construction-link">
+                🌳 3Dカオスパーク (建設中)
+            </a>
         </div>
 
+        <div class="panel construction-panel">
+            <a href="#" onclick="alert('🚧 【立入禁止】住宅区画は現在、基礎工事中だべ！ 🚧'); return false;" class="construction-link">
+                🏠 住宅区画 (建設中)
+            </a>
+        </div>
+
+        <div class="panel construction-panel">
+            <a href="#" onclick="alert('🚧 【立入禁止】労働区画は現在、ブラック労働環境を整備中だべ！ 🚧'); return false;" class="construction-link">
+                ⛏️ 労働区画 (建設中)
+            </a>
+        </div>
         <div class="panel">ランキングボード<br>・作者ランキング<br>・ルーキー作者</div>
         <div class="panel">お知らせ掲示板</div>
         <div class="panel" style="text-align: center;">
@@ -161,8 +173,9 @@
         }
 
         window.closeTutorial = function() {
+            // 💡 ここも100Pに修正したべ！
             localStorage.setItem('chaosPoint', 100);
-            localStorage.setItem('creatorMileage', 50);
+            localStorage.setItem('creatorMileage', 100);
             localStorage.setItem('isTutorialDone', 'true');
             
             document.getElementById('tutorial-modal').style.display = 'none';
@@ -179,4 +192,22 @@
 
         checkTutorial();
 
-        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ
+        // 💡 末尾のテキスト混入バグを直したべ！
+        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
+
+        const messages = [
+            "おいっす～！", 
+            "何して遊ぶべ？", 
+            "楽しんでるか～", 
+            "カオスポイントは足りてるかべ？",
+            "ミニゲームで一攫千金だべ！",
+            "建設中のエリアが気になるべ…"
+        ];
+        setInterval(() => {
+            if(document.getElementById('tutorial-modal').style.display === 'none') {
+                document.getElementById('akari-speech').innerText = messages[Math.floor(Math.random() * messages.length)];
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
