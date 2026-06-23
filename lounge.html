@@ -47,6 +47,12 @@
             background: #ff00ff; color: #fff; border: none; padding: 12px 24px; font-size: 1.2em; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px; width: 100%;
         }
         .btn-neon:hover { background: #cc00cc; }
+
+        /* 制作所ボタンのホバーエフェクト（追加） */
+        #start-btn:hover {
+            background: #fff !important;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -79,9 +85,14 @@
     </aside>
 
     <main id="core-zone" class="panel">
-        <h1>診断制作所</h1>
-        <p>カオスポイントを生成せよ</p>
-        <button id="start-btn" style="padding: 15px 30px; font-size: 1.2em; cursor: pointer;">診断を始める</button>
+        <h1 style="color: #00ff41; margin-top: 0;">診断制作所</h1>
+        <p>あなたのカオスを形にする場所</p>
+        <button id="start-btn" 
+                onclick="window.location.href='maker.html'" 
+                style="padding: 15px 30px; font-size: 1.2em; cursor: pointer; background: #00ff41; color: #000; border: none; font-weight: bold; border-radius: 4px; transition: 0.2s;">
+            ＞ 診断を制作する ＜
+        </button>
+        <p style="font-size: 0.8em; color: #555; margin-top: 20px;">※制作するとカオスポイントが貯まるべ！</p>
     </main>
 
     <section id="utility-zone">
