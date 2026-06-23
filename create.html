@@ -83,6 +83,14 @@
 </head>
 <body>
 
+    <!-- 不法侵入ガード -->
+    <script>
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「ゲートを通ってから出直してきなさい！」");
+            window.location.href = 'index.html';
+        }
+    </script>
+
     <div class="atelier-box" id="atelier-box">
         
         <div id="lock-overlay">
@@ -99,7 +107,8 @@
         <h1>[ 診断アトリエ ]</h1>
         
         <div class="status-header">
-            <div class="mileage-display">💎 マイレージ: 0 pt</div>
+            <!-- 修正：JSから書き換えるために id="mileage-val" を追加したべ！ -->
+            <div class="mileage-display">💎 マイレージ: <span id="mileage-val">0</span> pt</div>
             <div class="limit-display" id="limit-display">⏳ 残り制作枠: 5 回</div>
         </div>
 
@@ -132,7 +141,8 @@
         <button id="publish-btn" disabled>システムに公開する (+5 pt)</button>
     </div>
 
-    <a href="maker.html" class="back-link">▶ ゲートへ戻る</a>
+    <!-- 修正：ラウンジに戻るようにリンク先を変更したべ！ -->
+    <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
     <script>
         const bannedWords = ["死ね", "殺す", "犯罪", "爆破", "違法"];
@@ -146,7 +156,11 @@
         
         let savedDate = localStorage.getItem('lastPostDate');
         let postCount = parseInt(localStorage.getItem('postCount')) || 0;
-        let lastPostTime = parseInt(localStorage.getItem('lastPostTime')) || 0; // 前回の投稿時刻
+        let lastPostTime = parseInt(localStorage.getItem('lastPostTime')) || 0; 
+        
+        // 追加：マイレージの読み込み
+        let creatorMileage = parseInt(localStorage.getItem('creatorMileage')) || 0;
+        document.getElementById('mileage-val').innerText = creatorMileage;
 
         if (savedDate !== today) {
             postCount = 0;
@@ -158,7 +172,6 @@
             const limitDisplay = document.getElementById('limit-display');
             limitDisplay.innerText = `⏳ 残り制作枠: ${MAX_POSTS - postCount} 回`;
 
-            // 1. まず1日5回の制限をチェック（最優先）
             if (postCount >= MAX_POSTS) {
                 document.getElementById('lock-overlay').style.display = 'flex';
                 document.getElementById('cooldown-overlay').style.display = 'none';
@@ -167,7 +180,6 @@
                 return;
             }
 
-            // 2. 次に10分の冷却時間をチェック
             const now = new Date().getTime();
             const timeDiff = now - lastPostTime;
 
@@ -176,7 +188,6 @@
                 const remainingMs = COOLDOWN_MS - timeDiff;
                 const minutes = Math.floor(remainingMs / 60000);
                 const seconds = Math.floor((remainingMs % 60000) / 1000);
-                // タイマーを mm:ss 形式で表示
                 document.getElementById('timer-display').innerText = 
                     `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             } else {
@@ -184,11 +195,9 @@
             }
         }
 
-        // 1秒ごとにUIを更新してカウントダウンを動かすべ！
         setInterval(updateUI, 1000);
-        updateUI(); // 初回読み込み時にも実行
+        updateUI();
 
-        // 入力監視
         inputs.forEach(input => {
             input.addEventListener('input', () => {
                 if (postCount >= MAX_POSTS || (new Date().getTime() - lastPostTime) < COOLDOWN_MS) return;
@@ -230,7 +239,12 @@
         publishBtn.addEventListener('click', () => {
             if (postCount < MAX_POSTS) {
                 postCount++;
-                lastPostTime = new Date().getTime(); // 今の時間を記録するべ
+                lastPostTime = new Date().getTime(); 
+                
+                // 追加：マイレージを5増やして保存＆表示更新！
+                creatorMileage += 5;
+                localStorage.setItem('creatorMileage', creatorMileage);
+                document.getElementById('mileage-val').innerText = creatorMileage;
                 
                 localStorage.setItem('postCount', postCount);
                 localStorage.setItem('lastPostTime', lastPostTime);
@@ -240,7 +254,7 @@
                 inputs.forEach(input => input.value = '');
                 publishBtn.disabled = true;
                 publishBtn.innerText = "必須項目を埋めろべ";
-                updateUI(); // すぐに冷却画面を出すべ
+                updateUI(); 
             }
         });
     </script>
