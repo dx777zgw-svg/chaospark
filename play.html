@@ -11,7 +11,6 @@
 
         h1 { color: #00ff41; text-align: center; border-bottom: 1px dashed #333; padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; }
 
-        /* 全体で1日1回の「おすすめ権」 */
         #ticket-board {
             background: #1a1a1a; border: 2px solid #00ff41; color: #00ff41;
             padding: 15px; text-align: center; font-size: 18px; font-weight: bold;
@@ -23,14 +22,12 @@
         .category-section { margin-bottom: 40px; }
         .category-title { font-size: 20px; color: #fff; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #00ff41; }
         
-        /* 各枠のタイトル装飾 */
         .akari-title { border-left-color: #00e5ff; color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
         .rookie-title { border-left-color: #ffd700; color: #ffd700; }
         .popular-title { border-left-color: #ff007f; color: #ff007f; }
 
         .card-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 15px; }
         
-        /* データが無い時のプレースホルダー装飾 */
         .empty-placeholder {
             width: 100%; text-align: center; padding: 40px; background: #111; 
             border: 1px dashed #333; color: #555; letter-spacing: 2px;
@@ -38,7 +35,6 @@
         .empty-text-main { font-size: 20px; font-weight: bold; color: #444; margin-bottom: 5px; }
         .empty-text-sub { font-size: 12px; }
 
-        /* 生成される診断カードのスタイル */
         .diag-card {
             background: #121212; border: 1px solid #333; min-width: 280px; max-width: 300px; padding: 20px;
             box-sizing: border-box; transition: transform 0.3s, border-color 0.3s;
@@ -60,6 +56,32 @@
         .back-link:hover { color: #00ff41; }
         .maker-link { display: block; text-align: center; margin-top: 10px; color: #00e5ff; text-decoration: none; font-size: 1.2rem; font-weight: bold; border: 1px dashed #00e5ff; padding: 10px; }
         .maker-link:hover { background: #00e5ff; color: #000; }
+
+        /* 👑 劇的進化：結果画面（モーダル）のスタイル 👑 */
+        #result-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); z-index: 10000; justify-content: center; align-items: center;
+            box-sizing: border-box; padding: 20px;
+        }
+        #result-window {
+            background: #111; border: 2px solid #00ff41; border-radius: 10px;
+            width: 100%; max-width: 500px; padding: 25px; box-sizing: border-box;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2); text-align: center;
+        }
+        #res-diag-title { color: #aaa; font-size: 1rem; margin: 0 0 15px 0; border-bottom: 1px dashed #333; padding-bottom: 10px; }
+        
+        /* 💡 改修の核心：ホワイトスペースを保持して改行を完全再現！ */
+        #res-diag-text {
+            background: #000; border: 1px solid #222; color: #fff;
+            padding: 20px; font-size: 1.2rem; text-align: left; line-height: 1.6;
+            white-space: pre-wrap; word-wrap: break-word; border-radius: 5px;
+            margin-bottom: 20px; font-family: inherit; box-shadow: inset 0 0 10px rgba(0,255,65,0.05);
+        }
+        .result-btns { display: flex; gap: 10px; }
+        .btn-share { flex: 1; background: #1da1f2; color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 1rem; }
+        .btn-share:hover { background: #fff; color: #1da1f2; }
+        .btn-close { flex: 1; background: #333; color: #ccc; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 1rem; }
+        .btn-close:hover { background: #444; color: #fff; }
 
         ::-webkit-scrollbar { height: 8px; }
         ::-webkit-scrollbar-track { background: #111; }
@@ -83,7 +105,6 @@
         </div>
     </div>
 
-    <!-- 🌐 ここにFirebaseから取得した新作が並ぶべ！ -->
     <div class="category-section">
         <div class="category-title">🆕 新作診断 (リアルタイム同期中)</div>
         <div class="card-container" id="new-diag-container">
@@ -114,7 +135,18 @@
         </div>
     </div>
 
-    <!-- 🛠️ アトリエへの導線 -->
+    <!-- 🌳 専用結果画面モーダル（追加！） 🌳 -->
+    <div id="result-modal">
+        <div id="result-window">
+            <div id="res-diag-title">診断タイトル</div>
+            <div id="res-diag-text">ここに改行付きの診断結果が綺麗に展開されるべ！</div>
+            <div class="result-btns">
+                <button class="btn-share" onclick="shareToX()">𝕏 に結果を投稿</button>
+                <button class="btn-close" onclick="closeResult()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
     <a href="maker.html" class="maker-link">🛠️ 診断アトリエ（制作所）へ行く</a>
     <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
@@ -136,10 +168,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 🎟️ 1日1回限定「おすすめ権」制御システム
         const ticketBoard = document.getElementById('ticket-board');
         const today = new Date().toLocaleDateString();
         let lastRecoDate = localStorage.getItem('lastRecommendDate');
+
+        let currentActiveTitle = "";
+        let currentActiveResult = "";
 
         function updateTicketUI() {
             ticketBoard.innerText = "🎟️ 本日のおすすめ権：消費済み（残り 0 回）";
@@ -168,24 +202,44 @@
             updateTicketUI();
         };
 
-        // 🚀 診断プレイ関数（文字列のエスケープ対策を強化したべ！）
+        // 🚀 特製結果画面の呼び出しロジック！
         window.playDiag = function(diagId) {
             const userName = localStorage.getItem('userName') || "あなた";
             
-            // グローバルに一時保存しておいたデータから結果を生成するべ！
             if (window.currentDiagnoses && window.currentDiagnoses[diagId]) {
                 const diag = window.currentDiagnoses[diagId];
                 const pattern = diag.resultPattern || "結果データが見つからないべ…";
                 
                 // [名前] をユーザー名に置換！
                 const finalResult = pattern.replace(/\[名前\]/g, userName);
-                alert(`【${diag.title}】\n\n${finalResult}`);
+                
+                // シェア用にグローバルにキープ
+                currentActiveTitle = diag.title;
+                currentActiveResult = finalResult;
+
+                // モーダルウィンドウを開いてデータを流し込むべ！
+                document.getElementById('res-diag-title').innerText = `【 診断結果：${diag.title} 】`;
+                document.getElementById('res-diag-text').innerText = finalResult;
+                document.getElementById('result-modal').style.display = 'flex';
             } else {
                 alert("診断データの読み込みに失敗したべ！");
             }
         };
 
-        // 🔥 Firebaseから「新作診断」をリアルタイム取得！
+        // 結果画面を閉じる関数
+        window.closeResult = function() {
+            document.getElementById('result-modal').style.display = 'none';
+        };
+
+        // 🕳️ 𝕏 (Twitter) への共有URL生成システム（SNSシェアによるバズ設計！）
+        window.shareToX = function() {
+            const text = `【${currentActiveTitle}】\n${currentActiveResult}\n\nカオスな診断で遊ぶなら 🌀G-Chaospark✨\n`;
+            const url = "https://dx777zgw-svg.github.io/chaospark/";
+            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            window.open(shareUrl, '_blank');
+        };
+
+        // Firebaseから「新作診断」をリアルタイム取得
         const diagListRef = ref(db, 'diagnoses');
         onValue(diagListRef, (snapshot) => {
             const container = document.getElementById('new-diag-container');
@@ -193,20 +247,15 @@
 
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                
-                // 💡 文字列のバグを防ぐために、取得した全データを一旦ウインドウオブジェクトに退避させるべ！
                 window.currentDiagnoses = data;
 
                 const diagArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                // 新しい順に並び替え
                 diagArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
                 diagArray.forEach(diag => {
-                    // XSSや改行バグを防ぐため、安全にテキストを処理するべ
                     const card = document.createElement('div');
                     card.className = 'diag-card';
                     
-                    // タイトルや説明文のHTMLエスケープ処理
                     const safeTitle = diag.title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const safeDesc = diag.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const safeAuthor = diag.authorName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -218,7 +267,6 @@
                             <div class="diag-author">作者: ${safeAuthor}</div>
                         </div>
                         <div class="diag-actions">
-                            <!-- 💡 関数の引数をIDだけにして、バグを完全に消し去ったべ！ -->
                             <button class="btn-play" onclick="playDiag('${diag.id}')">▶ 診断する</button>
                             <button class="reco-btn-target" onclick="handleRecommend(this, '${diag.id}')" ${lastRecoDate === today ? 'disabled title="明日復活するべ！"' : ''}>🔃 ${diag.recoCount || 0}</button>
                         </div>
