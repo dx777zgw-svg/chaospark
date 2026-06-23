@@ -1,71 +1,100 @@
-<div id="multi-panic-buttons" style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px;">
-    <button id="oya-fla-btn" onclick="emergencyExit()" style="display:none; padding: 10px; background: #ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除ボタン (残り:<span id="fla-count">15</span>回)</button>
-    <div style="display:flex; justify-content:center; gap:10px;">
-        <button onclick="simulateDisconnect()" style="padding: 6px 12px; font-size: 0.8rem; background: #555; color: #fff; border: none; border-radius: 4px; cursor: pointer;">⚠️ 悪質切断(失格) 📡❌</button>
-        <button onclick="userResign()" style="padding: 6px 12px; font-size: 0.8rem; background: #aaa; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🏳️ 離脱する(親フラ) w</button>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>パンツがなければ、はかなければいいじゃない！ゲーム┃パンツがなければ、はかなければいいじゃない！ゲーム</title>
+</head>
+<body>
+<div id="g-futon-game-box" style="text-align: center; font-family: sans-serif; padding: 20px; background: #fff5f8; border: 3px solid #ffb6c1; border-radius: 15px; max-width: 440px; margin: 20px auto; box-shadow: 0px 4px 15px rgba(0,0,0,0.08);">
+  <h2 style="color: #ff69b4; font-size: 1.1rem; margin: 0;">🛌 G-FutOnlab 最終完全体【オンライン版】</h2>
+  
+  <div id="setup-screen" style="margin: 20px 0;">
+    <input type="text" id="username-input" placeholder="ユーザー名を入力してだべw" style="padding: 10px; width: 80%; border: 2px solid #ffb6c1; border-radius: 5px; text-align: center; margin-bottom: 20px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <button onclick="startGame('solo')" style="padding: 12px 24px; background: #ff69b4; color: white; border: none; border-radius: 5px; width: 85%; cursor: pointer;">🆚 ソロ特訓</button>
+      <button onclick="startGame('multi')" style="padding: 12px 24px; background: #4ae; color: white; border: none; border-radius: 5px; width: 85%; cursor: pointer;">👥 みんなでレッスン</button>
+      <button onclick="startGame('online')" style="padding: 12px 24px; background: #ff4500; color: white; border: none; border-radius: 5px; width: 85%; cursor: pointer;">🌐 オンライン対戦(3分待機)</button>
     </div>
+  </div>
+
+  <div id="game-screen" style="display: none;">
+    <div id="turn-counter" style="font-weight: bold; color: #333;">ターン: 1 / 15</div>
+    <div id="timer-box" style="color: #d14; font-weight: bold;">残り時間: 20秒</div>
+    <div id="room-users-log" style="text-align: left; background: #fff; padding: 10px; margin: 15px 0; border: 1px solid #ffb6c1;"></div>
+    
+    <div id="action-buttons-area">
+      <button onclick="userSelect(true)" style="padding: 10px; background: #ff69b4; color:white; border:none;">はいてる</button>
+      <button onclick="userSelect(false)" style="padding: 10px; background: #4ae; color:white; border:none;">はいてない</button>
+    </div>
+
+    <div id="multi-panic-buttons" style="margin: 15px 0; display: flex; flex-direction: column; gap: 5px;">
+        <button id="oya-fla-btn" onclick="emergencyExit()" style="display:none; padding: 10px; background: #ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除(残り:<span id="fla-count">10</span>回)</button>
+        <button onclick="simulateDisconnect()" style="padding: 5px; background: #555; color: white; border: none;">📡 悪質切断(失格)</button>
+    </div>
+
+    <div id="npc-box" style="padding: 10px; background: #fff; border: 1px dashed #ffb6c1; margin-top: 10px;">待機中…</div>
+  </div>
 </div>
 
 <script>
-// --- 追加設定 ---
-let flaCount = 15; // 免除回数
-let onlineWaitTimer = null;
+let currentTurn = 1, timeLeft = 20, thinkingTimer = null, flaCount = 10;
+let gameMode = "multi";
+let roomPlayers = [
+  { name: "ユーザー", isNPC: false, hasAnswered: false, choice: null, score: 0, isDisconnected: false, isResigned: false },
+  { name: "AKARI", isNPC: true, hasAnswered: false, choice: null, score: 0 },
+  { name: "Liro", isNPC: true, hasAnswered: false, choice: null, score: 0 }
+];
 
-// --- 拡張機能ロジック ---
 function startGame(mode) {
-    gameMode = mode; 
+    gameMode = mode;
     document.getElementById("setup-screen").style.display = "none";
     document.getElementById("game-screen").style.display = "block";
     
     if (gameMode === "online") {
         document.getElementById("oya-fla-btn").style.display = "block";
-        // 3分待機後にNPCが自動参戦する処理
+        document.getElementById("npc-box").innerText = "オンライン待機中...3分でNPCが参戦するべ！";
         setTimeout(() => {
-            if(roomPlayers.some(p => p.isNPC && p.hasAnswered === false)) {
-                alert("3分経過！NPCが強制対応するべ！");
-            }
-        }, 180000);
+            if (currentTurn === 1) alert("3分経過！NPCが強制参戦したべ！");
+        }, 180000); // 3分
     }
     initRound();
 }
 
-// 親フラ緊急免除
 function emergencyExit() {
     if(flaCount > 0) {
         flaCount--;
         alert("親フラ回避！残り" + flaCount + "回だべ！");
     } else {
-        let currentScore = roomPlayers[0].score;
-        roomPlayers[0].score = Math.max(0, currentScore - 50); // -50P
-        alert("免除回数切れ！ペナルティで-50Pだべ！");
+        roomPlayers[0].score = Math.max(0, roomPlayers[0].score - 50);
+        alert("免除切れ！-50Pペナルティだべ！");
     }
     document.getElementById('fla-count').innerText = flaCount;
-    updateRoomLog();
 }
 
-// 既存のsimulateDisconnectを上書き(切断ペナルティ強化)
 function simulateDisconnect() {
-    if (gameMode !== "online") return;
     roomPlayers[0].isDisconnected = true;
     roomPlayers[0].score = 0; // ポイント没収
-    alert("切断によりポイント没収！NPCが代行するべ！");
-    handleEarlyExit();
+    alert("切断！ポイント没収してNPCが代行するべ！");
+    if(!roomPlayers[0].hasAnswered) {
+        roomPlayers[0].hasAnswered = true;
+        roomPlayers[0].choice = Math.random() < 0.5;
+    }
 }
 
-// NPC代行ロジック (切断時やNPC参加時に自動呼び出し)
-function autoFillNPC() {
-    roomPlayers.forEach(p => {
-        if((p.isDisconnected || p.isNPC) && !p.hasAnswered) {
-            p.hasAnswered = true;
-            p.choice = Math.random() < 0.5;
-        }
-    });
+// 既存のinitRoundと融合
+function initRound() {
+    if (gameMode === "online") {
+        roomPlayers.forEach(p => {
+            if (p.isNPC || p.isDisconnected) {
+                p.hasAnswered = true;
+                p.choice = Math.random() < 0.5;
+            }
+        });
+    }
+    // ...以降の既存ロジック(RevealResults等)をそのまま実行
 }
 
-// initRoundの冒頭で自動NPC代行を仕込む
-const originalInitRound = initRound;
-initRound = function() {
-    if(gameMode === "online") autoFillNPC();
-    originalInitRound();
-}
+// ※上記のコードをベースに、既存のrevealResultsやcheckAllAnswered等の関数を末尾に追加して完成だべ！
 </script>
+</body>
+</html>
