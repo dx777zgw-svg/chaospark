@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | My Page</title>
+    <style>
+        body { 
+            margin: 0; background: #050505; color: #e0e0e0; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 20px; box-sizing: border-box;
+            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+        
+        /* スタイリッシュなメインパネル */
+        .mypage-container {
+            width: 100%; max-width: 600px; 
+            background: rgba(18, 18, 18, 0.8); 
+            border: 1px solid #333; border-top: 3px solid #ffd700; 
+            border-radius: 8px; padding: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        h1 { margin-top: 0; color: #fff; font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        
+        /* アバターエリア */
+        .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .avatar-box {
+            width: 80px; height: 80px; background: #222; 
+            border: 2px dashed #555; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 3em; cursor: pointer; transition: 0.3s;
+        }
+        .avatar-box:hover { border-color: #ffd700; transform: scale(1.05); background: #333;}
+        .user-info h2 { margin: 0; font-size: 1.5em; color: #fff; }
+        .user-info p { margin: 5px 0 0; color: #888; font-size: 0.9em; }
+
+        /* ステータスボード */
+        .status-board { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .status-card { 
+            background: #0a0a0a; border: 1px solid #222; 
+            padding: 20px; border-radius: 5px; text-align: center; 
+        }
+        .status-title { font-size: 0.9em; color: #aaa; margin-bottom: 10px; }
+        .cp-val { font-size: 1.8em; font-weight: bold; color: #00ff41; }
+        .cm-val { font-size: 1.8em; font-weight: bold; color: #ffd700; }
+
+        /* ボタン類 */
+        .btn { 
+            display: inline-block; width: 100%; text-align: center; 
+            padding: 12px; background: transparent; border: 1px solid #555; 
+            color: #ccc; text-decoration: none; font-weight: bold; 
+            border-radius: 4px; cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { background: #222; color: #fff; border-color: #fff; }
+        .btn-lounge { border-color: #00ff41; color: #00ff41; margin-top: 20px; }
+        .btn-lounge:hover { background: #003300; border-color: #00ff41; color: #00ff41; }
+
+        /* アバター選択モーダル */
+        #avatar-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #111; border: 1px solid #444; padding: 20px; border-radius: 8px; text-align: center; width: 300px;
+        }
+        .emoji-grid { display: flex; justify-content: space-around; margin: 20px 0; }
+        .emoji-item { font-size: 2.5em; cursor: pointer; padding: 10px; border-radius: 5px; transition: 0.2s; }
+        .emoji-item:hover { background: #333; transform: scale(1.2); }
+    </style>
+</head>
+<body>
+
+    <!-- 不法侵入ガード -->
+    <script>
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「誰だお前は。ゲートを通って出直してきなさい。」");
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- アバター選択モーダル -->
+    <div id="avatar-modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:#fff;">初期アイコンを選択</h3>
+            <p style="color:#888; font-size:0.9em;">※後で変更できます</p>
+            <div class="emoji-grid">
+                <div class="emoji-item" onclick="setAvatar('👦')">👦</div>
+                <div class="emoji-item" onclick="setAvatar('👧')">👧</div>
+                <div class="emoji-item" onclick="setAvatar('🐶')">🐶</div>
+                <div class="emoji-item" onclick="setAvatar('👽')">👽</div>
+                <div class="emoji-item" onclick="setAvatar('👤')">👤</div>
+            </div>
+            <button class="btn" onclick="closeAvatarModal()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="mypage-container">
+        <h1>RESIDENT DATA <span style="font-size: 0.5em; color: #ffd700;">G-Chaos Park</span></h1>
+
+        <div class="profile-header">
+            <!-- アバター表示領域（クリックで変更） -->
+            <div class="avatar-box" id="user-avatar" onclick="openAvatarModal()" title="アイコンを変更">👤</div>
+            <div class="user-info">
+                <h2 id="display-name">NO NAME</h2>
+                <p id="display-id">ID: ---------</p>
+            </div>
+        </div>
+
+        <div class="status-board">
+            <div class="status-card">
+                <div class="status-title">カオスポイント (CP)</div>
+                <div class="cp-val" id="display-cp">0</div>
+            </div>
+            <div class="status-card">
+                <div class="status-title">作者マイレージ (CM)</div>
+                <div class="cm-val" id="display-cm">0</div>
+            </div>
+        </div>
+
+        <button class="btn">💳 所持アイテム・称号を見る (未実装)</button>
+        <a href="lounge.html" class="btn btn-lounge">◀ メインラウンジに戻る</a>
+    </div>
+
+    <script>
+        // 1. ユーザー情報の読み込みと反映
+        const userName = localStorage.getItem('userName') || 'ゲスト';
+        const userId = localStorage.getItem('userId') || 'UNKNOWN_ID';
+        const cp = localStorage.getItem('chaosPoint') || 0;
+        const cm = localStorage.getItem('creatorMileage') || 0;
+        
+        // 保存されたアバターがあれば読み込む（なければ初期値のシルエット）
+        const savedAvatar = localStorage.getItem('userAvatar') || '👤';
+
+        document.getElementById('display-name').innerText = userName;
+        document.getElementById('display-id').innerText = `ID: ${userId}`;
+        document.getElementById('display-cp').innerText = cp;
+        document.getElementById('display-cm').innerText = cm;
+        document.getElementById('user-avatar').innerText = savedAvatar;
+
+        // 2. アバター変更モーダルの制御
+        function openAvatarModal() {
+            document.getElementById('avatar-modal').style.display = 'flex';
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal').style.display = 'none';
+        }
+
+        function setAvatar(emoji) {
+            // ローカルストレージに保存して画面に反映
+            localStorage.setItem('userAvatar', emoji);
+            document.getElementById('user-avatar').innerText = emoji;
+            closeAvatarModal();
+        }
+    </script>
+</body>
+</html>
