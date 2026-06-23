@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | 闇鍋ガチャ</title>
+    <style>
+        body { margin: 0; background: #110011; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 50px; }
+        h1 { color: #ff00ff; text-shadow: 0 0 15px #ff00ff; }
+        .gacha-machine { font-size: 100px; margin: 30px; animation: float 3s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .btn { padding: 15px 30px; font-size: 1.2rem; background: #ff00ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 0 15px #ff00ff; }
+        .btn:hover { background: #fff; color: #ff00ff; }
+        #result-box { margin-top: 30px; font-size: 1.5rem; font-weight: bold; min-height: 50px; padding: 20px; border: 2px dashed #ff00ff; display: none; background: #000; }
+        .back-btn { display: inline-block; margin-top: 40px; padding: 10px 20px; border: 1px solid #00e5ff; color: #00e5ff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🎲 闇鍋ガチャ 🎲</h1>
+    <h2 style="color: #00ff41;">所持CP: <span id="cp-display">0</span></h2>
+    <p>1回 10 CP！<br>パークのガラクタから超レアアイテムまで何が出るか分からないべ！</p>
+
+    <div class="gacha-machine" id="machine">🎰</div>
+    <button class="btn" onclick="rollGacha()">10 CPで回す！</button>
+
+    <div id="result-box"></div>
+
+    <br><a href="lounge.html" class="back-btn">▶ ラウンジへ戻る</a>
+
+    <script>
+        function updateCP() { document.getElementById('cp-display').innerText = localStorage.getItem('chaosPoint') || 0; }
+        updateCP();
+
+        const items = [
+            { name: "誰かの片方だけの靴下", rarity: "N", color: "#888" },
+            { name: "光る泥団子", rarity: "N", color: "#888" },
+            { name: "マリー・トワネッドのフランスパン", rarity: "R", color: "#00e5ff" },
+            { name: "AKARIのサイン入りチェキ", rarity: "SR", color: "#ff8c00" },
+            { name: "総統の椅子（レプリカ）", rarity: "UR", color: "#ff00ff" }
+        ];
+
+        function rollGacha() {
+            let cp = parseInt(localStorage.getItem('chaosPoint')) || 0;
+            if (cp < 10) return alert("CPが足りないべ！労働してこい！");
+
+            localStorage.setItem('chaosPoint', cp - 10);
+            updateCP();
+
+            const machine = document.getElementById('machine');
+            const resultBox = document.getElementById('result-box');
+            resultBox.style.display = "none";
+            machine.innerText = "🔄";
+
+            setTimeout(() => {
+                let rand = Math.random();
+                let item;
+                if (rand < 0.05) item = items[4]; // UR 5%
+                else if (rand < 0.20) item = items[3]; // SR 15%
+                else if (rand < 0.50) item = items[2]; // R 30%
+                else item = items[Math.floor(Math.random() * 2)]; // N 50%
+
+                machine.innerText = "🎁";
+                resultBox.style.display = "block";
+                resultBox.style.borderColor = item.color;
+                resultBox.innerHTML = `<span style="color:${item.color};">【${item.rarity}】${item.name}</span> を手に入れた！`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
