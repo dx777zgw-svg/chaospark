@@ -98,8 +98,8 @@ function userSelect(guess) {
 function revealResults() {
     const isWearing = Math.random() < 0.5;
     document.getElementById("question-text").innerText = isWearing 
-        ? "安心はさいはいてますわ👸" 
-        : "はいてないはよ～うぶ～ん😘";
+        ? "安心なさいはいてますわ👸" 
+        : "はいてないはよ～うふ～ん😘";
     
     roomPlayers.forEach(p => {
         if(p.choice === isWearing) { p.score += 10; p.lastResult = "〇"; }
