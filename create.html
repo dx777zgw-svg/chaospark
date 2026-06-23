@@ -75,8 +75,10 @@
         #cooldown-overlay p { color: #aaa; text-align: center; }
         #timer-display { font-size: 32px; color: #fff; font-weight: bold; margin-top: 10px; font-family: monospace; }
 
-        .back-link { display: block; text-align: center; margin-top: 20px; color: #444; text-decoration: none; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #444; text-decoration: none; font-weight: bold; }
         .back-link:hover { color: #00ff41; }
+        .play-link { display: block; text-align: center; margin-top: 10px; color: #00e5ff; text-decoration: none; font-size: 1.2rem; font-weight: bold; border: 1px dashed #00e5ff; padding: 10px; }
+        .play-link:hover { background: #00e5ff; color: #000; }
     </style>
 </head>
 <body>
@@ -128,18 +130,38 @@
         <div class="form-group">
             <label>タグ (最大3つまで任意)</label>
             <div class="tag-container">
-                <input type="text" class="check-ng" placeholder="#タグ1">
-                <input type="text" class="check-ng" placeholder="#タグ2">
-                <input type="text" class="check-ng" placeholder="#タグ3">
+                <input type="text" id="tag1" class="check-ng" placeholder="#タグ1">
+                <input type="text" id="tag2" class="check-ng" placeholder="#タグ2">
+                <input type="text" id="tag3" class="check-ng" placeholder="#タグ3">
             </div>
         </div>
 
         <button id="publish-btn" disabled>システムに公開する (+5 pt)</button>
     </div>
 
+    <a href="play.html" class="play-link">👀 プレイエリア（観測地点）へ行く</a>
     <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+            authDomain: "g-chaospark.firebaseapp.com",
+            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "g-chaospark",
+            storageBucket: "g-chaospark.firebasestorage.app",
+            messagingSenderId: "256664886136",
+            appId: "1:256664886136:web:e87bbe307a654331c1468d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const userName = localStorage.getItem('userName') || 'ゲスト作者';
+        const userId = localStorage.getItem('userId');
+
         const bannedWords = ["死ね", "殺す", "犯罪", "爆破", "違法"];
         const inputs = document.querySelectorAll('.check-ng');
         const warningBox = document.getElementById('ng-warning');
@@ -229,8 +251,8 @@
             });
         });
 
-        // 公開ボタン押下
-        publishBtn.addEventListener('click', () => {
+        // 🔥 公開ボタン押下でFirebaseへ送信！
+        publishBtn.addEventListener('click', async () => {
             if (postCount < MAX_POSTS) {
                 postCount++;
                 lastPostTime = new Date().getTime(); 
@@ -242,14 +264,40 @@
                 localStorage.setItem('postCount', postCount);
                 localStorage.setItem('lastPostTime', lastPostTime);
 
-                // 🔥【超重要】入力欄を空っぽにする「前」に、play.html用にデータを保存するべ！！
-                localStorage.setItem('testDiagTitle', document.getElementById('diag-title').value);
-                localStorage.setItem('testDiagDesc', document.getElementById('diag-desc').value);
-                localStorage.setItem('testDiagResult', document.getElementById('diag-result').value);
+                const titleVal = document.getElementById('diag-title').value;
+                const descVal = document.getElementById('diag-desc').value;
+                const resultVal = document.getElementById('diag-result').value;
+                const tag1 = document.getElementById('tag1').value;
+                const tag2 = document.getElementById('tag2').value;
+                const tag3 = document.getElementById('tag3').value;
+
+                // Firebaseの「diagnoses」ツリーに新規データをプッシュ
+                const diagListRef = ref(db, 'diagnoses');
+                const newDiagRef = push(diagListRef);
+                await set(newDiagRef, {
+                    title: titleVal,
+                    desc: descVal,
+                    resultPattern: resultVal,
+                    tags: [tag1, tag2, tag3].filter(t => t.trim() !== ""),
+                    authorName: userName,
+                    authorId: userId,
+                    createdAt: new Date().toISOString(),
+                    playCount: 0,
+                    recoCount: 0
+                });
+
+                // Firebase連携時のユーザーデータ更新（所持CM同期）
+                const userRef = ref(db, 'users/' + userId);
+                await set(userRef, {
+                    name: userName,
+                    cp: parseInt(localStorage.getItem('chaosPoint')) || 0,
+                    cm: creatorMileage,
+                    tutorial: localStorage.getItem('isTutorialDone') || 'false',
+                    lastLogin: new Date().toLocaleString('ja-JP')
+                });
                 
-                alert(`「${document.getElementById('diag-title').value}」を公開したべ！\n作者マイレージ +5pt 獲得！`);
+                alert(`「${titleVal}」を世界に公開したべ！\n作者マイレージ +5pt 獲得！`);
                 
-                // ここで入力欄を空っぽにする
                 inputs.forEach(input => input.value = '');
                 publishBtn.disabled = true;
                 publishBtn.innerText = "必須項目を埋めろべ";
