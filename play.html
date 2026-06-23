@@ -83,6 +83,7 @@
         </div>
     </div>
 
+    <!-- 🌐 ここにFirebaseから取得した新作が並ぶべ！ -->
     <div class="category-section">
         <div class="category-title">🆕 新作診断 (リアルタイム同期中)</div>
         <div class="card-container" id="new-diag-container">
@@ -113,9 +114,11 @@
         </div>
     </div>
 
+    <!-- 🛠️ アトリエへの導線 -->
     <a href="maker.html" class="maker-link">🛠️ 診断アトリエ（制作所）へ行く</a>
     <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
+    <!-- 🚀 Firebase連携＆処理スクリプト 🚀 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -151,7 +154,6 @@
             updateTicketUI();
         }
 
-        // おすすめボタンを押したときの処理（動的に生成されたボタンにも対応）
         window.handleRecommend = function(btnElement, diagId) {
             if (lastRecoDate === today) return;
             alert("この診断に貴重な「おすすめ」を捧げたべ！\n（本日のおすすめ権を消費しました）");
@@ -163,48 +165,67 @@
             btnElement.style.color = "#00ff41";
             btnElement.style.borderColor = "#00ff41";
             
-            // 本当はここでFirebaseのrecoCountも増やす処理を入れると完璧だべ！(今回はUIのみ更新)
             updateTicketUI();
         };
 
-        // 診断をプレイする処理（今回はアラートで仮実装）
-        window.playDiag = function(title, resultPattern) {
+        // 🚀 診断プレイ関数（文字列のエスケープ対策を強化したべ！）
+        window.playDiag = function(diagId) {
             const userName = localStorage.getItem('userName') || "あなた";
-            // [名前] をユーザー名に置換して結果を表示！
-            const finalResult = resultPattern.replace(/\[名前\]/g, userName);
-            alert(`【${title}】\n\n${finalResult}`);
+            
+            // グローバルに一時保存しておいたデータから結果を生成するべ！
+            if (window.currentDiagnoses && window.currentDiagnoses[diagId]) {
+                const diag = window.currentDiagnoses[diagId];
+                const pattern = diag.resultPattern || "結果データが見つからないべ…";
+                
+                // [名前] をユーザー名に置換！
+                const finalResult = pattern.replace(/\[名前\]/g, userName);
+                alert(`【${diag.title}】\n\n${finalResult}`);
+            } else {
+                alert("診断データの読み込みに失敗したべ！");
+            }
         };
 
         // 🔥 Firebaseから「新作診断」をリアルタイム取得！
         const diagListRef = ref(db, 'diagnoses');
         onValue(diagListRef, (snapshot) => {
             const container = document.getElementById('new-diag-container');
-            container.innerHTML = ''; // 一旦空にする
+            container.innerHTML = ''; 
 
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                // データを配列に変換して、新しい順（降順）に並び替え
+                
+                // 💡 文字列のバグを防ぐために、取得した全データを一旦ウインドウオブジェクトに退避させるべ！
+                window.currentDiagnoses = data;
+
                 const diagArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // 新しい順に並び替え
                 diagArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
                 diagArray.forEach(diag => {
+                    // XSSや改行バグを防ぐため、安全にテキストを処理するべ
                     const card = document.createElement('div');
                     card.className = 'diag-card';
+                    
+                    // タイトルや説明文のHTMLエスケープ処理
+                    const safeTitle = diag.title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const safeDesc = diag.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const safeAuthor = diag.authorName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
                     card.innerHTML = `
                         <div>
-                            <h3 class="diag-title">${diag.title}</h3>
-                            <p class="diag-desc">${diag.desc}</p>
-                            <div class="diag-author">作者: ${diag.authorName}</div>
+                            <h3 class="diag-title">${safeTitle}</h3>
+                            <p class="diag-desc">${safeDesc}</p>
+                            <div class="diag-author">作者: ${safeAuthor}</div>
                         </div>
                         <div class="diag-actions">
-                            <button class="btn-play" onclick="playDiag('${diag.title}', '${diag.resultPattern}')">▶ 診断する</button>
+                            <!-- 💡 関数の引数をIDだけにして、バグを完全に消し去ったべ！ -->
+                            <button class="btn-play" onclick="playDiag('${diag.id}')">▶ 診断する</button>
                             <button class="reco-btn-target" onclick="handleRecommend(this, '${diag.id}')" ${lastRecoDate === today ? 'disabled title="明日復活するべ！"' : ''}>🔃 ${diag.recoCount || 0}</button>
                         </div>
                     `;
                     container.appendChild(card);
                 });
             } else {
-                // データが1つもない場合
                 container.innerHTML = `
                     <div class="empty-placeholder">
                         <div class="empty-text-main">[ NO SIGNAL DETECTED ]</div>
