@@ -2,171 +2,64 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>G-Chaospark | ダイス・デスマッチ改 (完全単体BGM版)</title>
+    <title>G-Chaospark | カオス・ダイス</title>
     <style>
-        body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; padding: 20px; display: flex; justify-content: center; }
-        .dice-box { background: #121212; border: 1px solid #333; padding: 30px; width: 100%; max-width: 450px; text-align: center; }
-        .opponent-grid { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .opp-btn { cursor: pointer; padding: 10px; border: 1px solid #444; background: #1a1a1a; transition: 0.2s; }
-        .opp-btn:hover { border-color: #00e5ff; background: #00222b; }
-        .btn { background: #00e5ff; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; }
-        .btn:disabled { background: #444; color: #888; cursor: not-allowed; }
-        #status { color: #aaa; margin: 15px 0; font-weight: bold; }
-        
-        #result-area { display: none; margin-top: 25px; padding: 20px; border: 2px dashed #ffd700; background: #1a1a00; }
-        .res-title { font-size: 20px; color: #ffd700; margin-bottom: 10px; }
-        .res-score { font-size: 24px; margin-bottom: 15px; }
+        body { margin: 0; background: #0a0a0a; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 50px; }
+        .input-bet { padding: 10px; font-size: 18px; width: 150px; text-align: center; background: #222; color: #00e5ff; border: 1px solid #00e5ff; }
+        .btn { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; background: #00e5ff; color: #000; border: none; font-weight: bold; }
+        .btn:hover { background: #fff; }
+        .dice-display { font-size: 80px; margin: 20px 0; text-shadow: 0 0 15px #00e5ff; }
+        .back-btn { display: inline-block; margin-top: 50px; padding: 10px 20px; border: 1px solid #00e5ff; color: #00e5ff; text-decoration: none; }
     </style>
 </head>
 <body>
-
-<div class="dice-box">
-    <h1>[ ダイス・デスマッチ ]</h1>
+    <h1 style="color: #00e5ff;">カオス・ダイス</h1>
+    <h2 style="color: #00ff41;">所持CP: <span id="cp-display"></span></h2>
     
-    <div id="setup-area">
-        <p>対戦相手を選ぶべ：</p>
-        <div class="opponent-grid" id="opponents">
-            <div class="opp-btn" onclick="selectOpponent(0, 0)">👶<br>弱</div>
-            <div class="opp-btn" onclick="selectOpponent(1, 2)">🤖<br>中</div>
-            <div class="opp-btn" onclick="selectOpponent(2, 4)">👹<br>強</div>
-        </div>
+    <p>賭けるCPを入力して、サイコロの目が「Low(1-3)」か「High(4-6)」か予想するべ！</p>
+    <input type="number" id="bet-amount" class="input-bet" value="10" min="1"> CP
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="rollDice('low')">⬇️ Low (1-3) ⬇️</button>
+        <button class="btn" onclick="rollDice('high')">⬆️ High (4-6) ⬆️</button>
     </div>
-    
-    <div id="battle-area" style="display:none;">
-        <div id="status">対戦相手：<span id="opp-name" style="color:#00e5ff;">なし</span></div>
-        <div style="font-size: 30px; margin: 20px 0;">ターン <span id="turn">1</span> / 10</div>
-        <div style="font-size: 24px;">自分 <span id="p-score" style="color:#00ff41;">0</span> | 相手 <span id="o-score" style="color:#ff003c;">0</span></div>
-        <button class="btn" id="roll-btn" onclick="playTurn()" style="margin-top: 20px;">サイコロを振る！</button>
-        
-        <div id="result-area">
-            <div class="res-title">[ 最終結果 ]</div>
-            <div class="res-score" id="final-text"></div>
-            <button class="btn" style="background:#ffd700;" onclick="resetGame()">もう一度戦うべ！</button>
-        </div>
-    </div>
-</div>
 
-<script>
-    let turn = 1, pTotal = 0, oTotal = 0, oppBonus = 0;
-    
-    // --- 🎵 Web Audio API を使った内蔵シンセサイザーだべ！ ---
-    let audioCtx = null;
-    let bgmInterval = null;
-    let noteIdx = 0;
-    
-    // 少し気の抜けたファミコン風の音階（ド・ミ・ソ・休・ソ・ミ・シ・休）
-    const notes = [261.6, 329.6, 392.0, 0, 392.0, 329.6, 246.9, 0];
+    <div id="dice-result" class="dice-display">🎲</div>
+    <div id="result-text" style="font-size: 24px; font-weight: bold; margin-top: 20px;"></div>
 
-    function startBGM() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    <a href="gamebooth.html" class="back-btn">▶ ブースへ戻る</a>
+
+    <script>
+        function updateCP() {
+            document.getElementById('cp-display').innerText = localStorage.getItem('chaosPoint') || 0;
         }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        if (bgmInterval) clearInterval(bgmInterval);
-        
-        bgmInterval = setInterval(() => {
-            const freq = notes[noteIdx];
-            noteIdx = (noteIdx + 1) % notes.length;
-            
-            if (freq === 0) return; // 0は休符
+        updateCP();
 
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'square'; // 8bit特有のピコピコ波形
-            osc.frequency.value = freq;
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            gain.gain.setValueAtTime(0.03, audioCtx.currentTime); // 音量は控えめ
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-            
-            osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.15);
-        }, 200); // テンポ
-    }
+        function rollDice(guess) {
+            let cp = parseInt(localStorage.getItem('chaosPoint')) || 0;
+            let bet = parseInt(document.getElementById('bet-amount').value);
 
-    function stopBGM() {
-        if (bgmInterval) clearInterval(bgmInterval);
-    }
+            if (isNaN(bet) || bet <= 0) return alert("賭け金がおかしいべ！");
+            if (cp < bet) return alert("CPが足りないべ！");
 
-    // サイコロを振った時のSE
-    function playDiceSound() {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.1);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-        
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.1);
-    }
-    // ----------------------------------------------------
-
-    function selectOpponent(idx, bonus) {
-        const names = ["弱々モンスター", "ポンコツロボ", "魔王の末裔(？)"];
-        document.getElementById('opp-name').innerText = names[idx];
-        
-        // 内蔵BGMスタート！
-        startBGM();
-        
-        oppBonus = bonus;
-        document.getElementById('setup-area').style.display = 'none';
-        document.getElementById('battle-area').style.display = 'block';
-    }
-
-    function playTurn() {
-        if (turn > 10) return;
-        
-        // 効果音を鳴らす！
-        playDiceSound();
-        
-        const pRoll = Math.floor(Math.random()*6) + Math.floor(Math.random()*6) + Math.floor(Math.random()*6) + 3;
-        const oRoll = Math.floor(Math.random()*6) + Math.floor(Math.random()*6) + Math.floor(Math.random()*6) + 3 + oppBonus;
-        
-        pTotal += pRoll; oTotal += oRoll;
-        document.getElementById('p-score').innerText = pTotal;
-        document.getElementById('o-score').innerText = oTotal;
-        
-        if (turn < 10) {
-            document.getElementById('turn').innerText = ++turn;
-        } else {
-            turn++;
-            document.getElementById('roll-btn').style.display = 'none';
-            stopBGM(); // 勝負がついたらBGMを止める
+            cp -= bet; // 先にベット分を引く
             
-            setTimeout(() => {
-                const isWin = pTotal >= oTotal;
-                const resMsg = isWin ? "🎉 勝利だべ！！" : "💀 敗北だべ……";
-                const resColor = isWin ? "#00ff41" : "#ff003c";
-                
-                document.getElementById('final-text').innerHTML = 
-                    `あなた: ${pTotal} vs 相手: ${oTotal}<br><br><span style="color:${resColor}; font-weight:bold; font-size:30px;">${resMsg}</span>`;
-                
-                document.getElementById('result-area').style.display = 'block';
-            }, 500);
+            let roll = Math.floor(Math.random() * 6) + 1; // 1~6のランダム
+            let isHigh = roll >= 4;
+            let win = (guess === 'high' && isHigh) || (guess === 'low' && !isHigh);
+
+            document.getElementById('dice-result').innerText = roll;
+
+            if (win) {
+                cp += bet * 2; // 倍返し
+                document.getElementById('result-text').innerHTML = `<span style='color: #00ff41;'>アタリだべ！！ +${bet} CPの儲け！</span>`;
+            } else {
+                document.getElementById('result-text').innerHTML = `<span style='color: #ff003c;'>ハズレだべ... -${bet} CP没収！</span>`;
+            }
+
+            localStorage.setItem('chaosPoint', cp);
+            updateCP();
         }
-    }
-
-    function resetGame() {
-        turn = 1; pTotal = 0; oTotal = 0;
-        document.getElementById('p-score').innerText = '0';
-        document.getElementById('o-score').innerText = '0';
-        document.getElementById('turn').innerText = '1';
-        
-        document.getElementById('roll-btn').style.display = 'inline-block';
-        document.getElementById('result-area').style.display = 'none';
-        
-        document.getElementById('battle-area').style.display = 'none';
-        document.getElementById('setup-area').style.display = 'block';
-    }
-</script>
+    </script>
 </body>
 </html>
