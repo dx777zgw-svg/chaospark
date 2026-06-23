@@ -31,6 +31,16 @@
         #mypage-link { color: #ffd700; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
         #mypage-link:hover { background: #333300; border-radius: 5px; }
 
+        /* ミニゲームブースリンクの特別装飾（追加） */
+        #gamebooth-panel { border-color: #00e5ff; text-align: center; background: #001a1f; }
+        #gamebooth-link { color: #00e5ff; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
+        #gamebooth-link:hover { background: #00333d; border-radius: 5px; }
+
+        /* 闇の換金所リンクの特別装飾（追加） */
+        #exchange-panel { border-color: #ff003c; text-align: center; background: #1a0005; }
+        #exchange-link { color: #ff003c; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
+        #exchange-link:hover { background: #33000a; border-radius: 5px; }
+
         /* ステータス（お財布）パネルの装飾 */
         #status-panel { border-color: #00ff41; background: #001a05; }
         .status-item { font-size: 1.1em; font-weight: bold; margin: 5px 0; }
@@ -48,7 +58,7 @@
         }
         .btn-neon:hover { background: #cc00cc; }
 
-        /* 制作所ボタンのホバーエフェクト（追加） */
+        /* 制作所ボタンのホバーエフェクト */
         #start-btn:hover {
             background: #fff !important;
             transform: scale(1.05);
@@ -106,14 +116,23 @@
             <a href="mypage.html" id="mypage-link">マイページへ</a>
         </div>
 
-        <div class="panel">ミニゲームブース</div>
+        <!-- 修正：ミニゲームブースへのリンク -->
+        <div class="panel" id="gamebooth-panel">
+            <a href="gamebooth.html" id="gamebooth-link">🎮 ミニゲームブース</a>
+        </div>
+
+        <!-- 追加：闇の換金所へのリンク -->
+        <div class="panel" id="exchange-panel">
+            <a href="exchange.html" id="exchange-link">⚖️ 闇の換金所</a>
+        </div>
+
         <div class="panel">ランキングボード<br>・作者ランキング<br>・ルーキー作者</div>
         <div class="panel">お知らせ掲示板</div>
         <div class="panel">
             <a href="park.html">公園へ</a> | <a href="gacha.html">ガチャへ</a>
         </div>
 
-        <div class="panel" style="border-color: #ff003c; text-align: center; background: #1a0005;">
+        <div class="panel" style="border-color: #ff003c; text-align: center; background: #1a0005; margin-top: 20px;">
             <button onclick="localStorage.clear(); alert('住民権（ID）を破棄したべ！審査ゲートに戻るべ！'); window.location.href='index.html';" style="background: #ff003c; color: #fff; border: none; padding: 10px; font-weight: bold; cursor: pointer; width: 100%; font-family: monospace;">⚙️ RESET USER DATA</button>
         </div>
     </section>
