@@ -5,31 +5,95 @@
     <title>G-Chaospark | Main Lounge</title>
     <style>
         body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; height: 100vh; display: grid; grid-template-columns: 320px 1fr 300px; gap: 20px; padding: 20px; box-sizing: border-box; }
+        
+        /* エリア共通枠 */
         .panel { border: 1px solid #333; padding: 20px; background: #121212; }
         
-        /* 左：AKARIエリア（上部配置） */
-        #akari-zone { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; }
+        /* 左：AKARIエリア（最優先・上部特等席レイアウト） */
+        #akari-zone { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; height: 100%; }
         #akari-move { width: 80%; max-width: 250px; margin-top: 20px; animation: float 4s ease-in-out infinite; }
-        #akari-speech { border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 90%; text-align: center; font-weight: bold; background: #001a05; }
+        #akari-speech { border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 90%; text-align: center; font-weight: bold; background: #001a05; box-sizing: border-box; }
         
-        /* 中央：核エリア */
+        /* 真ん中：核エリア */
         #core-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #00ff41; }
         
-        /* 右：Utility */
+        /* 右： utilityエリア */
         #utility-zone { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         
-        /* お問い合わせ（右下固定） */
-        #contact-footer { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        #contact-footer a { color: #888; text-decoration: none; font-size: 0.8rem; border: 1px solid #333; padding: 8px 12px; background: #000; }
-        
+        /* アニメーション回路 */
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        #start-btn:hover { background: #fff !important; transform: scale(1.05); }
-        .construction-panel { opacity: 0.6; }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .pop-animation { animation: pop 0.3s ease; }
+
+        /* 左下・右下の固定フッターリンク */
+        #legal-links { position: fixed; bottom: 10px; left: 15px; font-family: sans-serif; font-size: 11px; z-index: 100; }
+        #legal-links a { color: #ffffff; text-decoration: none; margin-right: 15px; }
+        #legal-links a:hover { text-decoration: underline; }
+
+        #contact-footer { position: fixed; bottom: 10px; right: 15px; font-family: sans-serif; font-size: 11px; z-index: 1000; }
+        #contact-footer a { color: #888; text-decoration: none; font-weight: bold; border: 1px solid #333; padding: 4px 8px; background: #000; }
+        #contact-footer a:hover { color: #fff; border-color: #666; }
+
+        /* 各種リンクの特別装飾 */
+        #mypage-panel { border-color: #ffd700; text-align: center; background: #1a1a00; }
+        #mypage-link { color: #ffd700; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
+        #mypage-link:hover { background: #333300; border-radius: 5px; }
+
+        #gamebooth-panel { border-color: #00e5ff; text-align: center; background: #001a1f; }
+        #gamebooth-link { color: #00e5ff; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
+        #gamebooth-link:hover { background: #00333d; border-radius: 5px; }
+
+        #exchange-panel { border-color: #ff003c; text-align: center; background: #1a0005; }
+        #exchange-link { color: #ff003c; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; }
+        #exchange-link:hover { background: #33000a; border-radius: 5px; }
+
+        /* 🚧 建設中エリアの装飾 🚧 */
+        .construction-panel { border-color: #555; text-align: center; background: #111; opacity: 0.8; }
+        .construction-link { color: #888; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px; cursor: not-allowed; }
+
+        /* ステータス（お財布）パネルの装飾 */
+        #status-panel { border-color: #00ff41; background: #001a05; }
         .status-item { font-size: 1.1em; font-weight: bold; margin: 5px 0; }
-        /* チュートリアル等は既存のスタイルを維持 */
+
+        /* チュートリアルポップアップの装飾 */
+        #tutorial-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 9999; justify-content: center; align-items: center;
+        }
+        #tutorial-content {
+            background: #121212; border: 2px solid #ff00ff; padding: 30px; text-align: center; border-radius: 10px; width: 400px;
+        }
+        .btn-neon {
+            background: #ff00ff; color: #fff; border: none; padding: 12px 24px; font-size: 1.2em; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px; width: 100%;
+        }
+        .btn-neon:hover { background: #cc00cc; }
+
+        /* 制作所ボタンのホバーエフェクト */
+        #start-btn:hover { background: #fff !important; transform: scale(1.05); }
     </style>
 </head>
 <body>
+
+    <script>
+        // IDがない場合は審査ゲートに弾き返す
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「ゲートを通ってから出直してきなさい！」");
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <div id="tutorial-modal">
+        <div id="tutorial-content">
+            <h2 style="color: #ff00ff;">🎉 初回入国ボーナス！</h2>
+            <img src="AKARI.png" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 2px solid #ff00ff;" onerror="this.style.display='none';">
+            <p><strong>AKARI</strong><br>「初めての入国じゃん！<br>パークで遊ぶための資金、渡しとくね！」</p>
+            <div style="background: #000; padding: 15px; margin: 20px 0; border: 1px solid #333;">
+                <div style="font-size: 1.4em; color: #00ff41;">🌀 カオスポイント: 100 P</div>
+                <div style="font-size: 1.4em; color: #ffd700; margin-top: 10px;">💎 作者マイレージ: 100 P</div>
+            </div>
+            <button class="btn-neon" onclick="closeTutorial()">受け取って遊ぶ！</button>
+        </div>
+    </div>
 
     <aside id="akari-zone" class="panel">
         <div id="akari-speech">おいっす～！</div>
@@ -39,27 +103,185 @@
     <main id="core-zone" class="panel">
         <h1 style="color: #00ff41; margin-top: 0;">診断制作所</h1>
         <p>あなたのカオスを形にする場所</p>
-        <button id="start-btn" onclick="window.location.href='maker.html'" style="padding: 15px 30px; font-size: 1.2em; cursor: pointer; background: #00ff41; color: #000; border: none; font-weight: bold; border-radius: 4px; transition: 0.2s;">＞ 診断を制作する ＜</button>
+        <button id="start-btn" 
+                onclick="window.location.href='maker.html'" 
+                style="padding: 15px 30px; font-size: 1.2em; cursor: pointer; background: #00ff41; color: #000; border: none; font-weight: bold; border-radius: 4px; transition: 0.2s;">
+            ＞ 診断を制作する ＜
+        </button>
+        <p style="font-size: 0.8em; color: #555; margin-top: 20px;">※制作するとカオスポイントが貯まるべ！</p>
     </main>
 
     <section id="utility-zone">
-        <div class="panel" id="status-panel" style="border-color: #00ff41; background: #001a05;">
-            <h3 style="margin-top:0; color:#00ff41;">📊 ステータス</h3>
-            <div class="status-item">🌀 カオス: <span id="cp-display">0</span> P</div>
-            <div class="status-item">💎 マイレージ: <span id="cm-display">0</span> P</div>
+        <div class="panel" id="status-panel">
+            <h3 style="margin-top: 0; color: #00ff41; border-bottom: 1px solid #00ff41; padding-bottom: 5px;">📊 所持ステータス</h3>
+            <div class="status-item" style="color: #00ff41;">🌀 カオス: <span id="cp-display">0</span> P</div>
+            <div class="status-item" style="color: #ffd700;">💎 マイレージ: <span id="cm-display">0</span> P</div>
         </div>
-        <div class="panel"><a href="mypage.html" id="mypage-link" style="color:#ffd700; text-decoration:none;">🚪 マイページ</a></div>
-        <div class="panel"><a href="gamebooth.html" style="color:#00e5ff; text-decoration:none;">🎮 ミニゲームブース</a></div>
-        <div class="panel"><a href="exchange.html" style="color:#ff003c; text-decoration:none;">⚖️ 闇の換金所</a></div>
-        <div class="panel"><a href="ranking.html" style="color:#ff8c00; text-decoration:none;">🏆 ランキングボード</a></div>
+
+        <div class="panel" id="mypage-panel">
+            <a href="mypage.html" id="mypage-link">マイページへ</a>
+        </div>
+
+        <div class="panel" id="gamebooth-panel">
+            <a href="gamebooth.html" id="gamebooth-link">🎮 ミニゲームブース</a>
+        </div>
+
+        <div class="panel" id="exchange-panel">
+            <a href="exchange.html" id="exchange-link">⚖️ 闇の換金所</a>
+        </div>
+        
+        <div class="panel" id="ranking-panel" style="border-color: #ff8c00; text-align: center; background: #1a0f00;">
+            <a href="ranking.html" style="color: #ff8c00; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px;">🏆 ランキングボード</a>
+        </div>
+
+        <div class="panel" id="notice-panel" style="border-color: #1e90ff; text-align: center; background: #000f1a;">
+            <a href="notice.html" style="color: #1e90ff; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px;">📢 お知らせ掲示板</a>
+        </div>
+
+        <div class="panel" id="gacha-panel" style="border-color: #ff00ff; text-align: center; background: #1a001a;">
+            <a href="gacha.html" style="color: #ff00ff; font-weight: bold; text-decoration: none; font-size: 1.3em; display: block; padding: 15px; text-shadow: 0 0 10px #ff00ff;">🎲 闇鍋ガチャを回す 🎲</a>
+        </div>
+
+        <div class="panel construction-panel">
+            <a href="#" onclick="alert('🚧 【立入禁止】3Dカオスパークは現在、総統の力により絶賛空間構築中だべ！アップデートを待て！ 🚧'); return false;" class="construction-link">
+                🌳 3Dカオスパーク (建設中)
+            </a>
+        </div>
+
+        <div class="panel construction-panel">
+            <a href="#" onclick="alert('🚧 【立入禁止】住宅区画は現在、基礎工事中だべ！ 🚧'); return false;" class="construction-link">
+                🏠 住宅区画 (建設中)
+            </a>
+        </div>
+
+        <div class="panel construction-panel">
+            <a href="#" onclick="alert('🚧 【立入禁止】労働区画は現在、ブラック労働環境を整備中だべ！ 🚧'); return false;" class="construction-link">
+                ⛏️ 労働区画 (建設中)
+            </a>
+        </div>
+
+        <div class="panel" style="border-color: #ff003c; text-align: center; background: #1a0005;">
+            <button onclick="localStorage.clear(); alert('住民権（ID）を破棄したべ！審査ゲートに戻るべ！'); window.location.href='index.html';" style="background: #ff003c; color: #fff; border: none; padding: 10px; font-weight: bold; cursor: pointer; width: 100%; font-family: monospace;">⚙️ RESET USER DATA</button>
+        </div>
     </section>
 
+    <div id="legal-links">
+        <a href="terms.html">利用規約</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+    </div>
+
     <div id="contact-footer">
-        <a href="https://forms.gle/iRz3DKb5wa87kjJE8" target="_blank">📧 不具合・ご意見はこちら</a>
+        <a href="https://forms.gle/iRz3DKb5wa87kjJE8" target="_blank">📧 不具合・ご意見窓口</a>
     </div>
 
     <script type="module">
-        // --- 既存のJS処理をここに統合するべ ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // 総統の極秘キー
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+            authDomain: "g-chaospark.firebaseapp.com",
+            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "g-chaospark",
+            storageBucket: "g-chaospark.firebasestorage.app",
+            messagingSenderId: "256664886136",
+            appId: "1:256664886136:web:e87bbe307a654331c1468d"
+        };
+
+        // Firebase起動
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // ユーザー情報の取得・設定
+        const userId = localStorage.getItem('userId') || 'guest_' + Math.floor(Math.random() * 100000);
+        localStorage.setItem('userId', userId);
+        const userName = localStorage.getItem('userName') || 'ゲスト';
+        
+        // マイページリンクの更新
+        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
+        
+        const userRef = ref(db, 'users/' + userId);
+
+        // ☁️ クラウドからデータをダウンロード
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                localStorage.setItem('chaosPoint', data.cp);
+                localStorage.setItem('creatorMileage', data.cm);
+                localStorage.setItem('isTutorialDone', data.tutorial);
+                console.log("☁️ クラウドからデータを復元したべ！");
+            } else {
+                saveToFirebase();
+            }
+            updateStatusDisplay();
+            checkTutorial();
+        }).catch((error) => {
+            console.error("DB接続エラーだべ！", error);
+            updateStatusDisplay();
+            checkTutorial();
+        });
+
+        // ☁️ クラウドへデータをアップロード
+        window.saveToFirebase = function() {
+            set(userRef, {
+                name: userName,
+                cp: parseInt(localStorage.getItem('chaosPoint')) || 0,
+                cm: parseInt(localStorage.getItem('creatorMileage')) || 0,
+                tutorial: localStorage.getItem('isTutorialDone') || 'false',
+                lastLogin: new Date().toLocaleString('ja-JP')
+            });
+        };
+
+        function checkTutorial() {
+            if (localStorage.getItem('isTutorialDone') !== 'true') {
+                document.getElementById('tutorial-modal').style.display = 'flex';
+            } else {
+                runSpeechRotation();
+            }
+        }
+
+        window.closeTutorial = function() {
+            localStorage.setItem('chaosPoint', 100);
+            localStorage.setItem('creatorMileage', 100);
+            localStorage.setItem('isTutorialDone', 'true');
+            
+            document.getElementById('tutorial-modal').style.display = 'none';
+            updateStatusDisplay();
+            saveToFirebase();
+            runSpeechRotation();
+        };
+
+        function updateStatusDisplay() {
+            const cp = localStorage.getItem('chaosPoint') || 0;
+            const cm = localStorage.getItem('creatorMileage') || 0;
+            document.getElementById('cp-display').innerText = cp;
+            document.getElementById('cm-display').innerText = cm;
+            saveToFirebase();
+        }
+
+        // --- 🗣️ AKARIの新生・語彙力ローテーション回路（融合） ---
+        const messages = [
+            "おいっす～！",
+            "楽しんで～！",
+            "診断で稼ぐべ～！",
+            "工事中気になる～！",
+            "ゲームやった～？"
+        ];
+        
+        function changeSpeech() {
+            const speechBubble = document.getElementById('akari-speech');
+            if(speechBubble && document.getElementById('tutorial-modal').style.display !== 'flex') {
+                speechBubble.innerText = messages[Math.floor(Math.random() * messages.length)];
+                speechBubble.classList.add('pop-animation');
+                setTimeout(() => speechBubble.classList.remove('pop-animation'), 300);
+            }
+        }
+
+        function runSpeechRotation() {
+            document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
+            setInterval(changeSpeech, 5000);
+        }
     </script>
 </body>
 </html>
