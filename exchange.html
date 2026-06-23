@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | 闇の換金所</title>
+    <style>
+        body {
+            margin: 0; background: #050505; color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            background-image: repeating-linear-gradient(45deg, #0a0a0a, #0a0a0a 10px, #000 10px, #000 20px);
+        }
+
+        .exchange-box {
+            background: rgba(15, 15, 15, 0.95); border: 1px solid #444; 
+            border-top: 4px solid #ff003c; padding: 30px; border-radius: 8px;
+            width: 100%; max-width: 500px; box-sizing: border-box;
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.1);
+            text-align: center; position: relative;
+        }
+
+        h1 { color: #ff003c; margin-top: 0; font-size: 24px; border-bottom: 1px dashed #555; padding-bottom: 10px; text-shadow: 0 0 10px rgba(255,0,60,0.5); }
+        
+        .desc { font-size: 14px; color: #aaa; margin-bottom: 20px; line-height: 1.6; }
+
+        /* ウォレット（お財布）表示 */
+        .wallet {
+            display: flex; justify-content: space-around; background: #000;
+            border: 1px solid #333; padding: 15px; margin-bottom: 20px; border-radius: 5px;
+        }
+        .wallet-item { font-size: 18px; font-weight: bold; }
+        .cp-text { color: #00ff41; }
+        .cm-text { color: #ffd700; }
+
+        /* 残り回数表示 */
+        .limit-board {
+            background: #111; border: 1px solid #ff003c; color: #ff003c;
+            padding: 10px; margin-bottom: 30px; font-weight: bold; letter-spacing: 1px;
+            border-radius: 4px;
+        }
+        .limit-reached-text { background: #330000; }
+
+        /* 変換ボタンエリア */
+        .trade-section {
+            background: #0a0a0a; border: 1px dashed #555; padding: 20px;
+            margin-bottom: 20px; border-radius: 5px; transition: 0.3s;
+        }
+        .trade-section:hover { border-color: #aaa; }
+
+        .trade-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #fff; }
+        
+        .trade-btn {
+            width: 100%; background: transparent; padding: 15px; font-size: 18px; 
+            font-weight: bold; cursor: pointer; transition: 0.3s; border-radius: 5px;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        
+        /* CP → CM ボタン */
+        .btn-cp-to-cm { border: 2px solid #ffd700; color: #ffd700; }
+        .btn-cp-to-cm:hover:not(:disabled) { background: #ffd700; color: #000; }
+        
+        /* CM → CP ボタン */
+        .btn-cm-to-cp { border: 2px solid #00ff41; color: #00ff41; }
+        .btn-cm-to-cp:hover:not(:disabled) { background: #00ff41; color: #000; }
+
+        .trade-btn:disabled { border-color: #444; color: #555; cursor: not-allowed; background: #111; }
+
+        /* ロック画面 */
+        #lock-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); flex-direction: column; align-items: center;
+            justify-content: center; z-index: 10; border: 2px solid #ff003c; box-sizing: border-box;
+            border-radius: 8px;
+        }
+        #lock-overlay h2 { color: #ff003c; letter-spacing: 3px; margin-top: 0; }
+
+        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; }
+        .back-link:hover { color: #ff003c; }
+    </style>
+</head>
+<body>
+
+    <!-- 不法侵入ガード -->
+    <script>
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「ここはあなたのような者が来る場所ではありません。」");
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <div class="exchange-box">
+        
+        <!-- 10回制限ロック画面 -->
+        <div id="lock-overlay">
+            <h2>[ 取引停止 ]</h2>
+            <p style="color: #aaa; font-size: 14px; line-height: 1.6;">
+                本日の取引上限（10回）に達したべ。<br>
+                これ以上の資金洗浄は当局に目をつけられるべ。<br><br>
+                明日また来るべ。
+            </p>
+        </div>
+
+        <h1>[ 闇の換金所 ]</h1>
+        <p class="desc">
+            不足しているリソースを交換する違法な場所だべ。<br>
+            取引は<strong>1日合計10回</strong>までだべ。
+        </p>
+
+        <div class="wallet">
+            <div class="wallet-item cp-text">🌀 CP: <span id="cp-val">0</span></div>
+            <div class="wallet-item cm-text">💎 CM: <span id="cm-val">0</span></div>
+        </div>
+
+        <div class="limit-board" id="limit-board">
+            ⚖️ 本日の取引可能回数: 10 / 10
+        </div>
+
+        <!-- 取引A：CPを払ってCMを買う -->
+        <div class="trade-section">
+            <div class="trade-title">マイレージを買収する</div>
+            <button class="trade-btn btn-cp-to-cm" id="btn-cp-cm" onclick="trade('CP_TO_CM')">
+                <span>-100 CP</span> ➡ <span>+10 CM</span>
+            </button>
+        </div>
+
+        <!-- 取引B：CMを払ってCPを買う -->
+        <div class="trade-section">
+            <div class="trade-title">カオスポイントを生成する</div>
+            <button class="trade-btn btn-cm-to-cp" id="btn-cm-cp" onclick="trade('CM_TO_CP')">
+                <span>-10 CM</span> ➡ <span>+100 CP</span>
+            </button>
+        </div>
+
+    </div>
+
+    <a href="lounge.html" class="back-link">▶ ラウンジへ逃げる</a>
+
+    <script>
+        // ウォレットと取引回数データの読み込み
+        let currentCP = parseInt(localStorage.getItem('chaosPoint')) || 0;
+        let currentCM = parseInt(localStorage.getItem('creatorMileage')) || 0;
+        
+        const MAX_TRADES = 10;
+        const today = new Date().toLocaleDateString();
+        let savedDate = localStorage.getItem('exchangeDate');
+        let tradeCount = parseInt(localStorage.getItem('exchangeCount')) || 0;
+
+        // 日付リセット
+        if (savedDate !== today) {
+            tradeCount = 0;
+            localStorage.setItem('exchangeDate', today);
+            localStorage.setItem('exchangeCount', 0);
+        }
+
+        function updateUI() {
+            document.getElementById('cp-val').innerText = currentCP;
+            document.getElementById('cm-val').innerText = currentCM;
+            
+            const limitBoard = document.getElementById('limit-board');
+            const btnCpToCm = document.getElementById('btn-cp-cm');
+            const btnCmToCp = document.getElementById('btn-cm-cp');
+            const lockOverlay = document.getElementById('lock-overlay');
+            const remains = MAX_TRADES - tradeCount;
+
+            limitBoard.innerText = `⚖️ 本日の取引可能回数: ${remains} / ${MAX_TRADES}`;
+
+            // 取引回数オーバーの処理
+            if (tradeCount >= MAX_TRADES) {
+                limitBoard.classList.add('limit-reached-text');
+                limitBoard.innerText = `🚫 取引停止中`;
+                lockOverlay.style.display = 'flex';
+                btnCpToCm.disabled = true;
+                btnCmToCp.disabled = true;
+                return;
+            }
+
+            // CP → CM ボタンの制御
+            if (currentCP < 100) {
+                btnCpToCm.disabled = true;
+                btnCpToCm.innerHTML = "CPが足りないべ";
+            } else {
+                btnCpToCm.disabled = false;
+                btnCpToCm.innerHTML = "<span>-100 CP</span> ➡ <span>+10 CM</span>";
+            }
+
+            // CM → CP ボタンの制御
+            if (currentCM < 10) {
+                btnCmToCp.disabled = true;
+                btnCmToCp.innerHTML = "CMが足りないべ";
+            } else {
+                btnCmToCp.disabled = false;
+                btnCmToCp.innerHTML = "<span>-10 CM</span> ➡ <span>+100 CP</span>";
+            }
+        }
+
+        // 初期表示
+        updateUI();
+
+        // 実際の取引処理
+        function trade(type) {
+            if (tradeCount >= MAX_TRADES) return;
+
+            if (type === 'CP_TO_CM') {
+                if (currentCP < 100) return;
+                currentCP -= 100;
+                currentCM += 10;
+            } else if (type === 'CM_TO_CP') {
+                if (currentCM < 10) return;
+                currentCM -= 10;
+                currentCP += 100;
+            }
+
+            tradeCount++;
+
+            // セーブ
+            localStorage.setItem('chaosPoint', currentCP);
+            localStorage.setItem('creatorMileage', currentCM);
+            localStorage.setItem('exchangeCount', tradeCount);
+
+            // 更新
+            updateUI();
+        }
+    </script>
+</body>
+</html>
