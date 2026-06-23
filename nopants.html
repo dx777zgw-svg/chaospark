@@ -5,8 +5,10 @@
     <title>パンツがなければ、はかなければいいじゃない！</title>
     <style>
         body { background: #fff5f8; font-family: sans-serif; text-align: center; padding: 20px; }
-        .game-box { background: white; border: 3px solid #ffb6c1; border-radius: 15px; padding: 20px; max-width: 440px; margin: auto; }
+        .game-box { background: white; border: 3px solid #ffb6c1; border-radius: 15px; padding: 20px; max-width: 440px; margin: auto; position: relative; }
         .btn-base { padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; margin: 5px 0; }
+        .return-btn { margin-top: 25px; padding: 10px 20px; background: #555; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; }
+        .return-btn:hover { background: #333; }
     </style>
 </head>
 <body>
@@ -14,9 +16,8 @@
 <div class="game-box">
   <h2 style="color: #ff69b4;">🛌 パンツがなければ、はかなければいいじゃない！</h2>
 
-  <!-- セットアップ -->
   <div id="setup-screen">
-    <input type="text" id="username-input" placeholder="名前を入力..." style="padding:10px; width:80%; margin-bottom:10px;">
+    <input type="text" id="username-input" placeholder="名前を入力..." style="padding:10px; width:80%; margin-bottom:10px; box-sizing:border-box;">
     <div style="display:flex; flex-direction:column; align-items:center;">
         <button class="btn-base" onclick="startGame('solo')" style="background: #ff69b4; color:white;">🆚 ソロレッスン</button>
         <button class="btn-base" onclick="startGame('multi')" style="background: #4ae; color:white;">👥 NPCとレッスン</button>
@@ -24,22 +25,24 @@
     </div>
   </div>
 
-  <!-- ゲーム画面 -->
   <div id="game-screen" style="display:none;">
     <h3 id="question-text">マリー「今、はいてると思う？」</h3>
     <div id="timer-box" style="color:red; font-weight:bold;">残り時間: 20秒</div>
-    <div id="room-users-log" style="text-align: left; margin: 15px 0; border:1px solid #ffb6c1; padding:10px;"></div>
+    <div id="room-users-log" style="text-align: left; margin: 15px 0; border:1px solid #ffb6c1; padding:10px; border-radius:8px;"></div>
     
     <div id="action-buttons-area">
-        <button onclick="userSelect(true)" style="padding:10px 20px; background:#ff69b4; color:white; border:none;">はいてる</button>
-        <button onclick="userSelect(false)" style="padding:10px 20px; background:#4ae; color:white; border:none;">はいてない</button>
+        <button onclick="userSelect(true)" style="padding:10px 20px; background:#ff69b4; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-right:10px;">はいてる</button>
+        <button onclick="userSelect(false)" style="padding:10px 20px; background:#4ae; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">はいてない</button>
     </div>
 
-    <div style="margin-top:20px;">
-        <button onclick="emergencyExit()" style="background:#ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除ボタン</button>
-        <p style="font-size:0.8rem;">残り回数: <span id="fla-count">15</span> (超過時-10P)</p>
+    <div style="margin-top:20px; padding-top:15px; border-top:1px dashed #ffb6c1;">
+        <button onclick="emergencyExit()" style="background:#ffcc00; padding:8px 16px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除ボタン</button>
+        <p style="font-size:0.8rem; color:#666; margin-top:5px;">残り回数: <span id="fla-count">15</span> (超過時-10P)</p>
     </div>
   </div>
+
+  <button class="return-btn" onclick="window.location.href='gamebooth.html'">🏠 ブースに帰還する</button>
+
 </div>
 
 <script>
@@ -76,7 +79,6 @@ function initRound() {
         document.getElementById("timer-box").innerText = "残り時間: " + timeLeft + "秒";
         if (timeLeft <= 0) {
             clearInterval(thinkingTimer);
-            // タイムオーバー減点は -5P に調整！
             roomPlayers[0].score -= 5; 
             alert("タイムオーバー！-5P減点だべ！");
             revealResults();
@@ -105,6 +107,16 @@ function revealResults() {
         if(p.choice === isWearing) { p.score += 10; p.lastResult = "〇"; }
         else { p.lastResult = "❌"; }
     });
+    
+    // ログ更新（簡易表示）
+    let logHtml = "";
+    roomPlayers.forEach(p => {
+        if(p.hasAnswered) {
+            logHtml += `<div>${p.name} : ${p.lastResult} (スコア: ${p.score})</div>`;
+        }
+    });
+    document.getElementById("room-users-log").innerHTML = logHtml;
+
     // 次ターンへ
     setTimeout(() => { currentTurn++; initRound(); }, 2000);
 }
