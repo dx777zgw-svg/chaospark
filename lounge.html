@@ -126,8 +126,8 @@
         <div class="panel" id="exchange-panel">
             <a href="exchange.html" id="exchange-link">⚖️ 闇の換金所</a>
         </div>
-　
-<div class="panel" id="ranking-panel" style="border-color: #ff8c00; text-align: center; background: #1a0f00;">
+        
+        <div class="panel" id="ranking-panel" style="border-color: #ff8c00; text-align: center; background: #1a0f00;">
             <a href="ranking.html" style="color: #ff8c00; font-weight: bold; text-decoration: none; font-size: 1.1em; display: block; padding: 10px;">🏆 ランキングボード</a>
         </div>
 
@@ -156,11 +156,6 @@
                 ⛏️ 労働区画 (建設中)
             </a>
         </div>
-        <div class="panel">ランキングボード<br>・作者ランキング<br>・ルーキー作者</div>
-        <div class="panel">お知らせ掲示板</div>
-        <div class="panel" style="text-align: center;">
-            <a href="gacha.html" style="color: #ccc; text-decoration: none;">🎲 ガチャへ</a>
-        </div>
 
         <div class="panel" style="border-color: #ff003c; text-align: center; background: #1a0005; margin-top: 20px;">
             <button onclick="localStorage.clear(); alert('住民権（ID）を破棄したべ！審査ゲートに戻るべ！'); window.location.href='index.html';" style="background: #ff003c; color: #fff; border: none; padding: 10px; font-weight: bold; cursor: pointer; width: 100%; font-family: monospace;">⚙️ RESET USER DATA</button>
@@ -172,27 +167,84 @@
         <a href="privacy.html">プライバシーポリシー</a>
     </div>
 
+    <!-- 🚀 Firebase連携＆処理スクリプト（完全合体版） 🚀 -->
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // 総統の極秘キー
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+            authDomain: "g-chaospark.firebaseapp.com",
+            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "g-chaospark",
+            storageBucket: "g-chaospark.firebasestorage.app",
+            messagingSenderId: "256664886136",
+            appId: "1:256664886136:web:e87bbe307a654331c1468d"
+        };
+
+        // Firebase起動
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // ユーザー情報の取得・設定
+        const userId = localStorage.getItem('userId') || 'guest_' + Math.floor(Math.random() * 100000);
+        localStorage.setItem('userId', userId);
         const userName = localStorage.getItem('userName') || 'ゲスト';
         
+        // マイページリンクの更新
+        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
+        
+        const userRef = ref(db, 'users/' + userId);
+
+        // ☁️ クラウドからデータをダウンロード
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                localStorage.setItem('chaosPoint', data.cp);
+                localStorage.setItem('creatorMileage', data.cm);
+                localStorage.setItem('isTutorialDone', data.tutorial);
+                console.log("☁️ クラウドからデータを復元したべ！");
+            } else {
+                saveToFirebase();
+            }
+            updateStatusDisplay();
+            checkTutorial();
+        }).catch((error) => {
+            console.error("DB接続エラーだべ！設定ミスか無課金の壁だべw", error);
+            updateStatusDisplay();
+            checkTutorial();
+        });
+
+        // ☁️ クラウドへデータをアップロード
+        window.saveToFirebase = function() {
+            set(userRef, {
+                name: userName,
+                cp: parseInt(localStorage.getItem('chaosPoint')) || 0,
+                cm: parseInt(localStorage.getItem('creatorMileage')) || 0,
+                tutorial: localStorage.getItem('isTutorialDone') || 'false',
+                lastLogin: new Date().toLocaleString('ja-JP')
+            });
+        };
+
         function checkTutorial() {
-            if (!localStorage.getItem('isTutorialDone')) {
+            if (localStorage.getItem('isTutorialDone') !== 'true') {
                 document.getElementById('tutorial-modal').style.display = 'flex';
             } else {
                 document.getElementById('akari-speech').innerText = `よっ！${userName}、待ってたし！`;
             }
-            updateStatusDisplay();
         }
 
         window.closeTutorial = function() {
-            // 💡 ここも100Pに修正したべ！
             localStorage.setItem('chaosPoint', 100);
             localStorage.setItem('creatorMileage', 100);
             localStorage.setItem('isTutorialDone', 'true');
             
             document.getElementById('tutorial-modal').style.display = 'none';
             document.getElementById('akari-speech').innerText = `ボーナス使って、ガンガン遊んできな！`;
+            
             updateStatusDisplay();
+            saveToFirebase(); // ボーナスを受け取った直後にクラウド保存
         };
 
         function updateStatusDisplay() {
@@ -200,18 +252,16 @@
             const cm = localStorage.getItem('creatorMileage') || 0;
             document.getElementById('cp-display').innerText = cp;
             document.getElementById('cm-display').innerText = cm;
+            
+            saveToFirebase(); // 画面更新時にクラウドも更新
         }
 
-        checkTutorial();
-
-        // 💡 末尾のテキスト混入バグを直したべ！
-        document.getElementById('mypage-link').innerText = `🚪 ${userName}のマイページへ`;
-
+        // AKARIのランダムセリフ
         const messages = [
             "おいっす～！", 
             "何して遊ぶべ？", 
-            "楽しんでるか～", 
-            "カオスポイントは足りてるかべ？",
+            "クラウドセーブ対応らしいべ！", 
+            "スマホ変えてもデータ消えないべ！",
             "ミニゲームで一攫千金だべ！",
             "建設中のエリアが気になるべ…"
         ];
