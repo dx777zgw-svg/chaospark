@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | Live Park</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+</head>
+<body>
+    <a-scene cursor="rayOrigin: mouse">
+        <a-assets>
+            <img id="brick" src="https://img.freepik.com/free-photo/white-brick-wall-texture_53876-124976.jpg">
+            <img id="grass" src="https://img.freepik.com/free-photo/green-grass-texture_1232-1579.jpg">
+            <img id="my-fountain" src="1000014465.png">
+        </a-assets>
+
+        <a-sky color="#87CEEB"></a-sky>
+        <a-entity light="type: directional; intensity: 1.2" position="1 2 1"></a-entity>
+        <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+        
+        <a-sphere color="#FFF" radius="5" position="10 15 -20" scale="2 0.5 1"></a-sphere>
+        <a-sphere color="#FFF" radius="5" position="-15 12 -25" scale="2.5 0.6 1"></a-sphere>
+
+        <a-plane rotation="-90 0 0" width="50" height="50" src="#brick" repeat="10 10"></a-plane>
+        <a-circle rotation="-90 0 0" radius="20" src="#grass" position="0 0.01 0"></a-circle>
+
+        <a-entity id="fountain-gimmick" position="0 0 0" class="clickable">
+            <a-image src="#my-fountain" width="6" height="6" position="0 2 0" transparent="true"></a-image>
+            <a-cylinder radius="2" height="2" opacity="0" class="clickable"></a-cylinder>
+        </a-entity>
+
+        <a-box position="5 0.5 5" width="2" height="0.5" depth="1" color="#8B4513"></a-box>
+        <a-cylinder position="-5 0.2 5" radius="1.5" height="0.4" color="#FF69B4"></a-cylinder>
+        <a-entity position="10 0 0">
+            <a-cylinder color="#8B4513" height="1.5" radius="0.2"></a-cylinder>
+            <a-sphere color="#228B22" radius="1" position="0 1.5 0"></a-sphere>
+        </a-entity>
+
+        <a-entity id="camera-rig" position="0 0 0">
+            <a-entity id="avatar" position="0 0 0">
+                <a-sphere color="#FFD700" radius="0.3" position="0 1.5 0"></a-sphere>
+                <a-box color="#4169E1" width="0.6" height="1" depth="0.3" position="0 0.8 0"></a-box>
+            </a-entity>
+            <a-camera position="0 5 10" rotation="-30 0 0"></a-camera>
+        </a-entity>
+    </a-scene>
+</body>
+</html>
