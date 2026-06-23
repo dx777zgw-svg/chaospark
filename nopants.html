@@ -2,35 +2,28 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>G-Chaospark | G-FutOnlab</title>
+    <title>G-Chaospark | ノーパンツ・ゲーム</title>
 </head>
 <body>
-<div id="g-futon-game-box" style="text-align: center; font-family: sans-serif; padding: 20px; background: #fff5f8; border: 3px solid #ffb6c1; border-radius: 15px; max-width: 440px; margin: 20px auto; box-shadow: 0px 4px 15px rgba(0,0,0,0.08);">
+<div id="nopants-game-box" style="text-align: center; font-family: sans-serif; padding: 20px; background: #f0f8ff; border: 3px solid #4169e1; border-radius: 15px; max-width: 440px; margin: 20px auto; box-shadow: 0px 4px 15px rgba(0,0,0,0.08);">
   
-  <h2 style="color: #ff69b4; font-size: 1.1rem; margin: 0;">🛌 G-FutOnlab 最終完全体製品版【v9.5.0】 🌸</h2>
+  <h2 style="color: #4169e1; font-size: 1.2rem; margin: 0;">🩲 ノーパンツ・ゲーム 限界突破版【v10.0.0】 🚫</h2>
   
   <div id="setup-screen" style="margin: 20px 0;">
-    <p style="font-weight: bold; color: #555;">好きな絵文字アイコンを選んでだべw</p>
-    <div id="icon-selector" style="margin: 10px 0; font-size: 1.8rem; display: flex; justify-content: center; gap: 15px;">
-      <span id="icon-👑" onclick="selectIcon('👑')" style="cursor: pointer; padding: 5px; border-radius: 5px; background: #ffb6c1;">👑</span>
-      <span id="icon-😈" onclick="selectIcon('😈')" style="cursor: pointer; padding: 5px; border-radius: 5px;">😈</span>
-      <span id="icon-🍀" onclick="selectIcon('🍀')" style="cursor: pointer; padding: 5px; border-radius: 5px;">🍀</span>
-      <span id="icon-✨" onclick="selectIcon('✨')" style="cursor: pointer; padding: 5px; border-radius: 5px;">✨</span>
-      <span id="icon-🐶" onclick="selectIcon('🐶')" style="cursor: pointer; padding: 5px; border-radius: 5px;">🐶</span>
-    </div>
-    <input type="text" id="username-input" placeholder="ユーザー名を入力してだべw" style="padding: 10px; width: 80%; border: 2px solid #ffb6c1; border-radius: 5px; font-size: 1rem; text-align: center; margin-bottom: 20px;">
+    <p style="font-weight: bold; color: #555;">ようこそ、<span id="display-username" style="color: #ff1493;"></span> だべ！</p>
     
-    <p style="font-weight: bold; color: #ff1493; margin: 5px 0;">👇 レッスンモードを選択して進むべw 👇</p>
+    <p style="font-weight: bold; color: #4169e1; margin: 5px 0;">👇 モードを選択してパンツを賭けるべw 👇</p>
     <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 10px;">
-      <button onclick="startGame('solo')" style="padding: 12px 24px; font-size: 1.05rem; background: #ff69b4; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #d14; width: 85%;">🆚 マンツーマンでレッスン (ソロ) w</button>
-      <button onclick="startGame('multi')" style="padding: 12px 24px; font-size: 1.05rem; background: #4ae; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #28b; width: 85%;">👥 みんなでレッスン (疑似オンライン) w</button>
+      <button onclick="startGame('solo')" style="padding: 12px 24px; font-size: 1.05rem; background: #1e90ff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #0000cd; width: 85%;">🆚 マンツーマンで特訓 (ソロ)</button>
+      <button onclick="startGame('npc6')" style="padding: 12px 24px; font-size: 1.05rem; background: #9370DB; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #4B0082; width: 85%;">🤖 NPC6人と乱戦 (疑似)</button>
+      <button onclick="startGame('online')" style="padding: 12px 24px; font-size: 1.05rem; background: #ff4500; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #cd2626; width: 85%;">🌐 世界の変態と対戦 (オンライン)</button>
     </div>
   </div>
 
   <div id="game-screen" style="display: none;">
-    <div style="background: #ffe4e1; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px solid #ffb6c1;">
-      <span style="font-weight: bold; color: #ff1493; font-size: 1.1rem;">👑 出題者：マリー・トワネッド</span>
-      <h3 style="color: #333; margin: 5px 0 0 0; font-size: 1.3rem;">「今、はいてると思う？🥖✨」</h3>
+    <div style="background: #e6e6fa; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px solid #4169e1;">
+      <span style="font-weight: bold; color: #4169e1; font-size: 1.1rem;">👑 出題者：伝説のノーパンター</span>
+      <h3 style="color: #333; margin: 5px 0 0 0; font-size: 1.3rem;">「今、箱の中にパンツはあると思う？📦✨」</h3>
     </div>
     
     <div style="display: flex; justify-content: space-between; margin: 5px 10px; font-weight: bold;">
@@ -38,63 +31,53 @@
       <div id="timer-box" style="color: #d14;">残り時間: 20秒</div>
     </div>
 
-    <div id="room-users-log" style="text-align: left; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ffb6c1; font-size: 0.9rem; margin-bottom: 15px;">
+    <div id="room-users-log" style="text-align: left; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #4169e1; font-size: 0.9rem; margin-bottom: 15px;">
     </div>
     
     <div id="action-buttons-area" style="margin: 15px 0;">
-      <button onclick="userSelect(true)" style="padding: 12px 24px; font-size: 1rem; background: #ff69b4; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px; font-weight: bold; box-shadow: 0 3px 0 #d14;">はいてる</button>
-      <button onclick="userSelect(false)" style="padding: 12px 24px; font-size: 1rem; background: #4ae; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 3px 0 #28b;">はいてない</button>
+      <button onclick="userSelect(true)" style="padding: 12px 24px; font-size: 1rem; background: #ff69b4; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px; font-weight: bold; box-shadow: 0 3px 0 #d14;">入ってる👖</button>
+      <button onclick="userSelect(false)" style="padding: 12px 24px; font-size: 1rem; background: #4ae; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 3px 0 #28b;">ノーパンツ🚫</button>
     </div>
 
     <div id="multi-panic-buttons" style="margin-bottom: 15px; display: flex; justify-content: center; gap: 10px;">
       <button onclick="simulateDisconnect()" style="padding: 6px 12px; font-size: 0.8rem; background: #555; color: #fff; border: none; border-radius: 4px; cursor: pointer;">⚠️ 悪質切断(失格) 📡❌</button>
-      <button onclick="userResign()" style="padding: 6px 12px; font-size: 0.8rem; background: #aaa; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🏳️ 離脱する(親フラ・急用) w</button>
+      <button onclick="userResign()" style="padding: 6px 12px; font-size: 0.8rem; background: #aaa; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🏳️ 離脱する(親フラ) w</button>
     </div>
 
-    <div id="npc-box" style="min-height: 60px; margin: 15px 0; font-weight: bold; color: #ff1493; font-size: 1.1rem; background: #fff; padding: 10px; border-radius: 5px; border: 1px dashed #ffb6c1; display: flex; align-items: center; justify-content: center;">
-      (お布団マッチングを大待機中だし…👀)
+    <div id="npc-box" style="min-height: 60px; margin: 15px 0; font-weight: bold; color: #4169e1; font-size: 1.1rem; background: #fff; padding: 10px; border-radius: 5px; border: 1px dashed #4169e1; display: flex; align-items: center; justify-content: center;">
+      (参加者の回答を待機中だべ…👀)
     </div>
   </div>
 
   <div id="result-screen" style="display: none; padding: 10px;">
-    <h3 id="result-title" style="color: #ff1493; font-size: 1.4rem; margin-bottom: 10px;">🏆 最終リザルト結果発表 🏆</h3>
-    <div id="leaderboard-box" style="text-align: left; background: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ffb6c1; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.8rem;"></div>
+    <h3 id="result-title" style="color: #4169e1; font-size: 1.4rem; margin-bottom: 10px;">🏆 最終リザルト結果発表 🏆</h3>
+    <div id="leaderboard-box" style="text-align: left; background: #fff; padding: 15px; border-radius: 8px; border: 2px solid #4169e1; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.8rem;"></div>
     
-    <div id="resigned-box" style="text-align: left; background: #f0f0f0; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 20px; font-size: 0.95rem; color: #666; display: none;">
-    </div>
+    <div id="prize-box" style="color: #00ff41; font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;"></div>
 
-    <button onclick="location.reload()" style="padding: 10px 20px; background: #4ae; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">もう一度クソゲーを遊ぶ🔄</button>
+    <button onclick="location.reload()" style="padding: 10px 20px; background: #ff4500; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-right: 10px;">もう一度遊ぶ🔄</button>
+    <button onclick="window.location.href='gamebooth.html'" style="padding: 10px 20px; background: #4ae; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">ブースへ戻る</button>
   </div>
 </div>
 
 <script>
-let currentTurn = 1, timeLeft = 20, thinkingTimer = null, globalUserCounter = 1;
-let selectedIcon = "👑"; 
-let audioCtx = null; 
-let gameMode = "multi"; 
-
-function selectIcon(icon) {
-  selectedIcon = icon;
-  const icons = ['👑', '😈', '🍀', '✨', '🐶'];
-  icons.forEach(i => { document.getElementById(`icon-${i}`).style.background = 'none'; });
-  document.getElementById(`icon-${icon}`).style.background = '#ffb6c1'; 
-}
+let currentTurn = 1, timeLeft = 20, thinkingTimer = null;
+let gameMode = "solo"; 
+const storedName = localStorage.getItem('userName') || "ゲスト変態";
+document.getElementById('display-username').innerText = storedName;
 
 let roomPlayers = [
-  { name: "ユーザー", icon: "👤", isNPC: false, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
+  { name: storedName, icon: "👤", isNPC: false, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
   { name: "AKARI", icon: "🤖", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
   { name: "Liro(Lico)", icon: "💋", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
   { name: "ケンタ", icon: "👱‍♂️", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
   { name: "みちこ", icon: "👩", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
-  { name: "ふさこばぁば", icon: "👵", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false }
+  { name: "ふさこばぁば", icon: "👵", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false },
+  { name: "名無しの権兵衛", icon: "🥷", isNPC: true, hasAnswered: false, choice: null, score: 0, lastResult: "", isDisconnected: false, isResigned: false }
 ];
 
 function startGame(mode) {
   gameMode = mode; 
-  const inputName = document.getElementById("username-input").value.trim();
-  roomPlayers[0].name = inputName || `ユーザー${globalUserCounter++}`;
-  roomPlayers[0].icon = selectedIcon;
-  
   document.getElementById("setup-screen").style.display = "none";
   document.getElementById("game-screen").style.display = "block";
   
@@ -110,7 +93,7 @@ function initRound() {
   clearInterval(thinkingTimer); timeLeft = 20;
   document.getElementById("turn-counter").innerText = `ターン: ${currentTurn} / 15`;
   document.getElementById("timer-box").innerText = `残り時間: ${timeLeft}秒`;
-  document.getElementById("npc-box").innerText = "マリー・トワネッド「さあ選ぶのよ！うぶ〜ん（予告）🥖」";
+  document.getElementById("npc-box").innerText = "出題者「さあ選ぶんだべ！箱の中身は…📦」";
   
   roomPlayers.forEach(p => { 
     p.hasAnswered = false; 
@@ -118,39 +101,36 @@ function initRound() {
     p.lastResult = ""; 
   });
   
-  if (gameMode === "multi") {
+  if (gameMode === "npc6" || gameMode === "online") {
     triggerNPCChoices();
   } else {
     roomPlayers.forEach(p => { if(p.isNPC) { p.hasAnswered = true; p.choice = null; } });
   }
   
   updateRoomLog();
-  resumeAudioCircuit();
 
   thinkingTimer = setInterval(() => {
     timeLeft--;
     document.getElementById("timer-box").innerText = `残り時間: ${timeLeft}秒`;
     if (timeLeft <= 0) {
       clearInterval(thinkingTimer);
-      
       if (!roomPlayers[0].isDisconnected && !roomPlayers[0].isResigned) {
         roomPlayers[0].hasAnswered = true;
-        roomPlayers[0].choice = null;
+        roomPlayers[0].choice = null; 
       }
-      
-      if (gameMode === "multi") {
+      if (gameMode === "npc6" || gameMode === "online") {
         roomPlayers.forEach(p => {
           if(!p.hasAnswered) { p.hasAnswered = true; p.choice = Math.random() < 0.5; }
         });
       }
-      
       revealResults(); 
     }
   }, 1000);
 }
 
 function triggerNPCChoices() {
-  roomPlayers.forEach(p => {
+  let targetPlayers = gameMode === "npc6" ? roomPlayers : roomPlayers.slice(0, 4); 
+  targetPlayers.forEach(p => {
     if (p.isNPC || p.isDisconnected || p.isResigned) {
       setTimeout(() => {
         if (p.hasAnswered) return;
@@ -167,14 +147,16 @@ function updateRoomLog() {
   const logBox = document.getElementById("room-users-log");
   let html = "";
   
-  roomPlayers.forEach(p => {
-    if (gameMode === "solo" && p.isNPC) return;
+  let targetPlayers = roomPlayers;
+  if (gameMode === "solo") targetPlayers = [roomPlayers[0]]; 
+  if (gameMode === "online") targetPlayers = roomPlayers.slice(0, 4); 
 
+  targetPlayers.forEach(p => {
     let nameDisplay = p.name;
-    if (p.isDisconnected) nameDisplay += " <span style='color:red; font-size:0.75rem;'>[切断NPCボット🔄]</span>";
-    if (p.isResigned) nameDisplay += " <span style='color:orange; font-size:0.75rem;'>[親フラ棄権ボット🔄]</span>";
+    if (p.isDisconnected) nameDisplay += " <span style='color:red; font-size:0.75rem;'>[切断]</span>";
+    if (p.isResigned) nameDisplay += " <span style='color:orange; font-size:0.75rem;'>[親フラ]</span>";
 
-    let status = p.hasAnswered ? `<span style='color:${p.choice === null ? "#999" : (p.choice ? "#ff69b4" : "#4ae")}; font-weight:bold;'>【${p.choice === null ? '放置ペナルティ' : (p.choice ? 'はいてる' : 'はいてない')}】✅</span>` : "<span style='color:#999;'>考え中だし…👀</span>";
+    let status = p.hasAnswered ? `<span style='color:${p.choice === null ? "#999" : (p.choice ? "#ff69b4" : "#4ae")}; font-weight:bold;'>【${p.choice === null ? '放置ペナルティ' : (p.choice ? '入ってる👖' : 'ノーパンツ🚫')}】✅</span>` : "<span style='color:#999;'>考え中だべ…👀</span>";
     let resultDisplay = p.lastResult ? ` ➡️ ${p.lastResult}` : "";
     
     html += `<div style="padding:4px 0; border-bottom:1px dashed #ffe4e1; display: flex; justify-content: space-between; align-items: center;">
@@ -188,21 +170,15 @@ function updateRoomLog() {
 function simulateDisconnect() {
   if (roomPlayers[0].isDisconnected || roomPlayers[0].isResigned || gameMode === "solo") return;
   roomPlayers[0].isDisconnected = true;
-  document.getElementById("action-buttons-area").innerHTML = "<b style='color:red;'>⚠️ あなたは回線を切断しました。失格確定だし…💀</b>";
+  document.getElementById("action-buttons-area").innerHTML = "<b style='color:red;'>⚠️ あなたは回線を切断しました。失格確定だべ…💀</b>";
   handleEarlyExit();
 }
 
 function userResign() {
   if (roomPlayers[0].isDisconnected || roomPlayers[0].isResigned || gameMode === "solo") return;
   roomPlayers[0].isResigned = true;
-  document.getElementById("action-buttons-area").innerHTML = "<b style='color:orange;'>🏳️ 親フラ・急用により安全に離脱しました。棄権処理中だし…🌸</b>";
+  document.getElementById("action-buttons-area").innerHTML = "<b style='color:orange;'>🏳️ 親フラにより離脱しました。棄権処理中だべ…🌸</b>";
   handleEarlyExit();
-}
-
-function resumeAudioCircuit() {
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
 }
 
 function handleEarlyExit() {
@@ -224,71 +200,79 @@ function userSelect(guess) {
 }
 
 function checkAllAnswered() {
-  if (gameMode === "solo") {
-    if (roomPlayers[0].hasAnswered) { clearInterval(thinkingTimer); revealResults(); }
-  } else {
-    if (roomPlayers.every(p => p.hasAnswered)) { clearInterval(thinkingTimer); revealResults(); }
-  }
+  let targetPlayers = roomPlayers;
+  if (gameMode === "solo") targetPlayers = [roomPlayers[0]];
+  if (gameMode === "online") targetPlayers = roomPlayers.slice(0, 4);
+
+  if (targetPlayers.every(p => p.hasAnswered)) { clearInterval(thinkingTimer); revealResults(); }
 }
 
-// 途切れていた結果発表ロジックを完全修復！🔥
 function revealResults() {
   const npcBox = document.getElementById("npc-box");
-  const isWearingPants = Math.random() < 0.5; // True:はいてる, False:はいてない
+  const isWearingPants = Math.random() < 0.5;
   
   if (isWearingPants) {
-    npcBox.innerHTML = `マリー「うぶ〜ん！✨ <span style="color:#ff69b4;">【はいてるわよ！】</span> 🥖」`;
+    npcBox.innerHTML = `出題者「残念！✨ <span style="color:#ff69b4;">【パンツは入ってたべ！】</span> 👖」`;
   } else {
-    npcBox.innerHTML = `マリー「いやん！💦 <span style="color:#4ae;">【はいてないわよ！】</span> 🥖」`;
+    npcBox.innerHTML = `出題者「お見事！💦 <span style="color:#4ae;">【完全なるノーパンツだべ！】</span> 🚫」`;
   }
   
   roomPlayers.forEach(p => {
-    if (gameMode === "solo" && p.isNPC) return;
-    
     if (p.isDisconnected) {
-      p.lastResult = "<span style='color:red; font-weight:bold;'>【💀 切断・失格】</span>";
+      p.lastResult = "<span style='color:red; font-weight:bold;'>【💀 失格】</span>";
     } else if (p.isResigned) {
-      p.lastResult = "<span style='color:orange; font-weight:bold;'>【🏳️ 親フラ棄権】</span>";
+      p.lastResult = "<span style='color:orange; font-weight:bold;'>【🏳️ 棄権】</span>";
     } else if (!p.isNPC && p.choice === null) {
       p.score -= 3;
-      p.lastResult = "<span style='color:#999; font-weight:bold;'>【💤 放置 -3P】</span>";
+      p.lastResult = "<span style='color:#999; font-weight:bold;'>【💤 -3P】</span>";
     } else if (p.choice === isWearingPants) {
       p.score += 10;
-      p.lastResult = "<span style='color:#ff1493; font-weight:bold;'>【✨ 正解 +10P】</span>";
-    } else {
-      p.lastResult = "<span style='color:#4ae; font-weight:bold;'>【💦 不正解 0P】</span>";
+      p.lastResult = "<span style='color:#ff1493; font-weight:bold;'>【✨ +10P】</span>";
+    } else if (p.choice !== null) {
+      p.lastResult = "<span style='color:#4ae; font-weight:bold;'>【💦 0P】</span>";
     }
   });
 
   updateRoomLog();
   
-  // 3秒後に次のターンへ
   setTimeout(() => {
     currentTurn++;
     initRound();
-  }, 3000);
+  }, 2500);
 }
 
-// 15ターン終わった後の最終結果画面だべ！
 function endGame() {
   document.getElementById("game-screen").style.display = "none";
   document.getElementById("result-screen").style.display = "block";
   
-  const leaderboardBox = document.getElementById("leaderboard-box");
-  
-  // スコア順に並び替え
-  let activePlayers = roomPlayers.filter(p => !p.isDisconnected && !p.isResigned);
-  if (gameMode === "solo") activePlayers = [roomPlayers[0]];
-  
-  activePlayers.sort((a, b) => b.score - a.score);
+  let targetPlayers = roomPlayers.filter(p => !p.isDisconnected && !p.isResigned);
+  if (gameMode === "solo") targetPlayers = [roomPlayers[0]];
+  if (gameMode === "online") targetPlayers = targetPlayers.filter(p => roomPlayers.indexOf(p) < 4);
+
+  targetPlayers.sort((a, b) => b.score - a.score);
   
   let resultHtml = "";
-  activePlayers.forEach((p, index) => {
+  let userRank = -1;
+
+  targetPlayers.forEach((p, index) => {
     let rankEmoji = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🎀";
+    if (!p.isNPC) userRank = index + 1; // ユーザーの順位を記録
     resultHtml += `<div>${rankEmoji} <b>${p.icon} ${p.name}</b> : <span style="color:#ff1493; font-weight:bold;">${p.score} P</span></div>`;
   });
   
-  leaderboardBox.innerHTML = resultHtml;
+  document.getElementById("leaderboard-box").innerHTML = resultHtml;
+
+  // オンラインモードの報酬（マイレージ付与）
+  if (gameMode === "online" && userRank > 0 && userRank <= 3) {
+    let prizeCM = userRank === 1 ? 50 : userRank === 2 ? 30 : 10;
+    let currentCM = parseInt(localStorage.getItem('creatorMileage')) || 0;
+    localStorage.setItem('creatorMileage', currentCM + prizeCM);
+    document.getElementById("prize-box").innerHTML = `🎉 ${userRank}位入賞！賞金 <span style="color:#ffd700;">+${prizeCM} CM</span> を獲得したべ！ 🎉`;
+  } else if (gameMode === "online") {
+    document.getElementById("prize-box").innerHTML = `<span style="color:#999;">入賞ならず…。賞金はなしだべ。</span>`;
+  } else {
+     document.getElementById("prize-box").innerHTML = `※特訓・乱戦モードのため賞金は出ないべ！`;
+  }
 }
 </script>
 </body>
