@@ -30,46 +30,20 @@
 
         .card-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 15px; }
         
+        /* データが無い時のプレースホルダー装飾 */
+        .empty-placeholder {
+            width: 100%; text-align: center; padding: 40px; background: #111; 
+            border: 1px dashed #333; color: #555; letter-spacing: 2px;
+        }
+        .empty-text-main { font-size: 20px; font-weight: bold; color: #444; margin-bottom: 5px; }
+        .empty-text-sub { font-size: 12px; }
+
         .diag-card {
             background: #121212; border: 1px solid #333; min-width: 280px; padding: 20px;
             box-sizing: border-box; transition: transform 0.3s, border-color 0.3s;
             display: flex; flex-direction: column; justify-content: space-between; position: relative;
         }
         .diag-card:hover { border-color: #00ff41; transform: translateY(-5px); }
-
-        .akari-card { border-color: #00e5ff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
-        .akari-card:hover { border-color: #00e5ff; box-shadow: 0 0 20px rgba(0, 229, 255, 0.5); }
-        
-        .akari-comment {
-            background: #00222b; border: 1px solid #00e5ff; color: #00e5ff;
-            padding: 10px; font-size: 12px; margin-bottom: 15px; border-radius: 4px;
-            font-weight: bold; line-height: 1.4;
-        }
-
-        .diag-title { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 10px; }
-        .diag-author { font-size: 12px; color: #aaa; margin-bottom: 10px; text-align: right; }
-        .diag-desc { font-size: 14px; color: #888; margin-bottom: 20px; flex-grow: 1; }
-
-        .action-bar { display: flex; justify-content: space-between; border-top: 1px dashed #333; padding-top: 15px; }
-        
-        .action-btn {
-            background: transparent; border: none; color: #aaa; cursor: pointer;
-            font-size: 16px; transition: 0.3s; display: flex; align-items: center; gap: 5px;
-        }
-        .action-btn:hover:not(:disabled) { color: #fff; }
-        
-        .btn-like:hover:not(:disabled) { color: #ff007f; }
-        .btn-reco:hover:not(:disabled) { color: #00ff41; }
-        .btn-good:hover:not(:disabled) { color: #ffd700; }
-        .btn-reco:disabled { color: #444; cursor: not-allowed; }
-
-        .play-btn {
-            width: 100%; background: transparent; color: #00ff41; border: 1px solid #00ff41;
-            padding: 10px; margin-top: 15px; cursor: pointer; transition: 0.3s; font-family: inherit;
-        }
-        .play-btn:hover { background: #00ff41; color: #000; font-weight: bold; }
-        .akari-play-btn { color: #00e5ff; border-color: #00e5ff; }
-        .akari-play-btn:hover { background: #00e5ff; color: #000; }
 
         .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; }
         .back-link:hover { color: #00ff41; }
@@ -86,139 +60,59 @@
 
     <div id="ticket-board">🎟️ 本日のおすすめ権：残り 1 回</div>
 
-    <!-- 👑 AKARIのイチオシ特別指定枠 -->
     <div class="category-section">
         <div class="category-title akari-title">👑 AKARIのイチオシ特別指定 (全10枠)</div>
         <div class="card-container" id="akari-picks-container">
-            <!-- JSで自動生成 -->
+            <div class="empty-placeholder">
+                <div class="empty-text-main">[ 404 DATA NOT FOUND ]</div>
+                <div class="empty-text-sub">AKARI is currently searching the deep web...</div>
+            </div>
         </div>
     </div>
 
-    <!-- 🆕 新作枠（追加！） -->
     <div class="category-section">
         <div class="category-title">🆕 新作診断</div>
         <div class="card-container">
-            <div class="diag-card">
-                <div class="diag-title">視界のノイズ診断</div>
-                <div class="diag-author">Author: 観測者X</div>
-                <div class="diag-desc">最近、見えないはずのものが見えていませんか？</div>
-                <button class="play-btn">観測を開始する</button>
-                <div class="action-bar">
-                    <button class="action-btn btn-like">❤ 0</button>
-                    <button class="action-btn btn-reco reco-btn-target">🔃 0</button>
-                    <button class="action-btn btn-good">👍 2</button>
-                </div>
-            </div>
-            <div class="diag-card">
-                <div class="diag-title">深夜の徘徊シミュレーター</div>
-                <div class="diag-author">Author: 眠れない羊</div>
-                <div class="diag-desc">あなたが夜の街で遭遇するモノを測定します。</div>
-                <button class="play-btn">観測を開始する</button>
-                <div class="action-bar">
-                    <button class="action-btn btn-like">❤ 5</button>
-                    <button class="action-btn btn-reco reco-btn-target">🔃 1</button>
-                    <button class="action-btn btn-good">👍 10</button>
-                </div>
+            <div class="empty-placeholder">
+                <div class="empty-text-main">[ NO SIGNAL DETECTED ]</div>
+                <div class="empty-text-sub">Awaiting new creations from the void.</div>
             </div>
         </div>
     </div>
 
-    <!-- 🌟 ルーキー枠 -->
     <div class="category-section">
         <div class="category-title rookie-title">🔰 ルーキー作者診断 (保護期間)</div>
         <div class="card-container">
-            <div class="diag-card">
-                <div class="diag-title">深層心理のバグ測定</div>
-                <div class="diag-author">Author: 名無しルーキー</div>
-                <div class="diag-desc">あなたの脳内に潜む認識のバグを5段階で観測します。</div>
-                <button class="play-btn">観測を開始する</button>
-                <div class="action-bar">
-                    <button class="action-btn btn-like">❤ 12</button>
-                    <button class="action-btn btn-reco reco-btn-target">🔃 8</button>
-                    <button class="action-btn btn-good">👍 45</button>
-                </div>
+            <div class="empty-placeholder" style="border-color: #443a00;">
+                <div class="empty-text-main" style="color: #665500;">[ ROOKIES ARE SLEEPING ]</div>
+                <div class="empty-text-sub">No new entities have entered the training grounds.</div>
             </div>
         </div>
     </div>
 
-    <!-- 🏆 人気診断枠（追加！） -->
     <div class="category-section">
         <div class="category-title popular-title">🏆 殿堂入り・人気診断</div>
         <div class="card-container">
-            <div class="diag-card" style="border-color: #ff007f;">
-                <div class="diag-title">サイバーサイコシス度チェッカー</div>
-                <div class="diag-author">Author: 狂気の科学者</div>
-                <div class="diag-desc">あなたの精神が電子の海にどれだけ侵食されているか測るべ。</div>
-                <button class="play-btn">観測を開始する</button>
-                <div class="action-bar">
-                    <button class="action-btn btn-like">❤ 9999</button>
-                    <button class="action-btn btn-reco reco-btn-target">🔃 850</button>
-                    <button class="action-btn btn-good">👍 15000</button>
-                </div>
+            <div class="empty-placeholder" style="border-color: #400020;">
+                <div class="empty-text-main" style="color: #660033;">[ HALL OF FAME: EMPTY ]</div>
+                <div class="empty-text-sub">Waiting for a legend to be born.</div>
             </div>
         </div>
     </div>
 
-    <!-- 🔥 ユーザーおすすめ枠 -->
     <div class="category-section">
         <div class="category-title">🔥 ユーザーおすすめ診断</div>
         <div class="card-container">
-            <div class="diag-card" style="border-color: #00ff41;">
-                <div class="diag-title"> liminal space 適性検査</div>
-                <div class="diag-author">Author: 総統</div>
-                <div class="diag-desc">誰もいない空間に取り残された時の生存確率を割り出します。</div>
-                <button class="play-btn">観測を開始する</button>
-                <div class="action-bar">
-                    <button class="action-btn btn-like">❤ 890</button>
-                    <button class="action-btn btn-reco reco-btn-target">🔃 142</button>
-                    <button class="action-btn btn-good">👍 1205</button>
-                </div>
+            <div class="empty-placeholder">
+                <div class="empty-text-main">[ RECOMMENDATION QUEUE EMPTY ]</div>
+                <div class="empty-text-sub">Be the first to recommend a masterpiece.</div>
             </div>
         </div>
     </div>
 
-    <a href="maker.html" class="back-link">▶ ゲートへ戻る</a>
+    <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
     <script>
-        // 👑 AKARIの10件自動ピックアップシステム
-        const akariComments = [
-            "この作者の脳内、マジでカオスだべ！絶対やるべきだべ！！",
-            "システムが悲鳴を上げるレベルのヤバい診断見つけたべ…！",
-            "新人とは思えない狂気を感じるべ。推すなら今だべ！",
-            "これを作ったやつ、絶対に普通じゃないべｗｗ",
-            "カオスポイント稼ぐなら、とりあえずコレやっとけべ！"
-        ];
-
-        function createAkariCard(title, author, isRookie) {
-            const randomComment = akariComments[Math.floor(Math.random() * akariComments.length)];
-            const likeCount = Math.floor(Math.random() * 500);
-            const badge = isRookie ? "🔰新人" : "🔥一般";
-            
-            return `
-            <div class="diag-card akari-card">
-                <div class="akari-comment">「${randomComment}」<br>- AKARI</div>
-                <div class="diag-title">${title}</div>
-                <div class="diag-author">Author: ${author} <span style="color:${isRookie ? '#ffd700' : '#888'};">(${badge})</span></div>
-                <div class="diag-desc">AKARIによって深淵から引き上げられた特別指定の診断だべ。</div>
-                <button class="play-btn akari-play-btn">特別観測を開始する</button>
-                <div class="action-bar">
-                    <button class="action-btn btn-like">❤ ${likeCount}</button>
-                    <button class="action-btn btn-reco reco-btn-target">🔃 0</button>
-                    <button class="action-btn btn-good">👍 0</button>
-                </div>
-            </div>
-            `;
-        }
-
-        const akariContainer = document.getElementById('akari-picks-container');
-        let pickCards = [];
-
-        for(let i = 1; i <= 5; i++) pickCards.push(createAkariCard(`狂気の産物・ルーキー第${i}号`, `狂いかけの新人${i}`, true));
-        for(let i = 1; i <= 5; i++) pickCards.push(createAkariCard(`混沌の果て・一般第${i}号`, `歴戦の猛者${i}`, false));
-
-        pickCards.sort(() => Math.random() - 0.5);
-        akariContainer.innerHTML = pickCards.join('');
-
         // 🎟️ 1日1回限定「おすすめ権」制御システム
         const recoBtns = document.querySelectorAll('.reco-btn-target');
         const ticketBoard = document.getElementById('ticket-board');
@@ -229,8 +123,10 @@
             ticketBoard.innerText = "🎟️ 本日のおすすめ権：消費済み（残り 0 回）";
             ticketBoard.classList.add('empty');
             recoBtns.forEach(btn => {
-                btn.disabled = true;
-                btn.title = "明日また権利が復活するべ！";
+                if(btn) {
+                    btn.disabled = true;
+                    btn.title = "明日また権利が復活するべ！";
+                }
             });
         }
 
@@ -238,14 +134,16 @@
             updateTicketUI();
         } else {
             recoBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    alert("この診断に貴重な「おすすめ」を捧げたべ！\n（本日のおすすめ権を消費しました）");
-                    localStorage.setItem('lastRecommendDate', today);
-                    let currentCount = parseInt(this.innerText.replace('🔃 ', ''));
-                    this.innerText = `🔃 ${currentCount + 1}`;
-                    this.style.color = "#00ff41";
-                    updateTicketUI();
-                });
+                if(btn) {
+                    btn.addEventListener('click', function() {
+                        alert("この診断に貴重な「おすすめ」を捧げたべ！\n（本日のおすすめ権を消費しました）");
+                        localStorage.setItem('lastRecommendDate', today);
+                        let currentCount = parseInt(this.innerText.replace('🔃 ', ''));
+                        this.innerText = `🔃 ${currentCount + 1}`;
+                        this.style.color = "#00ff41";
+                        updateTicketUI();
+                    });
+                }
             });
         }
     </script>
