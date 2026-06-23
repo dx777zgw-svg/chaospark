@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | カオス・フィッシング</title>
+    <style>
+        body { margin: 0; background: #001a33; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 30px; }
+        h1 { color: #00e5ff; text-shadow: 0 0 10px #00e5ff; }
+        
+        .status-board { background: rgba(0,0,0,0.8); border: 1px solid #00e5ff; padding: 15px; margin-bottom: 20px; border-radius: 5px; display: flex; justify-content: space-around; font-size: 1.2rem; font-weight: bold; }
+        .cp-text { color: #00ff41; }
+        .cm-text { color: #ffd700; }
+
+        /* 釣り堀エリア */
+        #pond {
+            width: 100%; max-width: 600px; height: 300px; background: linear-gradient(180deg, #001133 0%, #004488 100%);
+            border: 3px solid #00e5ff; border-radius: 10px; margin: 0 auto; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        /* カウントダウン表示 */
+        #countdown-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 80px; font-weight: bold; color: #ff00ff; text-shadow: 0 0 20px #ff00ff;
+            pointer-events: none; display: none;
+        }
+
+        /* 出現する魚（ターゲット） */
+        #fish-target {
+            position: absolute; width: 50px; height: 50px; background: radial-gradient(circle, #fff, #00e5ff);
+            border-radius: 50%; cursor: pointer; display: none; font-size: 30px; line-height: 50px;
+            box-shadow: 0 0 15px #00e5ff; text-align: center;
+        }
+        
+        /* アクションボタン */
+        .btn { padding: 15px 30px; font-size: 1.2rem; background: #00e5ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .btn:hover { background: #fff; }
+        .btn:disabled { background: #555; cursor: not-allowed; }
+
+        #result-msg { margin-top: 20px; font-size: 1.5rem; font-weight: bold; min-height: 40px; }
+        .back-btn { display: inline-block; margin-top: 40px; padding: 10px 20px; border: 1px solid #00e5ff; color: #00e5ff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🎣 カオス・フィッシング 🐟</h1>
+    <p>参加費: 5 CP<br>「3カウント」で0になった瞬間、水面（枠内）のどこかに光る影が出る！素早くクリック（タップ）して釣り上げろ！</p>
+
+    <div class="status-board">
+        <div class="cp-text">🌀 CP: <span id="cp-display">0</span></div>
+        <div class="cm-text">💎 CM: <span id="cm-display">0</span></div>
+    </div>
+
+    <div id="pond">
+        <div id="countdown-text">3</div>
+        <div id="fish-target" onmousedown="catchFish()" ontouchstart="catchFish()">🐟</div>
+    </div>
+
+    <button id="start-btn" class="btn" onclick="startFishing()">竿を振る (5 CP消費)</button>
+
+    <div id="result-msg"></div>
+
+    <a href="gamebooth.html" class="back-btn">▶ ブースへ戻る</a>
+
+    <script>
+        let isFishing = false;
+        let escapeTimer = null;
+
+        function updateStatus() {
+            document.getElementById('cp-display').innerText = localStorage.getItem('chaosPoint') || 0;
+            document.getElementById('cm-display').innerText = localStorage.getItem('creatorMileage') || 0;
+        }
+        updateStatus();
+
+        function startFishing() {
+            if (isFishing) return;
+            let cp = parseInt(localStorage.getItem('chaosPoint')) || 0;
+            if (cp < 5) {
+                alert("CPが足りないべ！");
+                return;
+            }
+
+            // CP消費
+            localStorage.setItem('chaosPoint', cp - 5);
+            updateStatus();
+
+            isFishing = true;
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('result-msg').innerHTML = "";
+            const countdownEl = document.getElementById('countdown-text');
+            const targetEl = document.getElementById('fish-target');
+            
+            targetEl.style.display = 'none';
+            countdownEl.style.display = 'block';
+            countdownEl.innerText = "3";
+            countdownEl.style.color = "#ff00ff";
+
+            // カウントダウン処理
+            setTimeout(() => { countdownEl.innerText = "2"; }, 1000);
+            setTimeout(() => { countdownEl.innerText = "1"; }, 2000);
+            setTimeout(() => { 
+                countdownEl.innerText = "0!!"; 
+                countdownEl.style.color = "#00ff41";
+                spawnFish(); 
+            }, 3000);
+        }
+
+        function spawnFish() {
+            const pond = document.getElementById('pond');
+            const target = document.getElementById('fish-target');
+            const countdownEl = document.getElementById('countdown-text');
+            
+            // 少ししたらカウントダウンの文字を消す
+            setTimeout(() => { countdownEl.style.display = 'none'; }, 500);
+
+            // ランダムな位置を計算 (はみ出さないように)
+            const maxX = pond.clientWidth - 50;
+            const maxY = pond.clientHeight - 50;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+            target.style.display = 'block';
+
+            // 魚が逃げるまでの時間 (1.2秒！)
+            escapeTimer = setTimeout(() => {
+                fishEscaped();
+            }, 1200); 
+        }
+
+        function catchFish() {
+            if (!isFishing) return;
+            
+            // 逃げるタイマーを解除
+            clearTimeout(escapeTimer);
+            document.getElementById('fish-target').style.display = 'none';
+            
+            // 魚のサイズ判定
+            let size = Math.floor(Math.random() * 95) + 5; // 5cm 〜 100cm
+            let cmReward = 0;
+            let rarity = "";
+            let color = "";
+
+            if (size >= 90) {
+                cmReward = 50; rarity = "ヌシ級！"; color = "#ff00ff";
+            } else if (size >= 60) {
+                cmReward = 10; rarity = "大物！"; color = "#ff4500";
+            } else if (size >= 30) {
+                cmReward = 3; rarity = "中物！"; color = "#ffd700";
+            } else {
+                cmReward = 1; rarity = "小物！"; color = "#00e5ff";
+            }
+
+            let cm = parseInt(localStorage.getItem('creatorMileage')) || 0;
+            localStorage.setItem('creatorMileage', cm + cmReward);
+            updateStatus();
+
+            document.getElementById('result-msg').innerHTML = `<span style="color:${color};">ヒット！${size}cmの${rarity} (+${cmReward} CM獲得) 🐟✨</span>`;
+            resetFishing();
+        }
+
+        function fishEscaped() {
+            document.getElementById('fish-target').style.display = 'none';
+            document.getElementById('result-msg').innerHTML = `<span style="color:#ff003c;">逃げられたべ…💦 (-5 CP)</span>`;
+            resetFishing();
+        }
+
+        function resetFishing() {
+            isFishing = false;
+            document.getElementById('start-btn').disabled = false;
+        }
+    </script>
+</body>
+</html>
