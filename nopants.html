@@ -3,47 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>パンツがなければ、はかなければいいじゃない！</title>
+    <style>
+        body { background: #fff5f8; font-family: sans-serif; text-align: center; padding: 20px; }
+        .game-box { background: white; border: 3px solid #ffb6c1; border-radius: 15px; padding: 20px; max-width: 440px; margin: auto; }
+        .btn-base { padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; margin: 5px 0; }
+    </style>
 </head>
 <body>
-<div id="g-futon-game-box" style="text-align: center; font-family: sans-serif; padding: 20px; background: #fff5f8; border: 3px solid #ffb6c1; border-radius: 15px; max-width: 440px; margin: 20px auto; box-shadow: 0px 4px 15px rgba(0,0,0,0.08);">
-  
-  <h2 style="color: #ff69b4; font-size: 1.1rem; margin: 0;">🛌 パンツがなければ、はかなければいいじゃない！</h2>
-  
-  <div id="setup-screen" style="margin: 20px 0;">
-    <input type="text" id="username-input" placeholder="ユーザー名を入力してだべw" style="padding: 10px; width: 80%; border: 2px solid #ffb6c1; border-radius: 5px; text-align: center; margin-bottom: 20px;">
-    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
-      <button onclick="startGame('solo')" style="padding: 12px 24px; background: #ff69b4; color: white; border: none; border-radius: 5px; width: 85%; cursor: pointer;">🆚 ソロ特訓</button>
-      <button onclick="startGame('multi')" style="padding: 12px 24px; background: #4ae; color: white; border: none; border-radius: 5px; width: 85%; cursor: pointer;">👥 みんなでレッスン</button>
-      <button onclick="startGame('online')" style="padding: 12px 24px; background: #ff4500; color: white; border: none; border-radius: 5px; width: 85%; cursor: pointer;">🌐 オンライン対戦(3分待機)</button>
+
+<div class="game-box">
+  <h2 style="color: #ff69b4;">🛌 パンツがなければ、はかなければいいじゃない！</h2>
+
+  <!-- セットアップ -->
+  <div id="setup-screen">
+    <input type="text" id="username-input" placeholder="名前を入力..." style="padding:10px; width:80%; margin-bottom:10px;">
+    <div style="display:flex; flex-direction:column; align-items:center;">
+        <button class="btn-base" onclick="startGame('solo')" style="background: #ff69b4; color:white;">🆚 ソロレッスン</button>
+        <button class="btn-base" onclick="startGame('multi')" style="background: #4ae; color:white;">👥 NPCとレッスン</button>
+        <button class="btn-base" onclick="startGame('online')" style="background: #ff4500; color:white;">🌐 オンライン対戦(3分待機)</button>
     </div>
   </div>
 
-  <div id="game-screen" style="display: none;">
-    <div id="turn-counter" style="font-weight: bold; color: #333;">ターン: 1 / 15</div>
-    <div id="timer-box" style="color: #d14; font-weight: bold;">残り時間: 20秒</div>
-    <div id="room-users-log" style="text-align: left; background: #fff; padding: 10px; margin: 15px 0; border: 1px solid #ffb6c1;"></div>
+  <!-- ゲーム画面 -->
+  <div id="game-screen" style="display:none;">
+    <h3 id="question-text">マリー「今、はいてると思う？」</h3>
+    <div id="timer-box" style="color:red; font-weight:bold;">残り時間: 20秒</div>
+    <div id="room-users-log" style="text-align: left; margin: 15px 0; border:1px solid #ffb6c1; padding:10px;"></div>
     
     <div id="action-buttons-area">
-      <button onclick="userSelect(true)" style="padding: 10px; background: #ff69b4; color:white; border:none;">はいてる</button>
-      <button onclick="userSelect(false)" style="padding: 10px; background: #4ae; color:white; border:none;">はいてない</button>
+        <button onclick="userSelect(true)" style="padding:10px 20px; background:#ff69b4; color:white; border:none;">はいてる</button>
+        <button onclick="userSelect(false)" style="padding:10px 20px; background:#4ae; color:white; border:none;">はいてない</button>
     </div>
 
-    <div id="multi-panic-buttons" style="margin: 15px 0; display: flex; flex-direction: column; gap: 5px;">
-        <button id="oya-fla-btn" onclick="emergencyExit()" style="display:none; padding: 10px; background: #ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除(残り:<span id="fla-count">15</span>回)</button>
-        <button onclick="simulateDisconnect()" style="padding: 5px; background: #555; color: white; border: none;">📡 悪質切断(失格)</button>
+    <div style="margin-top:20px;">
+        <button onclick="emergencyExit()" style="background:#ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除ボタン</button>
+        <p style="font-size:0.8rem;">残り回数: <span id="fla-count">15</span> (超過時-10P)</p>
     </div>
-
-    <div id="npc-box" style="padding: 10px; background: #fff; border: 1px dashed #ffb6c1; margin-top: 10px;">待機中…</div>
   </div>
 </div>
 
 <script>
-let currentTurn = 1, timeLeft = 20, thinkingTimer = null, flaCount = 15; // 15回に変更！
-let gameMode = "multi";
+let currentTurn = 1, timeLeft = 20, thinkingTimer = null, flaCount = 15;
+let gameMode = "";
 let roomPlayers = [
-  { name: "ユーザー", isNPC: false, hasAnswered: false, choice: null, score: 0, isDisconnected: false, isResigned: false },
+  { name: "ユーザー", isNPC: false, hasAnswered: false, choice: null, score: 0 },
   { name: "AKARI", isNPC: true, hasAnswered: false, choice: null, score: 0 },
-  { name: "Liro", isNPC: true, hasAnswered: false, choice: null, score: 0 }
+  { name: "Liro", isNPC: true, hasAnswered: false, choice: null, score: 0 },
+  { name: "ケンタ", isNPC: true, hasAnswered: false, choice: null, score: 0 }
 ];
 
 function startGame(mode) {
@@ -52,46 +58,67 @@ function startGame(mode) {
     document.getElementById("game-screen").style.display = "block";
     
     if (gameMode === "online") {
-        document.getElementById("oya-fla-btn").style.display = "block";
-        document.getElementById("npc-box").innerText = "オンライン待機中...3分でNPCが参戦するべ！";
         setTimeout(() => {
-            if (currentTurn === 1) alert("3分経過！NPCが強制参戦したべ！");
-        }, 180000); 
+            if(currentTurn === 1) alert("3分経過！NPCが強制参戦するべ！");
+        }, 180000); // 3分
     }
     initRound();
 }
 
+function initRound() {
+    clearInterval(thinkingTimer);
+    timeLeft = 20;
+    roomPlayers.forEach(p => { p.hasAnswered = false; p.choice = null; });
+    document.getElementById("timer-box").innerText = "残り時間: 20秒";
+    
+    thinkingTimer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer-box").innerText = "残り時間: " + timeLeft + "秒";
+        if (timeLeft <= 0) {
+            clearInterval(thinkingTimer);
+            // タイムオーバー減点は -5P に調整！
+            roomPlayers[0].score -= 5; 
+            alert("タイムオーバー！-5P減点だべ！");
+            revealResults();
+        }
+    }, 1000);
+}
+
+function userSelect(guess) {
+    roomPlayers[0].hasAnswered = true;
+    roomPlayers[0].choice = guess;
+    // NPCも自動回答
+    roomPlayers.forEach(p => {
+        if(p.isNPC) { p.hasAnswered = true; p.choice = Math.random() < 0.5; }
+    });
+    clearInterval(thinkingTimer);
+    revealResults();
+}
+
+function revealResults() {
+    const isWearing = Math.random() < 0.5;
+    document.getElementById("question-text").innerText = isWearing 
+        ? "安心はさいはいてますわ👸" 
+        : "はいてないはよ～うぶ～ん😘";
+    
+    roomPlayers.forEach(p => {
+        if(p.choice === isWearing) { p.score += 10; p.lastResult = "〇"; }
+        else { p.lastResult = "❌"; }
+    });
+    // 次ターンへ
+    setTimeout(() => { currentTurn++; initRound(); }, 2000);
+}
+
 function emergencyExit() {
-    if(flaCount > 0) {
-        flaCount--;
-        alert("親フラ回避！残り" + flaCount + "回だべ！");
-    } else {
-        // 16回目以降は -10P 没収に修正
-        roomPlayers[0].score = Math.max(0, roomPlayers[0].score - 10);
-        alert("免除切れ！ペナルティで-10Pだべ！");
-    }
+    if(flaCount > 0) { flaCount--; alert("親フラ回避！残り"+flaCount+"回"); }
+    else { roomPlayers[0].score -= 10; alert("免除切れ！-10Pペナルティ"); }
     document.getElementById('fla-count').innerText = flaCount;
 }
 
 function simulateDisconnect() {
-    roomPlayers[0].isDisconnected = true;
-    roomPlayers[0].score = 0; // ポイント没収
-    alert("切断！ポイント没収してNPCが代行するべ！");
-    if(!roomPlayers[0].hasAnswered) {
-        roomPlayers[0].hasAnswered = true;
-        roomPlayers[0].choice = Math.random() < 0.5;
-    }
-}
-
-function initRound() {
-    if (gameMode === "online") {
-        roomPlayers.forEach(p => {
-            if (p.isNPC || p.isDisconnected) {
-                p.hasAnswered = true;
-                p.choice = Math.random() < 0.5;
-            }
-        });
-    }
+    roomPlayers[0].score -= 100; // 切断-100
+    alert("切断！-100P没収！NPCが代行するべ！");
+    roomPlayers[0].isNPC = true; // 以降NPCが代行
 }
 </script>
 </body>
