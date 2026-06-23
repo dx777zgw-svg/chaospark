@@ -52,12 +52,7 @@
         .reco-btn-target { background: transparent; border: 1px solid #555; color: #aaa; cursor: pointer; padding: 5px 10px; border-radius: 3px; }
         .reco-btn-target:hover:not(:disabled) { border-color: #00ff41; color: #00ff41; }
 
-        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; font-weight: bold; }
-        .back-link:hover { color: #00ff41; }
-        .maker-link { display: block; text-align: center; margin-top: 10px; color: #00e5ff; text-decoration: none; font-size: 1.2rem; font-weight: bold; border: 1px dashed #00e5ff; padding: 10px; }
-        .maker-link:hover { background: #00e5ff; color: #000; }
-
-        /* 👑 劇的進化：結果画面（モーダル）のスタイル 👑 */
+        /* 結果画面（モーダル） */
         #result-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); z-index: 10000; justify-content: center; align-items: center;
@@ -70,7 +65,6 @@
         }
         #res-diag-title { color: #aaa; font-size: 1rem; margin: 0 0 15px 0; border-bottom: 1px dashed #333; padding-bottom: 10px; }
         
-        /* 💡 改修の核心：ホワイトスペースを保持して改行を完全再現！ */
         #res-diag-text {
             background: #000; border: 1px solid #222; color: #fff;
             padding: 20px; font-size: 1.2rem; text-align: left; line-height: 1.6;
@@ -82,6 +76,11 @@
         .btn-share:hover { background: #fff; color: #1da1f2; }
         .btn-close { flex: 1; background: #333; color: #ccc; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 1rem; }
         .btn-close:hover { background: #444; color: #fff; }
+
+        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; font-weight: bold; }
+        .back-link:hover { color: #00ff41; }
+        .maker-link { display: block; text-align: center; margin-top: 10px; color: #00e5ff; text-decoration: none; font-size: 1.2rem; font-weight: bold; border: 1px dashed #00e5ff; padding: 10px; }
+        .maker-link:hover { background: #00e5ff; color: #000; }
 
         ::-webkit-scrollbar { height: 8px; }
         ::-webkit-scrollbar-track { background: #111; }
@@ -135,11 +134,10 @@
         </div>
     </div>
 
-    <!-- 🌳 専用結果画面モーダル（追加！） 🌳 -->
     <div id="result-modal">
         <div id="result-window">
             <div id="res-diag-title">診断タイトル</div>
-            <div id="res-diag-text">ここに改行付きの診断結果が綺麗に展開されるべ！</div>
+            <div id="res-diag-text">ここにランダムで選ばれた1つだけの診断結果が綺麗に展開されるべ！</div>
             <div class="result-btns">
                 <button class="btn-share" onclick="shareToX()">𝕏 に結果を投稿</button>
                 <button class="btn-close" onclick="closeResult()">閉じる</button>
@@ -150,7 +148,6 @@
     <a href="maker.html" class="maker-link">🛠️ 診断アトリエ（制作所）へ行く</a>
     <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
-    <!-- 🚀 Firebase連携＆処理スクリプト 🚀 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -202,22 +199,31 @@
             updateTicketUI();
         };
 
-        // 🚀 特製結果画面の呼び出しロジック！
+        // 🚀 診断プレイ関数（神改修：改行ごとに分割してランダムで1つを抽出するべ！）
         window.playDiag = function(diagId) {
             const userName = localStorage.getItem('userName') || "あなた";
             
             if (window.currentDiagnoses && window.currentDiagnoses[diagId]) {
                 const diag = window.currentDiagnoses[diagId];
-                const pattern = diag.resultPattern || "結果データが見つからないべ…";
+                const rawPattern = diag.resultPattern || "結果データが見つからないべ…";
                 
-                // [名前] をユーザー名に置換！
-                const finalResult = pattern.replace(/\[名前\]/g, userName);
+                // 💡 文章を「改行」でぶった切って、前後の余計な空白を消し、空の行を排除して配列化するべ！
+                const patternsList = rawPattern.split('\n').map(p => p.trim()).filter(p => p !== "");
                 
-                // シェア用にグローバルにキープ
+                let selectedPattern = rawPattern;
+                if (patternsList.length > 0) {
+                    // 配列の中からランダムで1つの結果をチョイスするべッ！
+                    selectedPattern = patternsList[Math.floor(Math.random() * patternsList.length)];
+                }
+                
+                // 選ばれた1本のパターンの中にある [名前] をユーザー名に置換！
+                const finalResult = selectedPattern.replace(/\[名前\]/g, userName);
+                
+                // シェア用グローバル変数
                 currentActiveTitle = diag.title;
                 currentActiveResult = finalResult;
 
-                // モーダルウィンドウを開いてデータを流し込むべ！
+                // モーダルウィンドウを開いてデータを流し込む
                 document.getElementById('res-diag-title').innerText = `【 診断結果：${diag.title} 】`;
                 document.getElementById('res-diag-text').innerText = finalResult;
                 document.getElementById('result-modal').style.display = 'flex';
@@ -226,12 +232,10 @@
             }
         };
 
-        // 結果画面を閉じる関数
         window.closeResult = function() {
             document.getElementById('result-modal').style.display = 'none';
         };
 
-        // 🕳️ 𝕏 (Twitter) への共有URL生成システム（SNSシェアによるバズ設計！）
         window.shareToX = function() {
             const text = `【${currentActiveTitle}】\n${currentActiveResult}\n\nカオスな診断で遊ぶなら 🌀G-Chaospark✨\n`;
             const url = "https://dx777zgw-svg.github.io/chaospark/";
