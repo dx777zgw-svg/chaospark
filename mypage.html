@@ -7,7 +7,7 @@
         body { 
             margin: 0; background: #050505; color: #e0e0e0; 
             font-family: 'Courier New', Courier, monospace; 
-            display: flex; justify-content: center; align-items: center; 
+            display: flex; justify-content: center; align-items: flex-start; 
             min-height: 100vh; padding: 20px; box-sizing: border-box;
             background-image: radial-gradient(circle at center, #111 0%, #000 100%);
         }
@@ -19,7 +19,7 @@
             border: 1px solid #333; border-top: 3px solid #ffd700; 
             border-radius: 8px; padding: 30px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            position: relative;
+            position: relative; margin-top: 20px;
         }
 
         h1 { margin-top: 0; color: #fff; font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
@@ -30,10 +30,10 @@
             width: 80px; height: 80px; background: #222; 
             border: 2px dashed #555; border-radius: 50%; 
             display: flex; justify-content: center; align-items: center; 
-            font-size: 3em; cursor: pointer; transition: 0.3s;
+            font-size: 3em; cursor: pointer; transition: 0.3s; flex-shrink: 0;
         }
         .avatar-box:hover { border-color: #ffd700; transform: scale(1.05); background: #333;}
-        .user-info h2 { margin: 0; font-size: 1.5em; color: #fff; }
+        .user-info h2 { margin: 0; font-size: 1.5em; color: #fff; word-break: break-all; }
         .user-info p { margin: 5px 0 0; color: #888; font-size: 0.9em; }
 
         /* ステータスボード */
@@ -48,7 +48,7 @@
 
         /* ボタン類 */
         .btn { 
-            display: inline-block; width: 100%; text-align: center; 
+            display: inline-block; width: 100%; text-align: center; box-sizing: border-box;
             padding: 12px; background: transparent; border: 1px solid #555; 
             color: #ccc; text-decoration: none; font-weight: bold; 
             border-radius: 4px; cursor: pointer; transition: 0.3s;
@@ -65,14 +65,60 @@
         .modal-content {
             background: #111; border: 1px solid #444; padding: 20px; border-radius: 8px; text-align: center; width: 300px;
         }
-        .emoji-grid { display: flex; justify-content: space-around; margin: 20px 0; }
+        .emoji-grid { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
         .emoji-item { font-size: 2.5em; cursor: pointer; padding: 10px; border-radius: 5px; transition: 0.2s; }
         .emoji-item:hover { background: #333; transform: scale(1.2); }
+
+        /* 👑 追加：自分が作った診断リスト 👑 */
+        .my-diagnoses-section { margin-top: 40px; border-top: 1px dashed #333; padding-top: 20px; }
+        .section-title { font-size: 1.2rem; color: #fff; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #00e5ff; }
+        
+        .diag-item {
+            background: #0a0a0a; border: 1px solid #222; padding: 15px; border-radius: 8px;
+            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .diag-info { flex-grow: 1; margin-right: 15px; overflow: hidden; }
+        .diag-title { color: #00ff41; font-weight: bold; font-size: 1.1rem; margin: 0 0 5px 0; word-break: break-all; }
+        .diag-desc { font-size: 0.85rem; color: #aaa; margin: 0; word-break: break-all; }
+
+        /* 操作ボタン */
+        .btn-area { display: flex; gap: 8px; flex-shrink: 0; }
+        .btn-edit { background: transparent; border: 1px solid #00e5ff; color: #00e5ff; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-edit:hover { background: #00e5ff; color: #000; }
+        .btn-delete { background: transparent; border: 1px solid #ff003c; color: #ff003c; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-delete:hover { background: #ff003c; color: #fff; }
+
+        /* 👑 修正用モーダル（ポップアップ窓） 👑 */
+        #edit-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center;
+            box-sizing: border-box; padding: 20px;
+        }
+        #edit-window {
+            background: #111; border: 2px solid #00e5ff; border-radius: 10px;
+            width: 100%; max-width: 500px; padding: 25px; box-sizing: border-box;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+        }
+        #edit-window h2 { color: #00e5ff; margin-top: 0; text-align: center; font-size: 1.3rem; border-bottom: 1px dashed #333; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; font-weight: bold; }
+        input[type="text"], textarea {
+            width: 100%; background: #000; border: 1px solid #444; color: #fff;
+            padding: 8px; box-sizing: border-box; font-family: inherit; border-radius: 4px;
+        }
+        input[type="text"]:focus, textarea:focus { border-color: #00e5ff; outline: none; }
+        textarea { resize: vertical; height: 80px; }
+
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-save { flex: 1; background: #00ff41; color: #000; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-save:hover { background: #fff; }
+        .btn-cancel { flex: 1; background: #333; color: #ccc; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-cancel:hover { background: #444; color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- 不法侵入ガード -->
     <script>
         if (!localStorage.getItem('userId')) {
             alert("Lico「誰だお前は。ゲートを通って出直してきなさい。」");
@@ -80,7 +126,6 @@
         }
     </script>
 
-    <!-- アバター選択モーダル -->
     <div id="avatar-modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#fff;">初期アイコンを選択</h3>
@@ -91,17 +136,41 @@
                 <div class="emoji-item" onclick="setAvatar('🐶')">🐶</div>
                 <div class="emoji-item" onclick="setAvatar('👽')">👽</div>
                 <div class="emoji-item" onclick="setAvatar('👤')">👤</div>
+                <div class="emoji-item" onclick="setAvatar('🤖')">🤖</div>
+                <div class="emoji-item" onclick="setAvatar('🤡')">🤡</div>
+                <div class="emoji-item" onclick="setAvatar('👻')">👻</div>
             </div>
             <button class="btn" onclick="closeAvatarModal()">閉じる</button>
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
+    <div id="edit-modal">
+        <div id="edit-window">
+            <h2>📝 診断内容の改変（システム干渉）</h2>
+            <input type="hidden" id="edit-id">
+            <div class="form-group">
+                <label>診断タイトル</label>
+                <input type="text" id="edit-title">
+            </div>
+            <div class="form-group">
+                <label>説明文</label>
+                <textarea id="edit-desc"></textarea>
+            </div>
+            <div class="form-group">
+                <label>結果のパターン</label>
+                <textarea id="edit-result" placeholder="例：[名前]の戦闘力は53万だべ！"></textarea>
+            </div>
+            <div class="modal-btns">
+                <button class="btn-save" onclick="saveEdit()">データを上書き（保存）</button>
+                <button class="btn-cancel" onclick="closeEditModal()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
     <div class="mypage-container">
         <h1>RESIDENT DATA <span style="font-size: 0.5em; color: #ffd700;">G-Chaos Park</span></h1>
 
         <div class="profile-header">
-            <!-- アバター表示領域（クリックで変更） -->
             <div class="avatar-box" id="user-avatar" onclick="openAvatarModal()" title="アイコンを変更">👤</div>
             <div class="user-info">
                 <h2 id="display-name">NO NAME</h2>
@@ -121,17 +190,40 @@
         </div>
 
         <button class="btn">💳 所持アイテム・称号を見る (未実装)</button>
+        
+        <div class="my-diagnoses-section">
+            <div class="section-title">🛠️ あなたが創造したカオス診断一覧</div>
+            <div id="diagnoses-container">
+                <div style="text-align: center; color: #555; padding: 20px;">データベースをスキャン中だべ...🔄</div>
+            </div>
+        </div>
+
         <a href="lounge.html" class="btn btn-lounge">◀ メインラウンジに戻る</a>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // 総統の極秘キー
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+            authDomain: "g-chaospark.firebaseapp.com",
+            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "g-chaospark",
+            storageBucket: "g-chaospark.firebasestorage.app",
+            messagingSenderId: "256664886136",
+            appId: "1:256664886136:web:e87bbe307a654331c1468d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         // 1. ユーザー情報の読み込みと反映
         const userName = localStorage.getItem('userName') || 'ゲスト';
         const userId = localStorage.getItem('userId') || 'UNKNOWN_ID';
         const cp = localStorage.getItem('chaosPoint') || 0;
         const cm = localStorage.getItem('creatorMileage') || 0;
-        
-        // 保存されたアバターがあれば読み込む（なければ初期値のシルエット）
         const savedAvatar = localStorage.getItem('userAvatar') || '👤';
 
         document.getElementById('display-name').innerText = userName;
@@ -140,21 +232,25 @@
         document.getElementById('display-cm').innerText = cm;
         document.getElementById('user-avatar').innerText = savedAvatar;
 
+        const userRef = ref(db, 'users/' + userId);
+
+        // ☁️ マイページを開いた時にユーザー情報をクラウドと同期（アバターも含める）
+        update(userRef, {
+            name: userName,
+            cp: parseInt(cp),
+            cm: parseInt(cm),
+            avatar: savedAvatar,
+            lastLogin: new Date().toLocaleString('ja-JP')
+        });
+
         // 2. アバター変更モーダルの制御
-        function openAvatarModal() {
+        window.openAvatarModal = function() {
             document.getElementById('avatar-modal').style.display = 'flex';
-        }
-
-        function closeAvatarModal() {
+        };
+        window.closeAvatarModal = function() {
             document.getElementById('avatar-modal').style.display = 'none';
-        }
+        };
 
-        function setAvatar(emoji) {
-            // ローカルストレージに保存して画面に反映
-            localStorage.setItem('userAvatar', emoji);
-            document.getElementById('user-avatar').innerText = emoji;
-            closeAvatarModal();
-        }
-    </script>
-</body>
-</html>
+        // 💡 アバターを変更したら、ローカル保存と同時にFirebaseにも送信！
+        window.setAvatar = function(emoji) {
+            localStorage.setItem('userAvatar',
