@@ -56,37 +56,48 @@
 
     <button onclick="previewResult()" class="preview-btn">🧪 プレビューを確認する</button>
     <button id="publish-btn">システムに公開する</button>
+    <a href="play.html" style="display:block; text-align:center; margin-top:20px; color:#00e5ff;">👀 プレイエリアへ</a>
 </div>
 
 <script type="module">
-    // Firebase初期化などのロジックはここに記述するべ
-    
-    // 1. テンプレート適用
-    window.applyTemplate = function(type) {
-        const titleField = document.getElementById('diag-title');
-        const descField = document.getElementById('diag-desc');
-        const resultField = document.getElementById('diag-result');
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+        authDomain: "g-chaospark.firebaseapp.com",
+        databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "g-chaospark",
+        storageBucket: "g-chaospark.firebasestorage.app",
+        messagingSenderId: "256664886136",
+        appId: "1:256664886136:web:e87bbe307a654331c1468d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // テンプレート適用
+    window.applyTemplate = function(type) {
         if(type === 'fruit') {
-            titleField.value = "おすすめの果物診断";
-            descField.value = "あなたに今必要な果物を診断します！";
-            resultField.value = "リンゴ\nバナナ\nぶどう\nメロン";
+            document.getElementById('diag-title').value = "おすすめの果物診断";
+            document.getElementById('diag-desc').value = "あなたに今必要な果物を診断します！";
+            document.getElementById('diag-result').value = "リンゴ\nバナナ\nぶどう\nメロン";
         } else if(type === 'weapon') {
-            titleField.value = "武器3つ診断";
-            descField.value = "あなたが戦場で持つべき武器はこれだべ！";
-            resultField.value = "剣\nピストル\n槍\n爆弾";
+            document.getElementById('diag-title').value = "武器3つ診断";
+            document.getElementById('diag-desc').value = "あなたが戦場で持つべき武器はこれだべ！";
+            document.getElementById('diag-result').value = "剣\nピストル\n槍\n爆弾";
         } else if(type === 'luck') {
-            titleField.value = "今日の運勢";
-            descField.value = "あなたの未来を観測するべ...";
-            resultField.value = "[名前]は明日、公園で推しと出会うでしょう";
+            document.getElementById('diag-title').value = "今日の運勢";
+            document.getElementById('diag-desc').value = "あなたの未来を観測するべ...";
+            document.getElementById('diag-result').value = "[名前]は明日、公園で推しと出会うでしょう";
         } else if(type === 'prob') {
-            titleField.value = "推しと会える確率";
-            descField.value = "どれくらいの確率か計算するべ！";
-            resultField.value = "[名前]が推しと会える確率は [数字]% だべ！";
+            document.getElementById('diag-title').value = "推しと会える確率";
+            document.getElementById('diag-desc').value = "どれくらいの確率か計算するべ！";
+            document.getElementById('diag-result').value = "[名前]が推しと会える確率は [数字]% だべ！";
         }
     };
 
-    // 2. 数字リスト生成
+    // 数字生成
     window.generateNumberList = function() {
         const range = document.getElementById('num-range').value.split('-');
         if(range.length !== 2) return alert("例: 1-500 と入力だべ！");
@@ -95,24 +106,32 @@
         document.getElementById('diag-result').value = list.trim();
     };
 
-    // 3. プレビュー機能（融合済み！）
+    // プレビュー
     window.previewResult = function() {
         const userName = localStorage.getItem('userName') || "ゲスト";
         const rawResult = document.getElementById('diag-result').value;
         const title = document.getElementById('diag-title').value || "無題の診断";
-
         if (!rawResult) return alert("結果欄が空っぽだべ！");
-
         const patternsList = rawResult.split('\n').map(p => p.trim()).filter(p => p !== "");
-        const selectedPattern = patternsList[Math.floor(Math.random() * patternsList.length)];
-        
-        let finalResult = selectedPattern.replace(/\[名前\]/g, userName);
-        finalResult = finalResult.replace(/\[数字\]/g, Math.floor(Math.random() * 1000) + 1);
-        
-        alert(`【 プレビュー: ${title} 】\n\n${finalResult}\n\n※この表示形式で公開されるべ！`);
+        const selected = patternsList[Math.floor(Math.random() * patternsList.length)];
+        let final = selected.replace(/\[名前\]/g, userName).replace(/\[数字\]/g, Math.floor(Math.random() * 1000) + 1);
+        alert(`【 プレビュー: ${title} 】\n\n${final}`);
     };
 
-    // 4. 公開機能 (Firebaseへの送信処理をここに記述だべ！)
+    // 公開処理
+    document.getElementById('publish-btn').onclick = async () => {
+        const title = document.getElementById('diag-title').value;
+        const desc = document.getElementById('diag-desc').value;
+        const result = document.getElementById('diag-result').value;
+        if(!title || !result) return alert("必須項目を埋めるべ！");
+        await push(ref(db, 'diagnoses'), {
+            title, desc, resultPattern: result,
+            authorName: localStorage.getItem('userName') || "ゲスト",
+            authorId: localStorage.getItem('userId'),
+            createdAt: new Date().toISOString()
+        });
+        alert("公開完了だべ！");
+    };
 </script>
 </body>
 </html>
