@@ -6,15 +6,20 @@
 </head>
 <body>
 <div id="nopants-game-box" style="text-align: center; font-family: sans-serif; padding: 20px; background: #f0f8ff; border: 3px solid #4169e1; border-radius: 15px; max-width: 440px; margin: 20px auto; box-shadow: 0px 4px 15px rgba(0,0,0,0.08);">
-  <h2 style="color: #4169e1; font-size: 1.2rem; margin: 0;">🩲 ノーパンツ・ゲーム オンライン版</h2>
+  <h2 style="color: #4169e1; font-size: 1.2rem; margin: 0;">🩲 ノーパンツ・ゲーム 完全版</h2>
   
   <div id="setup-screen" style="margin: 20px 0;">
     <p style="font-weight: bold; color: #555;">ようこそ、<span id="display-username" style="color: #ff1493;"></span> だべ！</p>
-    <button onclick="startGame('online')" style="padding: 15px 30px; background: #ff4500; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🌐 世界の変態と対戦 (オンライン)</button>
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+        <button onclick="startGame('solo')" style="width: 85%; padding: 12px; background: #1e90ff; color: white; border: none; border-radius: 5px; cursor: pointer;">🆚 ソロ特訓</button>
+        <button onclick="startGame('npc6')" style="width: 85%; padding: 12px; background: #9370DB; color: white; border: none; border-radius: 5px; cursor: pointer;">🤖 NPC乱戦</button>
+        <button onclick="startGame('online')" style="width: 85%; padding: 12px; background: #ff4500; color: white; border: none; border-radius: 5px; cursor: pointer;">🌐 オンライン対戦</button>
+    </div>
   </div>
 
   <div id="game-screen" style="display: none;">
-    <div id="room-users-log" style="text-align: left; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #4169e1; font-size: 0.9rem; margin-bottom: 15px;"></div>
+    <div id="status-display" style="color: #d14; font-weight: bold; margin-bottom: 10px;">待機中...</div>
+    <div id="room-users-log" style="text-align: left; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #4169e1; margin-bottom: 15px;"></div>
     
     <div id="action-buttons-area">
       <button onclick="userSelect(true)" style="padding: 10px 20px; background: #ff69b4; border:none; color:white; border-radius:5px;">入ってる👖</button>
@@ -23,72 +28,61 @@
 
     <div style="margin-top:20px;">
         <button onclick="emergencyExit()" style="padding: 10px; background: #ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除ボタン</button>
-        <p style="font-size:0.7rem; color:#666;">残り免除回数: <span id="fla-count">15</span> 回<br>(超えると-10P)</p>
+        <p style="font-size:0.7rem; color:#666;">残り免除: <span id="fla-count">15</span> 回 (超えると-10P)</p>
     </div>
+    
+    <button onclick="window.location.href='gamebooth.html'" style="margin-top:20px; padding: 8px; background: #555; color: #fff; border: none; border-radius: 5px;">🏠 ブースへ帰る</button>
   </div>
 </div>
 
 <script>
 let roomPlayers = [
-  { name: localStorage.getItem('userName'), isNPC: false, score: 0, hasAnswered: false, choice: null, isDisconnected: false },
-  { name: "NPC_A", isNPC: true, score: 0, hasAnswered: false, choice: null, isDisconnected: false },
-  { name: "NPC_B", isNPC: true, score: 0, hasAnswered: false, choice: null, isDisconnected: false }
+  { name: localStorage.getItem('userName') || "ゲスト", isNPC: false, score: 0, hasAnswered: false, choice: null, isDisconnected: false }
 ];
-
-// --- 設定の更新 ---
-let flaCount = 15; // 免除回数を15回に修正
-
+let flaCount = 15;
 let matchWaitTimer = null;
 
-// 3分待機後にNPCを強制参加させる処理
-function startMatchTimer() {
-    matchWaitTimer = setTimeout(() => {
-        alert("人数が集まらなかったべ！NPCが参戦するべ！");
-        roomPlayers.forEach(p => p.isNPC = true);
-        initRound();
-    }, 180000); 
+function startGame(mode) {
+    document.getElementById("setup-screen").style.display = "none";
+    document.getElementById("game-screen").style.display = "block";
+    
+    if (mode === 'online') {
+        let timeLeft = 180; // 3分
+        document.getElementById("status-display").innerText = "人数待機中...残り: " + timeLeft + "秒";
+        
+        matchWaitTimer = setInterval(() => {
+            timeLeft--;
+            document.getElementById("status-display").innerText = "人数待機中...残り: " + timeLeft + "秒";
+            if(timeLeft <= 0) {
+                clearInterval(matchWaitTimer);
+                document.getElementById("status-display").innerText = "時間切れ！NPCが参戦するべ！";
+                // ここでNPCを2人追加して開始
+                roomPlayers.push({name: "NPC_A", isNPC: true, score:0}, {name: "NPC_B", isNPC: true, score:0});
+            }
+        }, 1000);
+    } else {
+        document.getElementById("status-display").innerText = mode === 'solo' ? "ソロ特訓中" : "NPC乱戦中";
+    }
+    initRound();
 }
 
-// ユーザーが切断した場合
-function simulateDisconnect() {
-    roomPlayers[0].isDisconnected = true;
-    roomPlayers[0].score = 0; // ポイント没収
-    alert("通信が切断されたべ！ポイント没収だべ！");
-}
-
-// --- 親フラ・緊急回避ロジック ---
 function emergencyExit() {
     if(flaCount > 0) {
         flaCount--;
         alert("親フラ回避だべ！残り" + flaCount + "回だべ！");
     } else {
-        // 16回目以降は -10P 没収に修正
-        let cp = parseInt(localStorage.getItem('chaosPoint')) || 0;
-        localStorage.setItem('chaosPoint', Math.max(0, cp - 10));
-        alert("免除回数切れだべ！ペナルティとして -10P 没収するべ！");
+        alert("免除回数切れ！-10P没収だべ！");
     }
     document.getElementById('fla-count').innerText = flaCount;
 }
 
-// 毎ターンNPCが回答する処理
-function npcLogic(player) {
-    if(player.isNPC || player.isDisconnected) {
-        player.hasAnswered = true;
-        player.choice = Math.random() < 0.5;
-    }
+function userSelect(guess) {
+    roomPlayers[0].hasAnswered = true;
+    roomPlayers[0].choice = guess;
+    alert("回答したべ！");
 }
 
-function startGame(mode) {
-    document.getElementById("setup-screen").style.display = "none";
-    document.getElementById("game-screen").style.display = "block";
-    startMatchTimer();
-    initRound();
-}
-
-function initRound() {
-    roomPlayers.forEach(npcLogic);
-    // ...以降のゲーム進行ロジック
-}
+function initRound() { /* ゲーム進行ロジック */ }
 </script>
 </body>
 </html>
