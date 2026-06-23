@@ -7,20 +7,27 @@
         body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; height: 100vh; display: grid; grid-template-columns: 320px 1fr 300px; gap: 20px; padding: 20px; box-sizing: border-box; }
         .panel { border: 1px solid #333; padding: 20px; background: #121212; }
         
-        /* AKARIエリア：最優先調整 */
-        #akari-zone { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; }
-        #akari-move { width: 80%; max-width: 250px; margin-top: 20px; animation: float 4s ease-in-out infinite; }
-        #akari-speech { border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 90%; text-align: center; font-weight: bold; background: #001a05; order: -1; }
+        /* --- AKARIエリア --- */
+        #akari-zone { 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; height: 100%;
+        }
+        #akari-move { 
+            width: 80%; max-width: 250px; margin-top: 20px; animation: float 4s ease-in-out infinite; 
+        }
+        #akari-speech { 
+            border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 90%; 
+            text-align: center; font-weight: bold; background: #001a05; order: -1;
+        }
         
-        /* 右下お問い合わせ固定 */
+        /* 跳ねるアニメーション */
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .pop-animation { animation: pop 0.3s ease; }
+        
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* お問い合わせ */
         #contact-footer { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         #contact-footer a { color: #888; text-decoration: none; font-size: 0.8rem; border: 1px solid #333; padding: 8px 12px; background: #000; }
-        
-        /* 既存のその他装飾 */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        #start-btn:hover { background: #fff !important; transform: scale(1.05); }
-        .construction-panel { opacity: 0.6; }
-        .status-item { font-size: 1.1em; font-weight: bold; margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -30,31 +37,41 @@
         <img src="AKARI.png" id="akari-move" alt="AKARI" onerror="this.style.display='none';">
     </aside>
 
-    <main id="core-zone" class="panel" style="display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px solid #00ff41;">
+    <main id="core-zone" class="panel">
         <h1 style="color: #00ff41; margin-top: 0;">診断制作所</h1>
-        <p>あなたのカオスを形にする場所</p>
-        <button id="start-btn" onclick="window.location.href='maker.html'" style="padding: 15px 30px; font-size: 1.2em; cursor: pointer; background: #00ff41; color: #000; border: none; font-weight: bold; border-radius: 4px; transition: 0.2s;">＞ 診断を制作する ＜</button>
-        <p style="font-size: 0.8em; color: #555; margin-top: 20px;">※制作するとカオスポイントが貯まるべ！</p>
-    </main>
+        </main>
 
-    <section id="utility-zone" style="display:flex; flex-direction:column; gap:15px;">
-        <div class="panel" style="border-color:#00ff41;">
-            <h3 style="margin:0; color:#00ff41;">📊 ステータス</h3>
-            <div class="status-item" style="color:#00ff41;">🌀 カオス: <span id="cp-display">0</span> P</div>
-            <div class="status-item" style="color:#ffd700;">💎 マイレージ: <span id="cm-display">0</span> P</div>
-        </div>
-        <div class="panel"><a href="mypage.html" id="mypage-link" style="color:#ffd700; text-decoration:none;">マイページへ</a></div>
-        <div class="panel"><a href="gamebooth.html" id="gamebooth-link" style="color:#00e5ff; text-decoration:none;">🎮 ミニゲームブース</a></div>
-        <div class="panel"><a href="exchange.html" id="exchange-link" style="color:#ff003c; text-decoration:none;">⚖️ 闇の換金所</a></div>
-        <div class="panel"><a href="ranking.html" style="color:#ff8c00; text-decoration:none;">🏆 ランキング</a></div>
-    </section>
+    <section id="utility-zone">
+        </section>
 
     <div id="contact-footer">
         <a href="https://forms.gle/iRz3DKb5wa87kjJE8" target="_blank">📧 診断の不具合・ご意見はこちら</a>
     </div>
 
-    <script type="module">
-        // 既存のFirebase/Tutorialスクリプトをここに入れてくれべ！
+    <script>
+        // --- AKARIセリフロジック ---
+        const messages = [
+            "おいっす～！",
+            "楽しんで～！",
+            "診断で稼ぐべ～！",
+            "工事中気になる～！",
+            "ゲームやった～？"
+        ];
+
+        function changeSpeech() {
+            const speechBubble = document.getElementById('akari-speech');
+            speechBubble.innerText = messages[Math.floor(Math.random() * messages.length)];
+            
+            // 跳ねる演出を追加
+            speechBubble.classList.add('pop-animation');
+            setTimeout(() => speechBubble.classList.remove('pop-animation'), 300);
+        }
+
+        // 5秒ごとに更新
+        setInterval(changeSpeech, 5000);
+        changeSpeech(); // 起動時に一回実行
+
+        // ... その他のFirebase/Tutorialスクリプト ...
     </script>
 </body>
 </html>
