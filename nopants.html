@@ -26,6 +26,7 @@
   </div>
 
   <div id="game-screen" style="display:none;">
+    <div id="turn-counter" style="font-weight: bold; color: #333; margin-bottom: 5px; font-size: 1.1rem;">ターン: 1 / 15</div>
     <h3 id="question-text">マリー「今、はいてると思う？」</h3>
     <div id="timer-box" style="color:red; font-weight:bold;">残り時間: 20秒</div>
     <div id="room-users-log" style="text-align: left; margin: 15px 0; border:1px solid #ffb6c1; padding:10px; border-radius:8px;"></div>
@@ -39,6 +40,12 @@
         <button onclick="emergencyExit()" style="background:#ffcc00; padding:8px 16px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除ボタン</button>
         <p style="font-size:0.8rem; color:#666; margin-top:5px;">残り回数: <span id="fla-count">15</span> (超過時-10P)</p>
     </div>
+  </div>
+
+  <div id="result-screen" style="display: none; padding: 10px;">
+    <h3 style="color: #ff1493; font-size: 1.4rem; margin-bottom: 10px;">🏆 最終リザルト結果発表 🏆</h3>
+    <div id="leaderboard-box" style="text-align: left; background: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ffb6c1; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.8rem;"></div>
+    <button class="btn-base" onclick="location.reload()" style="background: #ff69b4; color: white;">もう一度遊ぶ🔄</button>
   </div>
 
   <button class="return-btn" onclick="window.location.href='gamebooth.html'">🏠 ブースに帰還する</button>
@@ -57,6 +64,9 @@ let roomPlayers = [
 
 function startGame(mode) {
     gameMode = mode;
+    const inputName = document.getElementById("username-input").value.trim();
+    if (inputName) roomPlayers[0].name = inputName;
+
     document.getElementById("setup-screen").style.display = "none";
     document.getElementById("game-screen").style.display = "block";
     
@@ -69,10 +79,18 @@ function startGame(mode) {
 }
 
 function initRound() {
+    // 💥 15ターンを超えたらゲーム終了！
+    if (currentTurn > 15) {
+        endGame();
+        return;
+    }
+
     clearInterval(thinkingTimer);
     timeLeft = 20;
-    roomPlayers.forEach(p => { p.hasAnswered = false; p.choice = null; });
+    document.getElementById("turn-counter").innerText = `ターン: ${currentTurn} / 15`;
     document.getElementById("timer-box").innerText = "残り時間: 20秒";
+    
+    roomPlayers.forEach(p => { p.hasAnswered = false; p.choice = null; });
     
     thinkingTimer = setInterval(() => {
         timeLeft--;
@@ -108,7 +126,7 @@ function revealResults() {
         else { p.lastResult = "❌"; }
     });
     
-    // ログ更新（簡易表示）
+    // ログ更新
     let logHtml = "";
     roomPlayers.forEach(p => {
         if(p.hasAnswered) {
@@ -131,6 +149,23 @@ function simulateDisconnect() {
     roomPlayers[0].score -= 100; // 切断-100
     alert("切断！-100P没収！NPCが代行するべ！");
     roomPlayers[0].isNPC = true; // 以降NPCが代行
+}
+
+// 💥 最終結果発表画面のロジック
+function endGame() {
+    document.getElementById("game-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+    
+    // スコア順に並び替え
+    let sortedPlayers = [...roomPlayers].sort((a, b) => b.score - a.score);
+    
+    let resultHtml = "";
+    sortedPlayers.forEach((p, index) => {
+        let rankEmoji = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🎀";
+        resultHtml += `<div>${rankEmoji} <b>${p.name}</b> : <span style="color:#ff1493; font-weight:bold;">${p.score} P</span></div>`;
+    });
+    
+    document.getElementById("leaderboard-box").innerHTML = resultHtml;
 }
 </script>
 </body>
