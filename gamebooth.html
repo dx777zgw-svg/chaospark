@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | ミニゲームブース</title>
+    <style>
+        body {
+            margin: 0; color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            /* 背景画像を設定。文字が読めるように黒の半透明フィルターを重ねてるべ */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('gameBooth.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .booth-container {
+            background: rgba(15, 15, 15, 0.85); border: 1px solid #444; 
+            border-top: 4px solid #00e5ff; padding: 30px; border-radius: 8px;
+            width: 100%; max-width: 700px; box-sizing: border-box;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15);
+            text-align: center;
+        }
+
+        h1 { 
+            color: #00e5ff; margin-top: 0; font-size: 28px; 
+            border-bottom: 1px dashed #555; padding-bottom: 15px; 
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); letter-spacing: 3px;
+        }
+        
+        .desc { font-size: 15px; color: #ccc; margin-bottom: 30px; line-height: 1.6; }
+
+        /* ウォレット（お財布）表示 */
+        .wallet {
+            display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00e5ff; padding: 15px; margin-bottom: 30px; border-radius: 5px;
+            box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+        .wallet-item { font-size: 18px; font-weight: bold; }
+        .cp-text { color: #00ff41; }
+        .cm-text { color: #ffd700; }
+
+        /* ゲームリストのグリッド */
+        .game-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+        }
+
+        /* 個別ゲームカード */
+        .game-card {
+            background: rgba(0, 0, 0, 0.9); border: 2px solid #333;
+            padding: 20px; border-radius: 8px; transition: 0.3s;
+            display: flex; flex-direction: column; justify-content: space-between;
+            text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-5px); border-color: #00e5ff;
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .game-icon { font-size: 40px; margin-bottom: 10px; }
+        .game-title { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+        .game-desc { font-size: 12px; color: #aaa; margin-bottom: 15px; flex-grow: 1; }
+        
+        .play-tag {
+            background: transparent; color: #00e5ff; border: 1px solid #00e5ff;
+            padding: 8px; font-size: 14px; font-weight: bold; border-radius: 4px;
+        }
+        .game-card:hover .play-tag { background: #00e5ff; color: #000; }
+
+        .back-link { display: block; text-align: center; margin-top: 40px; color: #aaa; text-decoration: none; font-weight: bold; }
+        .back-link:hover { color: #00e5ff; }
+    </style>
+</head>
+<body>
+
+    <script>
+        if (!localStorage.getItem('userId')) {
+            alert("Lico「ゲートを通ってから出直してきなさい！」");
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <div class="booth-container">
+        <h1>[ ミニゲームブース ]</h1>
+        <p class="desc">
+            稼いだカオスポイント(CP)をベットして、さらなる混沌に飛び込むべ！<br>
+            ここは完全実力（と運）主義の鉄火場だべ。
+        </p>
+
+        <div class="wallet">
+            <div class="wallet-item cp-text">🌀 CP: <span id="cp-val">0</span></div>
+            <div class="wallet-item cm-text">💎 CM: <span id="cm-val">0</span></div>
+        </div>
+
+        <div class="game-grid">
+            <a href="nopants.html" class="game-card">
+                <div class="game-icon">🩲🚫</div>
+                <div class="game-title">ノーパンツ・ゲーム</div>
+                <div class="game-desc">理性を捨てて挑む危険なサバイバル。</div>
+                <div class="play-tag">PLAY NOW</div>
+            </a>
+
+            <a href="dice.html" class="game-card">
+                <div class="game-icon">🎲</div>
+                <div class="game-title">カオス・ダイス</div>
+                <div class="game-desc">運命は賽の目に委ねられた。一攫千金を狙え！</div>
+                <div class="play-tag">PLAY NOW</div>
+            </a>
+
+            <a href="panur.html" class="game-card">
+                <div class="game-icon">🔮👖</div>
+                <div class="game-title">パンツ占い</div>
+                <div class="game-desc">本日の運勢とマイレージを天の啓示から受け取れ。</div>
+                <div class="play-tag">PLAY NOW</div>
+            </a>
+        </div>
+    </div>
+
+    <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
+
+    <script>
+        // お財布データの読み込みと反映
+        let currentCP = parseInt(localStorage.getItem('chaosPoint')) || 0;
+        let currentCM = parseInt(localStorage.getItem('creatorMileage')) || 0;
+
+        document.getElementById('cp-val').innerText = currentCP;
+        document.getElementById('cm-val').innerText = currentCM;
+    </script>
+</body>
+</html>
