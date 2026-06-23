@@ -7,44 +7,64 @@
         body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; height: 100vh; display: grid; grid-template-columns: 320px 1fr 300px; gap: 20px; padding: 20px; box-sizing: border-box; }
         .panel { border: 1px solid #333; padding: 20px; background: #121212; }
         
-        /* 左：AKARIエリアを上に調整 */
-        #akari-zone { display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 15px; }
-        #akari-move { width: 100%; animation: float 4s ease-in-out infinite; }
-        #akari-speech { border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 100%; text-align: center; }
+        /* --- AKARIエリア：最優先調整 --- */
+        #akari-zone { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 15px; 
+            height: 100%;
+        }
+        #akari-move { 
+            width: 80%; 
+            max-width: 250px; 
+            margin-top: 20px; 
+            animation: float 4s ease-in-out infinite; 
+        }
+        #akari-speech { 
+            border: 1px solid #00ff41; 
+            color: #00ff41; 
+            padding: 15px; 
+            width: 90%; 
+            text-align: center; 
+            order: -1; /* セリフを常に画像の上に強制配置 */
+            font-weight: bold;
+            background: #001a05;
+        }
         
         /* お問い合わせフォームを右下に固定配置 */
         #contact-footer { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         #contact-footer a { color: #888; text-decoration: none; font-size: 0.8rem; border: 1px solid #333; padding: 8px 12px; background: #000; }
         
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        /* ...他既存のCSSはそのまま維持だべ！... */
+        /* ...他既存のCSS... */
     </style>
 </head>
 <body>
 
-    <!-- AKARIエリア：セリフが頭上に -->
+    <!-- AKARIエリア -->
     <aside id="akari-zone" class="panel">
-        <img src="AKARI.png" id="akari-move" alt="AKARI" onerror="this.style.display='none';">
         <div id="akari-speech">おいっす～！</div>
+        <img src="AKARI.png" id="akari-move" alt="AKARI" onerror="this.style.display='none';">
     </aside>
 
     <!-- 真ん中：核エリア -->
     <main id="core-zone" class="panel">
         <h1 style="color: #00ff41; margin-top: 0;">診断制作所</h1>
-        <!-- ...省略... -->
+        <!-- ... -->
     </main>
 
     <!-- 右：Utility -->
     <section id="utility-zone">
-        <!-- ...省略... -->
+        <!-- ... -->
     </section>
 
-    <!-- 右下に問い合わせリンク -->
+    <!-- お問い合わせ -->
     <div id="contact-footer">
         <a href="https://forms.gle/iRz3DKb5wa87kjJE8" target="_blank">📧 診断の不具合・ご意見はこちら</a>
     </div>
 
-    <!-- 既存のスクリプトはそのまま維持だべ！ -->
     <script>
         // ...既存の処理...
     </script>
