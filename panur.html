@@ -16,6 +16,8 @@
     <h2 style="color: #00ff41;">所持CP: <span id="cp-display"></span> | 所持CM: <span id="cm-display"></span></h2>
     
     <p>5 CPを奉納して、天の啓示（とマイレージ）を受け取るべ！<br>下の水晶玉をクリックだべ。</p>
+    
+    <p id="limit-display" style="color: #ff00ff; font-weight: bold; font-size: 1.2rem;"></p>
 
     <div class="crystal-ball" onclick="drawFortune()">🔮</div>
 
@@ -24,9 +26,28 @@
     <a href="gamebooth.html" class="back-btn">▶ ブースへ戻る</a>
 
     <script>
+        function getTodayStr() {
+            // 現在の日付を「YYYY/MM/DD」形式で取得するべ
+            return new Date().toLocaleDateString('ja-JP');
+        }
+
         function updateStatus() {
             document.getElementById('cp-display').innerText = localStorage.getItem('chaosPoint') || 0;
             document.getElementById('cm-display').innerText = localStorage.getItem('creatorMileage') || 0;
+            
+            // 日付判定ロジック（日付が変わっていたら回数をリセットするべ！）
+            let today = getTodayStr();
+            let lastDate = localStorage.getItem('panur_last_date');
+            
+            if (lastDate !== today) {
+                localStorage.setItem('panur_last_date', today);
+                localStorage.setItem('panur_play_count', 0);
+            }
+
+            // 残り回数を計算して画面に出すべ
+            let count = parseInt(localStorage.getItem('panur_play_count')) || 0;
+            let remain = 10 - count;
+            document.getElementById('limit-display').innerText = `本日の残り啓示回数: ${remain} / 10回`;
         }
         updateStatus();
 
@@ -39,14 +60,36 @@
         ];
 
         function drawFortune() {
+            let today = getTodayStr();
+            let lastDate = localStorage.getItem('panur_last_date');
+            
+            // プレイ時にも念のため日付またぎをチェック
+            if (lastDate !== today) {
+                localStorage.setItem('panur_last_date', today);
+                localStorage.setItem('panur_play_count', 0);
+            }
+
+            let count = parseInt(localStorage.getItem('panur_play_count')) || 0;
+            
+            // 10回に達していたら弾くべ！
+            if (count >= 10) {
+                alert("本日の啓示はもう限界だべ！神様も疲れてるからまた明日来るべ！");
+                return;
+            }
+
             let cp = parseInt(localStorage.getItem('chaosPoint')) || 0;
             let cm = parseInt(localStorage.getItem('creatorMileage')) || 0;
 
             if (cp < 5) return alert("CPが足りないべ！神聖な占いを舐めるなべ！");
 
+            // CP消費 & CM獲得
             cp -= 5;
             let gainCM = Math.floor(Math.random() * 5) + 1; // 1〜5 CMを獲得
             cm += gainCM;
+
+            // プレイ回数を1増やすべ！
+            count++;
+            localStorage.setItem('panur_play_count', count);
 
             let randomText = fortunes[Math.floor(Math.random() * fortunes.length)];
             
@@ -54,6 +97,7 @@
             paper.style.display = 'block';
             paper.innerHTML = `${randomText}<br><br><span style='color: #ff00ff;'>✨ 啓示ボーナス: +${gainCM} CM 獲得！ ✨</span>`;
 
+            // セーブして画面を更新
             localStorage.setItem('chaosPoint', cp);
             localStorage.setItem('creatorMileage', cm);
             updateStatus();
