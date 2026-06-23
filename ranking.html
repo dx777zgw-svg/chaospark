@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Chaospark | ランキングボード</title>
+    <style>
+        body { margin: 0; background: #0a0500; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 30px; }
+        h1 { color: #ff8c00; text-shadow: 0 0 10px #ff8c00; margin-bottom: 10px; }
+        p { color: #ccc; margin-bottom: 30px; }
+        
+        .board { background: #1a0f00; border: 2px solid #ff8c00; max-width: 500px; margin: 0 auto; padding: 20px; text-align: left; border-radius: 8px; box-shadow: 0 0 20px rgba(255, 140, 0, 0.2); }
+        
+        h3 { margin-top: 0; padding-bottom: 5px; border-bottom: 2px solid; }
+        
+        /* スクロール可能なランキング枠 */
+        .ranking-list {
+            max-height: 250px; /* ここで高さを制限してスクロールさせるべ */
+            overflow-y: auto;
+            background: #0d0700;
+            border: 1px solid #555;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        /* スクロールバーの装飾 */
+        .ranking-list::-webkit-scrollbar { width: 8px; }
+        .ranking-list::-webkit-scrollbar-track { background: #1a0f00; }
+        .ranking-list::-webkit-scrollbar-thumb { background: #ff8c00; border-radius: 4px; }
+
+        .rank-item { padding: 10px; border-bottom: 1px dashed #444; font-size: 1.1rem; display: flex; justify-content: space-between; }
+        .rank-item:last-child { border-bottom: none; }
+        
+        .my-rank { background: rgba(255,140,0,0.3); font-weight: bold; color: #ff8c00; border: 2px solid #ff8c00; border-radius: 5px; margin-top: 10px; }
+        
+        .back-btn { display: inline-block; margin-top: 30px; padding: 10px 20px; border: 1px solid #ff8c00; color: #ff8c00; text-decoration: none; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: #ff8c00; color: #000; }
+    </style>
+</head>
+<body>
+    <h1>🏆 カオス・ランキング 🏆</h1>
+    <p>現在のパークの頂点に立つ変態たちだべ！</p>
+
+    <div class="board">
+        <h3 style="color: #ffd700; border-color: #ffd700;">👑 総合作者ランキング</h3>
+        <div class="ranking-list">
+            <div class="rank-item"><span>🥇 マリー・トワネッド</span> <span style="color: #ff00ff;">999,999 CM</span></div>
+            <div class="rank-item"><span>🥈 Lico</span> <span style="color: #00e5ff;">850,000 CM</span></div>
+            <div class="rank-item"><span>🥉 AKARI</span> <span style="color: #00ff41;">500,000 CM</span></div>
+            <div class="rank-item"><span>4位 ━━━</span> <span style="color: #aaa;">420,000 CM</span></div>
+            <div class="rank-item"><span>5位 ━━━</span> <span style="color: #aaa;">395,000 CM</span></div>
+            <div class="rank-item"><span>6位 ━━━</span> <span style="color: #aaa;">360,000 CM</span></div>
+            <div class="rank-item"><span>7位 ━━━</span> <span style="color: #aaa;">330,000 CM</span></div>
+            <div class="rank-item"><span>8位 ━━━</span> <span style="color: #aaa;">310,000 CM</span></div>
+            <div class="rank-item"><span>9位 ━━━</span> <span style="color: #aaa;">280,000 CM</span></div>
+            <div class="rank-item"><span>10位 ━━━</span> <span style="color: #aaa;">250,000 CM</span></div>
+            <div class="rank-item"><span>11位 ━━━</span> <span style="color: #aaa;">230,000 CM</span></div>
+            <div class="rank-item"><span>12位 ━━━</span> <span style="color: #aaa;">200,000 CM</span></div>
+            <div class="rank-item"><span>13位 ━━━</span> <span style="color: #aaa;">185,000 CM</span></div>
+            <div class="rank-item"><span>14位 ━━━</span> <span style="color: #aaa;">160,000 CM</span></div>
+            <div class="rank-item"><span>15位 ━━━</span> <span style="color: #aaa;">140,000 CM</span></div>
+            <div class="rank-item"><span>16位 ━━━</span> <span style="color: #aaa;">125,000 CM</span></div>
+            <div class="rank-item"><span>17位 ━━━</span> <span style="color: #aaa;">110,000 CM</span></div>
+            <div class="rank-item"><span>18位 ━━━</span> <span style="color: #aaa;">95,000 CM</span></div>
+            <div class="rank-item"><span>19位 ━━━</span> <span style="color: #aaa;">80,000 CM</span></div>
+            <div class="rank-item"><span>20位 ━━━</span> <span style="color: #aaa;">65,000 CM</span></div>
+        </div>
+        
+        <h3 style="color: #00e5ff; border-color: #00e5ff; margin-top: 20px;">🌱 ルーキーランキング</h3>
+        <div class="ranking-list">
+            <div class="rank-item"><span>🥇 ケンタ</span> <span style="color: #00e5ff;">120 CM</span></div>
+            <div class="rank-item"><span>🥈 みちこ</span> <span style="color: #00e5ff;">85 CM</span></div>
+            <div class="rank-item"><span>🥉 ━━━</span> <span style="color: #aaa;">80 CM</span></div>
+            <div class="rank-item"><span>4位 ━━━</span> <span style="color: #aaa;">75 CM</span></div>
+            <div class="rank-item"><span>5位 ━━━</span> <span style="color: #aaa;">70 CM</span></div>
+            <div class="rank-item"><span>6位 ━━━</span> <span style="color: #aaa;">65 CM</span></div>
+            <div class="rank-item"><span>7位 ━━━</span> <span style="color: #aaa;">60 CM</span></div>
+            <div class="rank-item"><span>8位 ━━━</span> <span style="color: #aaa;">55 CM</span></div>
+            <div class="rank-item"><span>9位 ━━━</span> <span style="color: #aaa;">50 CM</span></div>
+            <div class="rank-item"><span>10位 ━━━</span> <span style="color: #aaa;">48 CM</span></div>
+            <div class="rank-item"><span>11位 ━━━</span> <span style="color: #aaa;">45 CM</span></div>
+            <div class="rank-item"><span>12位 ━━━</span> <span style="color: #aaa;">42 CM</span></div>
+            <div class="rank-item"><span>13位 ━━━</span> <span style="color: #aaa;">39 CM</span></div>
+            <div class="rank-item"><span>14位 ━━━</span> <span style="color: #aaa;">35 CM</span></div>
+            <div class="rank-item"><span>15位 ━━━</span> <span style="color: #aaa;">30 CM</span></div>
+            <div class="rank-item"><span>16位 ━━━</span> <span style="color: #aaa;">28 CM</span></div>
+            <div class="rank-item"><span>17位 ━━━</span> <span style="color: #aaa;">25 CM</span></div>
+            <div class="rank-item"><span>18位 ━━━</span> <span style="color: #aaa;">20 CM</span></div>
+            <div class="rank-item"><span>19位 ━━━</span> <span style="color: #aaa;">15 CM</span></div>
+            <div class="rank-item"><span>20位 ━━━</span> <span style="color: #aaa;">10 CM</span></div>
+        </div>
+
+        <div class="rank-item my-rank">
+            <span>✨ あなた (<span id="my-name"></span>)</span> 
+            <span><span id="my-cm"></span> CM</span>
+        </div>
+    </div>
+
+    <a href="lounge.html" class="back-btn">▶ ラウンジへ戻る</a>
+
+    <script>
+        document.getElementById('my-name').innerText = localStorage.getItem('userName') || "ゲスト";
+        document.getElementById('my-cm').innerText = localStorage.getItem('creatorMileage') || 0;
+    </script>
+</body>
+</html>
