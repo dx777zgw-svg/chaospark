@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>パンツがなければ、はかなければいいじゃない！ゲーム┃パンツがなければ、はかなければいいじゃない！ゲーム</title>
+    <title>パンツがなければ、はかなければいいじゃない！</title>
 </head>
 <body>
 <div id="g-futon-game-box" style="text-align: center; font-family: sans-serif; padding: 20px; background: #fff5f8; border: 3px solid #ffb6c1; border-radius: 15px; max-width: 440px; margin: 20px auto; box-shadow: 0px 4px 15px rgba(0,0,0,0.08);">
-  <h2 style="color: #ff69b4; font-size: 1.1rem; margin: 0;">🛌 G-FutOnlab 最終完全体【オンライン版】</h2>
+  
+  <h2 style="color: #ff69b4; font-size: 1.1rem; margin: 0;">🛌 パンツがなければ、はかなければいいじゃない！</h2>
   
   <div id="setup-screen" style="margin: 20px 0;">
     <input type="text" id="username-input" placeholder="ユーザー名を入力してだべw" style="padding: 10px; width: 80%; border: 2px solid #ffb6c1; border-radius: 5px; text-align: center; margin-bottom: 20px;">
@@ -28,7 +29,7 @@
     </div>
 
     <div id="multi-panic-buttons" style="margin: 15px 0; display: flex; flex-direction: column; gap: 5px;">
-        <button id="oya-fla-btn" onclick="emergencyExit()" style="display:none; padding: 10px; background: #ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除(残り:<span id="fla-count">10</span>回)</button>
+        <button id="oya-fla-btn" onclick="emergencyExit()" style="display:none; padding: 10px; background: #ffcc00; border:none; font-weight:bold; cursor:pointer;">⚠️ 親フラ・緊急免除(残り:<span id="fla-count">15</span>回)</button>
         <button onclick="simulateDisconnect()" style="padding: 5px; background: #555; color: white; border: none;">📡 悪質切断(失格)</button>
     </div>
 
@@ -37,7 +38,7 @@
 </div>
 
 <script>
-let currentTurn = 1, timeLeft = 20, thinkingTimer = null, flaCount = 10;
+let currentTurn = 1, timeLeft = 20, thinkingTimer = null, flaCount = 15; // 15回に変更！
 let gameMode = "multi";
 let roomPlayers = [
   { name: "ユーザー", isNPC: false, hasAnswered: false, choice: null, score: 0, isDisconnected: false, isResigned: false },
@@ -55,7 +56,7 @@ function startGame(mode) {
         document.getElementById("npc-box").innerText = "オンライン待機中...3分でNPCが参戦するべ！";
         setTimeout(() => {
             if (currentTurn === 1) alert("3分経過！NPCが強制参戦したべ！");
-        }, 180000); // 3分
+        }, 180000); 
     }
     initRound();
 }
@@ -65,8 +66,9 @@ function emergencyExit() {
         flaCount--;
         alert("親フラ回避！残り" + flaCount + "回だべ！");
     } else {
-        roomPlayers[0].score = Math.max(0, roomPlayers[0].score - 50);
-        alert("免除切れ！-50Pペナルティだべ！");
+        // 16回目以降は -10P 没収に修正
+        roomPlayers[0].score = Math.max(0, roomPlayers[0].score - 10);
+        alert("免除切れ！ペナルティで-10Pだべ！");
     }
     document.getElementById('fla-count').innerText = flaCount;
 }
@@ -81,7 +83,6 @@ function simulateDisconnect() {
     }
 }
 
-// 既存のinitRoundと融合
 function initRound() {
     if (gameMode === "online") {
         roomPlayers.forEach(p => {
@@ -91,10 +92,7 @@ function initRound() {
             }
         });
     }
-    // ...以降の既存ロジック(RevealResults等)をそのまま実行
 }
-
-// ※上記のコードをベースに、既存のrevealResultsやcheckAllAnswered等の関数を末尾に追加して完成だべ！
 </script>
 </body>
 </html>
