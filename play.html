@@ -38,15 +38,28 @@
         .empty-text-main { font-size: 20px; font-weight: bold; color: #444; margin-bottom: 5px; }
         .empty-text-sub { font-size: 12px; }
 
+        /* 生成される診断カードのスタイル */
         .diag-card {
-            background: #121212; border: 1px solid #333; min-width: 280px; padding: 20px;
+            background: #121212; border: 1px solid #333; min-width: 280px; max-width: 300px; padding: 20px;
             box-sizing: border-box; transition: transform 0.3s, border-color 0.3s;
             display: flex; flex-direction: column; justify-content: space-between; position: relative;
         }
-        .diag-card:hover { border-color: #00ff41; transform: translateY(-5px); }
+        .diag-card:hover { border-color: #00ff41; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 255, 65, 0.1); }
+        
+        .diag-title { color: #00ff41; font-size: 1.2rem; margin: 0 0 10px 0; word-break: break-all; }
+        .diag-desc { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; flex-grow: 1; word-break: break-all; }
+        .diag-author { font-size: 0.8rem; color: #666; margin-bottom: 15px; text-align: right; }
+        
+        .diag-actions { display: flex; justify-content: space-between; align-items: center; }
+        .btn-play { background: #00ff41; color: #000; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 3px; }
+        .btn-play:hover { background: #fff; }
+        .reco-btn-target { background: transparent; border: 1px solid #555; color: #aaa; cursor: pointer; padding: 5px 10px; border-radius: 3px; }
+        .reco-btn-target:hover:not(:disabled) { border-color: #00ff41; color: #00ff41; }
 
-        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; }
+        .back-link { display: block; text-align: center; margin-top: 40px; color: #444; text-decoration: none; font-weight: bold; }
         .back-link:hover { color: #00ff41; }
+        .maker-link { display: block; text-align: center; margin-top: 10px; color: #00e5ff; text-decoration: none; font-size: 1.2rem; font-weight: bold; border: 1px dashed #00e5ff; padding: 10px; }
+        .maker-link:hover { background: #00e5ff; color: #000; }
 
         ::-webkit-scrollbar { height: 8px; }
         ::-webkit-scrollbar-track { background: #111; }
@@ -71,11 +84,11 @@
     </div>
 
     <div class="category-section">
-        <div class="category-title">🆕 新作診断</div>
-        <div class="card-container">
-            <div class="empty-placeholder">
-                <div class="empty-text-main">[ NO SIGNAL DETECTED ]</div>
-                <div class="empty-text-sub">Awaiting new creations from the void.</div>
+        <div class="category-title">🆕 新作診断 (リアルタイム同期中)</div>
+        <div class="card-container" id="new-diag-container">
+            <div class="empty-placeholder" id="loading-placeholder">
+                <div class="empty-text-main">[ SCANNING DATABASE... ]</div>
+                <div class="empty-text-sub">クラウドからデータを取得中だべ...</div>
             </div>
         </div>
     </div>
@@ -100,21 +113,27 @@
         </div>
     </div>
 
-    <div class="category-section">
-        <div class="category-title">🔥 ユーザーおすすめ診断</div>
-        <div class="card-container">
-            <div class="empty-placeholder">
-                <div class="empty-text-main">[ RECOMMENDATION QUEUE EMPTY ]</div>
-                <div class="empty-text-sub">Be the first to recommend a masterpiece.</div>
-            </div>
-        </div>
-    </div>
-
+    <a href="maker.html" class="maker-link">🛠️ 診断アトリエ（制作所）へ行く</a>
     <a href="lounge.html" class="back-link">▶ ラウンジへ戻る</a>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+            authDomain: "g-chaospark.firebaseapp.com",
+            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "g-chaospark",
+            storageBucket: "g-chaospark.firebasestorage.app",
+            messagingSenderId: "256664886136",
+            appId: "1:256664886136:web:e87bbe307a654331c1468d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         // 🎟️ 1日1回限定「おすすめ権」制御システム
-        const recoBtns = document.querySelectorAll('.reco-btn-target');
         const ticketBoard = document.getElementById('ticket-board');
         const today = new Date().toLocaleDateString();
         let lastRecoDate = localStorage.getItem('lastRecommendDate');
@@ -122,30 +141,78 @@
         function updateTicketUI() {
             ticketBoard.innerText = "🎟️ 本日のおすすめ権：消費済み（残り 0 回）";
             ticketBoard.classList.add('empty');
-            recoBtns.forEach(btn => {
-                if(btn) {
-                    btn.disabled = true;
-                    btn.title = "明日また権利が復活するべ！";
-                }
+            document.querySelectorAll('.reco-btn-target').forEach(btn => {
+                btn.disabled = true;
+                btn.title = "明日また権利が復活するべ！";
             });
         }
 
         if (lastRecoDate === today) {
             updateTicketUI();
-        } else {
-            recoBtns.forEach(btn => {
-                if(btn) {
-                    btn.addEventListener('click', function() {
-                        alert("この診断に貴重な「おすすめ」を捧げたべ！\n（本日のおすすめ権を消費しました）");
-                        localStorage.setItem('lastRecommendDate', today);
-                        let currentCount = parseInt(this.innerText.replace('🔃 ', ''));
-                        this.innerText = `🔃 ${currentCount + 1}`;
-                        this.style.color = "#00ff41";
-                        updateTicketUI();
-                    });
-                }
-            });
         }
+
+        // おすすめボタンを押したときの処理（動的に生成されたボタンにも対応）
+        window.handleRecommend = function(btnElement, diagId) {
+            if (lastRecoDate === today) return;
+            alert("この診断に貴重な「おすすめ」を捧げたべ！\n（本日のおすすめ権を消費しました）");
+            localStorage.setItem('lastRecommendDate', today);
+            lastRecoDate = today;
+            
+            let currentCount = parseInt(btnElement.innerText.replace('🔃 ', '')) || 0;
+            btnElement.innerText = `🔃 ${currentCount + 1}`;
+            btnElement.style.color = "#00ff41";
+            btnElement.style.borderColor = "#00ff41";
+            
+            // 本当はここでFirebaseのrecoCountも増やす処理を入れると完璧だべ！(今回はUIのみ更新)
+            updateTicketUI();
+        };
+
+        // 診断をプレイする処理（今回はアラートで仮実装）
+        window.playDiag = function(title, resultPattern) {
+            const userName = localStorage.getItem('userName') || "あなた";
+            // [名前] をユーザー名に置換して結果を表示！
+            const finalResult = resultPattern.replace(/\[名前\]/g, userName);
+            alert(`【${title}】\n\n${finalResult}`);
+        };
+
+        // 🔥 Firebaseから「新作診断」をリアルタイム取得！
+        const diagListRef = ref(db, 'diagnoses');
+        onValue(diagListRef, (snapshot) => {
+            const container = document.getElementById('new-diag-container');
+            container.innerHTML = ''; // 一旦空にする
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                // データを配列に変換して、新しい順（降順）に並び替え
+                const diagArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                diagArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                diagArray.forEach(diag => {
+                    const card = document.createElement('div');
+                    card.className = 'diag-card';
+                    card.innerHTML = `
+                        <div>
+                            <h3 class="diag-title">${diag.title}</h3>
+                            <p class="diag-desc">${diag.desc}</p>
+                            <div class="diag-author">作者: ${diag.authorName}</div>
+                        </div>
+                        <div class="diag-actions">
+                            <button class="btn-play" onclick="playDiag('${diag.title}', '${diag.resultPattern}')">▶ 診断する</button>
+                            <button class="reco-btn-target" onclick="handleRecommend(this, '${diag.id}')" ${lastRecoDate === today ? 'disabled title="明日復活するべ！"' : ''}>🔃 ${diag.recoCount || 0}</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                // データが1つもない場合
+                container.innerHTML = `
+                    <div class="empty-placeholder">
+                        <div class="empty-text-main">[ NO SIGNAL DETECTED ]</div>
+                        <div class="empty-text-sub">Awaiting new creations from the void.</div>
+                    </div>
+                `;
+            }
+        });
     </script>
 </body>
 </html>
