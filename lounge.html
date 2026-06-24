@@ -3,177 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Chaos Park</title>
+    <title>G-Chaos Park | メインラウンジ</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #000; }
+        body { margin: 0; padding: 0; background-color: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; }
+        
+        /* ヘッダー＆AKARIエリア */
+        header { background: #111; border-bottom: 2px solid #ff00ff; padding: 15px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+        .akari-container { display: flex; align-items: center; gap: 15px; }
+        .akari-icon { width: 50px; height: 50px; background: #333; border: 2px solid #00ff00; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #00ff00; }
+        .akari-speech { background: rgba(255, 0, 255, 0.2); border: 1px solid #ff00ff; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; color: #fff; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
-        #gate-screen {
-            margin: 0;
-            height: 100vh;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('mon.png') no-repeat center center/cover;
-            color: #fff;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-        }
-        #lico-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            z-index: 100;
-            padding-left: 20px;
-        }
-        #lico-img { height: 60vh; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); }
-        #speech-bubble {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #ff00ff;
-            color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            width: 300px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .google-btn {
-            background: #fff;
-            color: #333;
-            border: 2px solid #ccc;
-            padding: 10px 15px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-        .google-btn:hover { background: #f0f0f0; }
+        /* メインコンテナ */
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; display: grid; gap: 30px; grid-template-columns: 2fr 1fr; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+
+        /* セクション共通 */
+        .section-box { background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; }
+        .section-title { color: #fff; border-bottom: 1px solid #ff00ff; padding-bottom: 10px; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        /* 雑談ルーム（メイン） */
+        .chat-room { height: 400px; background: #000; border: 1px inset #555; border-radius: 5px; padding: 10px; overflow-y: auto; margin-bottom: 15px; font-family: monospace; }
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input { flex-grow: 1; padding: 10px; background: #222; border: 1px solid #555; color: #fff; border-radius: 4px; }
+        .chat-btn { padding: 10px 20px; background: #ff00ff; color: #fff; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .chat-btn:hover { background: #d100d1; }
+
+        /* クリエーション・各種リンク */
+        .link-list { list-style: none; padding: 0; margin: 0; }
+        .link-list li { margin-bottom: 15px; }
+        .link-btn { display: block; padding: 15px; background: #222; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; border-radius: 5px; text-align: center; font-weight: bold; transition: all 0.3s ease; }
+        .link-btn:hover { background: #00ff00; color: #000; }
+        .link-desc { display: block; font-size: 0.8rem; color: #aaa; margin-top: 5px; font-weight: normal; }
+
+        /* フッター（窓口） */
+        footer { background: #111; border-top: 1px solid #333; text-align: center; padding: 20px; margin-top: 40px; }
+        .support-link { color: #ff00ff; text-decoration: none; font-size: 0.9rem; }
+        .support-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <div id="gate-screen">
-        <h1>G-Chaos Park 入国開始手続きゲート</h1>
-        <div id="lico-container">
-            <img src="LICO.png" id="lico-img" onerror="this.style.display='none';">
-            <div id="speech-bubble">
-                <div id="lico-name" style="background:#ff00ff; padding:2px 10px; font-weight:bold;">Lico</div>
-                <p id="lico-text">……ゲートへようこそ。入国には手続きが必要よ。</p>
-                <div id="name-input-area" style="display:none;">
-                    <button class="google-btn" onclick="loginWithGoogle()">
-                        <span style="font-size:1.2rem; margin-right:8px;">🌐</span> Googleで手続きする
-                    </button>
-                </div>
-                <button id="start-btn" onclick="startProcess()">手続きを開始する</button>
-                
-                <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none; color:#ff00ff; font-weight:bold; cursor:pointer;" onclick="showCompleteBtn()">規約を確認する</a>
-                
-                <button id="complete-btn" style="display:none; margin-top:10px; background:#00ff00; color:#000; padding:10px; border:none; font-weight:bold; cursor:pointer;" onclick="completeImmigration()">確認した。入国する！</button>
-            </div>
+    <header>
+        <div class="akari-container">
+            <div class="akari-icon">AKARI</div>
+            <div class="akari-speech" id="akari-text">ヤッホー！楽しんでる～？</div>
         </div>
+        <div style="font-size: 0.9rem;">
+            ID: <span id="user-display-name" style="color:#00ff00; font-weight:bold;">ゲスト</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <main>
+            <div class="section-box">
+                <h2 class="section-title">💬 メイン雑談ルーム</h2>
+                <div class="chat-room" id="chat-display">
+                    <div style="color: #888;">[System] 雑談ルームに接続しました。</div>
+                    <div style="color: #ff00ff;">[AKARI] ここは自由帳だよ！適当に喋ってこー！</div>
+                    </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="メッセージを入力（※平和にいこうぜ）">
+                    <button class="chat-btn" onclick="dummySend()">送信</button>
+                </div>
+            </div>
+        </main>
+
+        <aside>
+            <div class="section-box">
+                <h2 class="section-title">✨ クリエーション</h2>
+                <ul class="link-list">
+                    <li>
+                        <a href="diagnosis.html" class="link-btn">
+                            🧠 脳内イメージ診断
+                            <span class="link-desc">あなたの精神状態を可視化（全5段階）</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="story_booth.html" class="link-btn" style="border-color:#ff9900; color:#ff9900;">
+                            ✍️ 物書きさんの1000文字ストーリー
+                            <span class="link-desc">承認欲求を満たすショートストーリー投稿所</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section-box" style="margin-top: 20px;">
+                <h2 class="section-title">📌 お知らせ・各種案内</h2>
+                <ul class="link-list">
+                    <li><a href="notice.html" style="color: #d1d1d1; text-decoration: none;">▶ 運営からのお知らせ</a></li>
+                    <li><a href="status.html" style="color: #d1d1d1; text-decoration: none;">▶ ステータスボード（準備中）</a></li>
+                    <li><a href="game.html" style="color: #d1d1d1; text-decoration: none;">▶ 遊技場（準備中）</a></li>
+                </ul>
+            </div>
+        </aside>
     </div>
 
-    <div id="volume-warning" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:10000; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center;">
-        <p style="font-size: 1.5rem; color: #ff00ff; border: 1px solid #ff00ff; padding: 20px;">
-            ⚠️ 警告：この先、音が出ます。<br>音量にご注意ください。
-        </p>
-        <button onclick="startExperience()" style="padding: 15px 30px; background:#ff00ff; color:#fff; border:none; cursor:pointer; font-size:1.2rem;">
-            音量を確認して入国する
-        </button>
-    </div>
+    <footer>
+        <a href="https://forms.google.com/your-form-link" target="_blank" class="support-link">🛠️ 不具合・ご意見窓口（Googleフォーム）</a>
+        <p style="font-size: 0.8rem; color: #555; margin-top: 10px;">&copy; G-Chaos Park All rights reserved.</p>
+    </footer>
 
-    <div id="opening-layer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #000;">
-        <video id="op-video" width="100%" height="100%" playsinline onended="hideMovie()">
-            <source src="opening.mp4" type="video/mp4">
-        </video>
-    </div>
-
-    <script type="module">
-        // Firebase本体と認証モジュールのインポート
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-        // お前のFirebase設定
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
-            authDomain: "g-chaospark.firebaseapp.com",
-            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "g-chaospark",
-            storageBucket: "g-chaospark.firebasestorage.app",
-            messagingSenderId: "256664886136",
-            appId: "1:256664886136:web:e87bbe307a654331c1468d"
-        };
-
-        // Firebaseの初期化
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        // モジュール内で定義した関数をHTMLから呼べるようにwindowオブジェクトに登録
-        window.startExperience = function() {
-            document.getElementById('volume-warning').style.display = 'none';
-            document.getElementById('opening-layer').style.display = 'block';
-            const video = document.getElementById('op-video');
-            video.muted = false; 
-            video.play().catch(e => console.log("再生ブロックされたべ: " + e));
-        }
-
-        window.hideMovie = function() {
-            document.getElementById('opening-layer').style.display = 'none';
-            if (localStorage.getItem('userId')) {
-                window.location.href = 'lounge.html';
-                return;
+    <script>
+        // ページ読み込み時にユーザー名を取得して表示
+        document.addEventListener('DOMContentLoaded', () => {
+            const userName = localStorage.getItem('userName');
+            if(userName) {
+                document.getElementById('user-display-name').innerText = userName;
+            } else {
+                // IDがない場合はゲートへ強制送還（直リンク対策）
+                window.location.href = 'index.html';
             }
-            document.getElementById('gate-screen').style.display = 'flex';
-        }
 
-        window.startProcess = function() {
-            document.getElementById('lico-text').innerText = "はじめてみる顔ね！Googleの身分証を見せてくれる？";
-            document.getElementById('start-btn').style.display = "none";
-            document.getElementById('name-input-area').style.display = "block";
-        }
+            // AKARIのランダムセリフ（ピョコピョコ演出付き）
+            const akariQuotes = [
+                "ヤッホー！楽しんでる～？",
+                "おいっす！今日もカオスだね！",
+                "なんか面白いことないかなー",
+                "水分補給はしっかりね！",
+                "ルールは守って遊んでねっ！"
+            ];
+            setInterval(() => {
+                const randomQuote = akariQuotes[Math.floor(Math.random() * akariQuotes.length)];
+                document.getElementById('akari-text').innerText = randomQuote;
+            }, 10000); // 10秒ごとにセリフ変更
+        });
 
-        // 🌟 ここがGoogleログインの核だ！
-        window.loginWithGoogle = function() {
-            signInWithPopup(auth, provider).then((result) => {
-                const user = result.user;
-                
-                // Googleから取得した名前と永続ID（UID）をローカルに保存
-                localStorage.setItem('userName', user.displayName);
-                localStorage.setItem('userId', user.uid); 
-                
-                // Licoのセリフ更新
-                document.getElementById('lico-text').innerHTML = 
-                    `${user.displayName}さんね！身分証の確認が取れたわ。<br>
-                     これがあなたのパーマネントIDよ。<br>
-                     <strong style="color:#00ff00; background:#222; padding:3px 8px; margin:8px 0; display:inline-block; font-size:1.1rem;">【 ${user.uid} 】</strong><br>
-                     まずは規約を読んでくれる？`;
-                     
-                document.getElementById('name-input-area').style.display = "none";
-                document.getElementById('terms-link-btn').style.display = "block";
-                
-            }).catch((error) => {
-                console.error("ログインエラー:", error);
-                alert("手続きに失敗したわ。もう一度試してね。");
-            });
-        }
+        // 雑談ルームのダミー送信処理（※Firebase連携前の見せかけ）
+        function dummySend() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
 
-        window.showCompleteBtn = function() {
-            document.getElementById('lico-text').innerText = "確認できた？じゃあ、中へどうぞ。";
-            document.getElementById('terms-link-btn').style.display = "none";
-            document.getElementById('complete-btn').style.display = "block";
-        }
-
-        window.completeImmigration = function() {
-            window.location.href = 'lounge.html';
+            const userName = localStorage.getItem('userName') || 'ゲスト';
+            const chatDisplay = document.getElementById('chat-display');
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.innerHTML = `<strong style="color:#00ff00;">[${userName}]</strong> ${text}`;
+            chatDisplay.appendChild(msgDiv);
+            
+            input.value = '';
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
         }
     </script>
-
 </body>
 </html>
