@@ -2,22 +2,51 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>G-Chaospark | 診断アトリエ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G-Chaos Park | 診断アトリエ</title>
     <style>
-        body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .atelier-box { background: #121212; border: 1px solid #333; padding: 30px; width: 100%; max-width: 600px; box-sizing: border-box; }
-        h1 { color: #00ff41; text-align: center; border-bottom: 1px dashed #333; padding-bottom: 15px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #aaa; font-weight: bold; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 10px; box-sizing: border-box; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        .template-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .template-btn { background: #222; border: 1px solid #444; color: #00e5ff; padding: 10px; cursor: pointer; font-size: 0.8rem; }
-        .template-btn:hover { background: #00e5ff; color: #000; }
+        .atelier-box { background: #121212; border: 1px solid #333; padding: 20px; width: 100%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,255,65,0.1); }
+        
+        h1 { color: #00ff41; text-align: center; border-bottom: 1px dashed #333; padding-bottom: 15px; margin-top: 0; font-size: 1.5rem; letter-spacing: 2px; }
+        
+        /* テンプレートボタン群 */
+        .template-label { display: block; margin-bottom: 10px; color: #aaa; font-weight: bold; font-size: 0.9rem; }
+        .template-btn-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
+        @media (min-width: 500px) { .template-btn-group { grid-template-columns: repeat(4, 1fr); } }
+        .template-btn { background: #222; border: 1px solid #444; color: #00e5ff; padding: 10px; cursor: pointer; font-size: 0.85rem; border-radius: 5px; transition: 0.2s; }
+        .template-btn:active { background: #00e5ff; color: #000; }
 
-        #publish-btn { width: 100%; background: #00ff41; color: #000; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border: none; margin-top: 20px; }
-        .magic-box { background: #1a1a1a; border: 1px solid #00ff41; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-        .preview-btn { width: 100%; background: #333; color: #fff; padding: 10px; cursor: pointer; border: none; margin-top: 10px; }
+        /* フォーム共通 */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #00ff41; font-weight: bold; font-size: 0.95rem; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #555; color: #fff; padding: 12px; border-radius: 5px; font-size: 16px; /* スマホズーム防止 */ font-family: sans-serif; }
+        input:focus, textarea:focus { outline: none; border-color: #00ff41; }
+        
+        /* 結果入力エリア（広くする） */
+        #diag-result { height: 250px; resize: vertical; line-height: 1.5; font-family: monospace; }
+        
+        /* 入力サポートボタン */
+        .helper-tools { display: flex; gap: 8px; margin-bottom: 8px; }
+        .insert-btn { background: #1a1a1a; border: 1px solid #00ff41; color: #00ff41; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .insert-btn:active { background: #00ff41; color: #000; }
+
+        /* 数字生成ツール */
+        .magic-box { background: #1a1a1a; border: 1px dashed #00ff41; padding: 15px; margin-bottom: 25px; border-radius: 5px; }
+        .magic-box label { color: #aaa; margin-bottom: 10px; }
+        .magic-flex { display: flex; gap: 10px; }
+        .magic-flex input { flex-grow: 1; }
+        .magic-flex button { padding: 0 20px; background: #222; color: #00ff41; border: 1px solid #00ff41; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* アクションボタン */
+        .action-group { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; }
+        .preview-btn { background: #333; color: #fff; border: 1px solid #555; padding: 15px; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 1rem; }
+        #publish-btn { background: #00ff41; color: #000; padding: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; }
+        
+        .nav-links { display: flex; justify-content: space-between; margin-top: 20px; }
+        .nav-link { color: #00e5ff; text-decoration: none; font-size: 0.9rem; padding: 10px; }
     </style>
 </head>
 <body>
@@ -25,43 +54,55 @@
 <div class="atelier-box">
     <h1>[ 診断アトリエ ]</h1>
 
-    <label>⚡ テンプレートを即時挿入</label>
+    <span class="template-label">⚡ テンプレートを即時挿入</span>
     <div class="template-btn-group">
-        <button class="template-btn" onclick="applyTemplate('fruit')">🍎 果物診断</button>
-        <button class="template-btn" onclick="applyTemplate('weapon')">⚔️ 武器3つ</button>
-        <button class="template-btn" onclick="applyTemplate('luck')">🔮 文書診断</button>
-        <button class="template-btn" onclick="applyTemplate('prob')">🎰 確率診断</button>
+        <button class="template-btn" onclick="applyTemplate('fruit')">🍎 果物</button>
+        <button class="template-btn" onclick="applyTemplate('weapon')">⚔️ 武器</button>
+        <button class="template-btn" onclick="applyTemplate('luck')">🔮 運勢</button>
+        <button class="template-btn" onclick="applyTemplate('prob')">🎰 確率</button>
     </div>
 
     <div class="magic-box">
-        <label style="color: #00ff41;">🔢 数字リスト生成 (1-1000)</label>
-        <div style="display: flex; gap: 10px; margin-top: 5px;">
-            <input type="text" id="num-range" placeholder="例: 1-500">
-            <button onclick="generateNumberList()" style="padding: 5px 15px; cursor: pointer;">生成</button>
+        <label>🔢 数字リスト一括生成 (結果欄に上書きされます)</label>
+        <div class="magic-flex">
+            <input type="text" id="num-range" placeholder="例: 1-100">
+            <button onclick="generateNumberList()">生成</button>
         </div>
     </div>
 
     <div class="form-group">
-        <label>タイトル</label>
-        <input type="text" id="diag-title" placeholder="狂気のタイトル...">
+        <label>📌 タイトル</label>
+        <input type="text" id="diag-title" placeholder="狂気のタイトルを入力...">
     </div>
+    
     <div class="form-group">
-        <label>説明</label>
-        <textarea id="diag-desc" placeholder="この診断の説明..."></textarea>
+        <label>📝 診断の説明</label>
+        <textarea id="diag-desc" rows="3" placeholder="この診断の概要や遊び方を入力..."></textarea>
     </div>
+    
     <div class="form-group">
-        <label>結果（改行で区切る）</label>
-        <textarea id="diag-result" placeholder="例：[名前]の戦闘力は[数字]！"></textarea>
+        <label>🎲 結果パターン（改行で区切る）</label>
+        <div class="helper-tools">
+            <button type="button" class="insert-btn" onclick="insertTag('[name]')">+ [name] を挿入</button>
+            <button type="button" class="insert-btn" onclick="insertTag('[数字]')">+ [数字] を挿入</button>
+        </div>
+        <textarea id="diag-result" placeholder="例：[name]の戦闘力は[数字]！&#10;[name]は明日、すごいことになります。"></textarea>
     </div>
 
-    <button onclick="previewResult()" class="preview-btn">🧪 プレビューを確認する</button>
-    <button id="publish-btn">システムに公開する</button>
-    <a href="play.html" style="display:block; text-align:center; margin-top:20px; color:#00e5ff;">👀 プレイエリアへ</a>
+    <div class="action-group">
+        <button onclick="previewResult()" class="preview-btn">🧪 プレビューを確認する</button>
+        <button id="publish-btn">🚀 システムに公開する</button>
+    </div>
+    
+    <div class="nav-links">
+        <a href="lounge.html" class="nav-link">◀ ラウンジへ戻る</a>
+        <a href="play.html" class="nav-link">👀 プレイエリアへ ▶</a>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
@@ -76,45 +117,66 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // テンプレート適用
+    // テキストエリアにタグを挿入するUX機能
+    window.insertTag = function(tag) {
+        const textarea = document.getElementById('diag-result');
+        const startPos = textarea.selectionStart;
+        const endPos = textarea.selectionEnd;
+        const textBefore = textarea.value.substring(0, startPos);
+        const textAfter  = textarea.value.substring(endPos, textarea.value.length);
+        
+        textarea.value = textBefore + tag + textAfter;
+        textarea.focus();
+        textarea.selectionStart = startPos + tag.length;
+        textarea.selectionEnd = startPos + tag.length;
+    };
+
+    // テンプレート適用 ([name]に変更済み)
     window.applyTemplate = function(type) {
         if(type === 'fruit') {
             document.getElementById('diag-title').value = "おすすめの果物診断";
             document.getElementById('diag-desc').value = "あなたに今必要な果物を診断します！";
-            document.getElementById('diag-result').value = "リンゴ\nバナナ\nぶどう\nメロン";
+            document.getElementById('diag-result').value = "[name]には「リンゴ」がおすすめ！\n[name]には「バナナ」がおすすめ！\n[name]には「ぶどう」がおすすめ！\n[name]には「メロン」がおすすめ！";
         } else if(type === 'weapon') {
             document.getElementById('diag-title').value = "武器3つ診断";
             document.getElementById('diag-desc').value = "あなたが戦場で持つべき武器はこれだべ！";
-            document.getElementById('diag-result').value = "剣\nピストル\n槍\n爆弾";
+            document.getElementById('diag-result').value = "[name]の武器は【剣・盾・ポーション】\n[name]の武器は【ピストル・ナイフ・無線機】\n[name]の武器は【素手・素手・素手】";
         } else if(type === 'luck') {
             document.getElementById('diag-title').value = "今日の運勢";
             document.getElementById('diag-desc').value = "あなたの未来を観測するべ...";
-            document.getElementById('diag-result').value = "[名前]は明日、公園で推しと出会うでしょう";
+            document.getElementById('diag-result').value = "[name]は明日、大吉です！\n[name]は明日、中吉です。\n[name]は明日、小吉です。\n[name]は明日、凶です...気を付けて。";
         } else if(type === 'prob') {
             document.getElementById('diag-title').value = "推しと会える確率";
             document.getElementById('diag-desc').value = "どれくらいの確率か計算するべ！";
-            document.getElementById('diag-result').value = "[名前]が推しと会える確率は [数字]% だべ！";
+            document.getElementById('diag-result').value = "[name]が推しと会える確率は [数字]% だべ！";
         }
     };
 
     // 数字生成
     window.generateNumberList = function() {
         const range = document.getElementById('num-range').value.split('-');
-        if(range.length !== 2) return alert("例: 1-500 と入力だべ！");
+        if(range.length !== 2) return alert("例: 1-100 と入力だべ！");
         let list = "";
         for(let i = parseInt(range[0]); i <= parseInt(range[1]); i++) list += i + "\n";
         document.getElementById('diag-result').value = list.trim();
     };
 
-    // プレビュー
+    // プレビュー機能 ([name]と[数字]を置換)
     window.previewResult = function() {
         const userName = localStorage.getItem('userName') || "ゲスト";
         const rawResult = document.getElementById('diag-result').value;
         const title = document.getElementById('diag-title').value || "無題の診断";
+        
         if (!rawResult) return alert("結果欄が空っぽだべ！");
+        
         const patternsList = rawResult.split('\n').map(p => p.trim()).filter(p => p !== "");
         const selected = patternsList[Math.floor(Math.random() * patternsList.length)];
-        let final = selected.replace(/\[名前\]/g, userName).replace(/\[数字\]/g, Math.floor(Math.random() * 1000) + 1);
+        
+        // [name] と [数字] を実際の値に変換
+        let final = selected
+            .replace(/\[name\]/gi, userName)
+            .replace(/\[数字\]/g, Math.floor(Math.random() * 100) + 1); // 1-100のランダム
+            
         alert(`【 プレビュー: ${title} 】\n\n${final}`);
     };
 
@@ -123,14 +185,28 @@
         const title = document.getElementById('diag-title').value;
         const desc = document.getElementById('diag-desc').value;
         const result = document.getElementById('diag-result').value;
-        if(!title || !result) return alert("必須項目を埋めるべ！");
-        await push(ref(db, 'diagnoses'), {
-            title, desc, resultPattern: result,
-            authorName: localStorage.getItem('userName') || "ゲスト",
-            authorId: localStorage.getItem('userId'),
-            createdAt: new Date().toISOString()
-        });
-        alert("公開完了だべ！");
+        
+        if(!title || !result) return alert("タイトルと結果は必須だべ！");
+        
+        try {
+            await push(ref(db, 'diagnoses'), {
+                title, 
+                desc, 
+                resultPattern: result,
+                authorName: localStorage.getItem('userName') || "ゲスト",
+                authorId: localStorage.getItem('userId') || "unknown",
+                createdAt: new Date().toISOString()
+            });
+            alert("✨ システムに公開完了だべ！");
+            
+            // 入力欄をクリア
+            document.getElementById('diag-title').value = '';
+            document.getElementById('diag-desc').value = '';
+            document.getElementById('diag-result').value = '';
+        } catch (error) {
+            console.error("エラー:", error);
+            alert("通信に失敗したべ。");
+        }
     };
 </script>
 </body>
