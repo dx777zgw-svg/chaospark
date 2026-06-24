@@ -1,67 +1,116 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
-    authDomain: "g-chaospark.firebaseapp.com",
-    databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "g-chaospark",
-    storageBucket: "g-chaospark.firebasestorage.app",
-    messagingSenderId: "256664886136",
-    appId: "1:256664886136:web:e87bbe307a654331c1468d"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+        authDomain: "g-chaospark.firebaseapp.com",
+        databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "g-chaospark",
+        storageBucket: "g-chaospark.firebasestorage.app",
+        messagingSenderId: "256664886136",
+        appId: "1:256664886136:web:e87bbe307a654331c1468d"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-const userId = localStorage.getItem('userId');
-const userName = localStorage.getItem('userName');
+    const userId = localStorage.getItem('userId');
+    const userName = localStorage.getItem('userName');
 
-if(!userId) {
-    window.location.href = 'index.html';
-}
-
-document.getElementById('display-id').innerText = `ID: ${userId}`;
-document.getElementById('display-name').innerText = userName;
-
-const userRef = ref(db, 'users/' + userId);
-
-// ☁️ 【超重要：リアルタイム監視】
-// get() ではなく onValue() を使うことで、クラウド上のデータが変化した瞬間に画面も更新される！
-onValue(userRef, (snapshot) => {
-    if (snapshot.exists()) {
-        const data = snapshot.val();
-        
-        // 1. ローカルストレージを最新のクラウドデータで上書き
-        localStorage.setItem('chaosPoint', data.cp ?? 0);
-        localStorage.setItem('creatorMileage', data.cm ?? 0);
-        localStorage.setItem('userAvatar', data.avatar ?? '👤');
-        
-        // 2. 画面の表示を最新データで書き換え
-        document.getElementById('display-cp').innerText = data.cp ?? 0;
-        document.getElementById('display-cm').innerText = data.cm ?? 0;
-        document.getElementById('user-avatar').innerText = data.avatar ?? '👤';
-        
-        console.log("🔄 クラウドとリアルタイム同期完了！");
-    } else {
-        // データがない場合は初期化
-        update(userRef, {
-            name: userName,
-            cp: 0,
-            cm: 0,
-            avatar: '👤'
-        });
+    if(!userId) {
+        window.location.href = 'index.html';
     }
-});
 
-// アバター制御
-window.openAvatarModal = function() { document.getElementById('avatar-modal').style.display = 'flex'; };
-window.closeAvatarModal = function() { document.getElementById('avatar-modal').style.display = 'none'; };
-window.setAvatar = function(emoji) {
-    // クラウドを更新すれば、上の onValue が自動で画面もローカルも書き換えてくれる
-    update(userRef, { avatar: emoji }); 
-    closeAvatarModal();
-};
+    // 基本情報の表示
+    document.getElementById('display-id').innerText = `ID: ${userId}`;
+    document.getElementById('display-name').innerText = userName;
 
-// --- 以下、既存の診断リスト表示・削除・修正のコードはそのまま ---
-// (※先ほどのコードと同じなので省略せずにそのまま残してくれ)
+    const userRef = ref(db, 'users/' + userId);
+
+    // ☁️ リアルタイム監視（ポイントとアバターの同期）
+    onValue(userRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            localStorage.setItem('chaosPoint', data.cp ?? 0);
+            localStorage.setItem('creatorMileage', data.cm ?? 0);
+            localStorage.setItem('userAvatar', data.avatar ?? '👤');
+            
+            document.getElementById('display-cp').innerText = data.cp ?? 0;
+            document.getElementById('display-cm').innerText = data.cm ?? 0;
+            document.getElementById('user-avatar').innerText = data.avatar ?? '👤';
+            console.log("🔄 クラウドとリアルタイム同期完了！");
+        } else {
+            update(userRef, { name: userName, cp: 0, cm: 0, avatar: '👤' });
+        }
+    });
+
+    // モーダル・アバター制御
+    window.openAvatarModal = () => { document.getElementById('avatar-modal').style.display = 'flex'; };
+    window.closeAvatarModal = () => { document.getElementById('avatar-modal').style.display = 'none'; };
+    window.setAvatar = (emoji) => {
+        update(userRef, { avatar: emoji }); 
+        closeAvatarModal();
+    };
+
+    // --- 既存の診断管理機能 ---
+    window.deleteDiag = (diagId, title) => {
+        if (confirm(`本当に「${title}」を抹消するべか？`)) {
+            remove(ref(db, 'diagnoses/' + diagId));
+        }
+    };
+
+    window.openEditModal = (diagId) => {
+        if (window.myDiagnosesData && window.myDiagnosesData[diagId]) {
+            const diag = window.myDiagnosesData[diagId];
+            document.getElementById('edit-id').value = diagId;
+            document.getElementById('edit-title').value = diag.title || '';
+            document.getElementById('edit-desc').value = diag.desc || '';
+            document.getElementById('edit-base').value = diag.baseText || "[name]の結果は[結果]だべ！";
+            document.getElementById('edit-result-list').value = diag.resultList || '';
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+    };
+
+    window.closeEditModal = () => { document.getElementById('edit-modal').style.display = 'none'; };
+
+    window.saveEdit = () => {
+        const diagId = document.getElementById('edit-id').value;
+        update(ref(db, 'diagnoses/' + diagId), {
+            title: document.getElementById('edit-title').value,
+            desc: document.getElementById('edit-desc').value,
+            baseText: document.getElementById('edit-base').value,
+            resultList: document.getElementById('edit-result-list').value,
+            updatedAt: new Date().toISOString()
+        }).then(() => {
+            alert("更新完了だべ！");
+            closeEditModal();
+        });
+    };
+
+    // 自分の診断リスト表示
+    onValue(ref(db, 'diagnoses'), (snapshot) => {
+        const container = document.getElementById('diagnoses-container');
+        container.innerHTML = '';
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            window.myDiagnosesData = data;
+            Object.keys(data).filter(key => data[key].authorId === userId).forEach(key => {
+                const diag = data[key];
+                const item = document.createElement('div');
+                item.className = 'diag-item';
+                item.innerHTML = `
+                    <div class="diag-info">
+                        <h4 class="diag-title">${diag.title}</h4>
+                        <p class="diag-desc">${diag.desc}</p>
+                    </div>
+                    <div class="btn-area">
+                        <button class="btn-edit" onclick="openEditModal('${key}')">📝 修正</button>
+                        <button class="btn-delete" onclick="deleteDiag('${key}', '${diag.title}')">🧹 削除</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+    });
+</script>
