@@ -2,77 +2,45 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>G-Chaospark | Main Lounge</title>
+    <title>G-Chaospark | お知らせ掲示板</title>
     <style>
-        body { margin: 0; background: #0a0a0a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; height: 100vh; display: grid; grid-template-columns: 320px 1fr 300px; gap: 20px; padding: 20px; box-sizing: border-box; }
-        .panel { border: 1px solid #333; padding: 20px; background: #121212; }
-        
-        /* AKARIエリア */
-        #akari-zone { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; height: 100%; }
-        #akari-move { width: 80%; max-width: 250px; margin-top: 20px; animation: float 4s ease-in-out infinite; }
-        #akari-speech { border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 90%; text-align: center; font-weight: bold; background: #001a05; order: -1; }
-        
-        /* 核エリア */
-        #core-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #00ff41; }
-        
-        /* Utilityエリア */
-        #utility-zone { display: flex; flex-direction: column; gap: 15px; }
-        
-        /* 跳ねるアニメーション */
-        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .pop-animation { animation: pop 0.3s ease; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        
-        /* 問い合わせ・固定装飾 */
-        #contact-footer { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        #contact-footer a { color: #888; text-decoration: none; font-size: 0.8rem; border: 1px solid #333; padding: 8px 12px; background: #000; }
-        .status-item { font-size: 1.1em; font-weight: bold; margin: 5px 0; }
-        #start-btn:hover { background: #fff !important; transform: scale(1.05); }
+        body { margin: 0; background: #000f1a; color: #d1d1d1; font-family: 'Courier New', monospace; padding: 30px; max-width: 600px; margin: 0 auto; }
+        h1 { color: #1e90ff; text-align: center; border-bottom: 2px solid #1e90ff; padding-bottom: 10px; }
+        .post { background: #001a33; border-left: 4px solid #1e90ff; padding: 15px; margin-bottom: 20px; }
+        .date { color: #00e5ff; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
+        .title { font-size: 1.2rem; color: #fff; font-weight: bold; margin-bottom: 10px; }
+        .back-btn { display: block; text-align: center; margin-top: 30px; padding: 10px; border: 1px solid #1e90ff; color: #1e90ff; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
+    <h1>📢 パーク運営からのお知らせ</h1>
 
-    <aside id="akari-zone" class="panel">
-        <div id="akari-speech">おいっす～！</div>
-        <img src="AKARI.png" id="akari-move" alt="AKARI" onerror="this.style.display='none';">
-    </aside>
-
-    <main id="core-zone" class="panel">
-        <h1 style="color: #00ff41; margin-top: 0;">診断制作所</h1>
-        <p>あなたのカオスを形にする場所</p>
-        <button id="start-btn" onclick="window.location.href='maker.html'" style="padding: 15px 30px; font-size: 1.2em; cursor: pointer; background: #00ff41; color: #000; border: none; font-weight: bold; border-radius: 4px; transition: 0.2s;">＞ 診断を制作する ＜</button>
-    </main>
-
-    <section id="utility-zone">
-        <div class="panel" style="border-color: #00ff41; background: #001a05;">
-            <h3 style="margin-top:0; color:#00ff41;">📊 所持ステータス</h3>
-            <div class="status-item" style="color: #00ff41;">🌀 カオス: <span id="cp-display">0</span> P</div>
-            <div class="status-item" style="color: #ffd700;">💎 マイレージ: <span id="cm-display">0</span> P</div>
+    <div class="post">
+        <div class="date">2026.XX.XX</div>
+        <div class="title">🎉 G-Chaospark プレリリース開始！</div>
+        <div>
+            総統の力により、ついにパークの一部が解放されたべ！<br>
+            現在は「メインラウンジ」「診断制作所」「ミニゲームブース」が稼働中だべ。初回ログインボーナスを忘れずに受け取ってくれべ！
         </div>
-        <div class="panel"><a href="mypage.html" style="color:#ffd700; text-decoration:none; font-weight:bold; display:block;">🚪 マイページ</a></div>
-        <div class="panel"><a href="gamebooth.html" style="color:#00e5ff; text-decoration:none; font-weight:bold; display:block;">🎮 ミニゲームブース</a></div>
-        <div class="panel"><a href="exchange.html" style="color:#ff003c; text-decoration:none; font-weight:bold; display:block;">⚖️ 闇の換金所</a></div>
-        <div class="panel"><a href="ranking.html" style="color:#ff8c00; text-decoration:none; font-weight:bold; display:block;">🏆 ランキングボード</a></div>
-        <div class="panel" style="border-color: #1e90ff; background: #000f1a;"><a href="notice.html" style="color:#1e90ff; text-decoration:none; font-weight:bold; display:block;">📢 お知らせ掲示板</a></div>
-    </section>
-
-    <div id="contact-footer">
-        <a href="https://forms.gle/iRz3DKb5wa87kjJE8" target="_blank">📧 不具合・ご意見はこちら</a>
     </div>
 
-    <script type="module">
-        // AKARIのランダムセリフ
-        const messages = ["おいっす～！", "楽しんで～！", "診断で稼ぐべ～！", "工事中気になる～！", "ゲームやった～？"];
-        function changeSpeech() {
-            const speechBubble = document.getElementById('akari-speech');
-            if(speechBubble) {
-                speechBubble.innerText = messages[Math.floor(Math.random() * messages.length)];
-                speechBubble.classList.add('pop-animation');
-                setTimeout(() => speechBubble.classList.remove('pop-animation'), 300);
-            }
-        }
-        setInterval(changeSpeech, 5000);
-        changeSpeech();
-    </script>
+    <div class="post">
+        <div class="date">2026.XX.XX</div>
+        <div class="title">🚧 3Dパーク・住宅・労働区画について</div>
+        <div>
+            現在、総統直轄の空間構築チームが絶賛工事中だべ！<br>
+            近日のアップデートで順次解放される予定だから、それまでミニゲームでCPとCMを稼いで待っててくれべ！
+        </div>
+    </div>
+
+    <div class="post">
+        <div class="date">2026.XX.XX</div>
+        <div class="title">🐟 新ゲーム「カオス・フィッシング」実装！</div>
+        <div>
+            ミニゲームブースに新たな鉄火場が追加されたべ！反射神経を研ぎ澄まして、レア魚（とマイレージ）を釣り上げろ！
+        </div>
+    </div>
+
+    <a href="lounge.html" class="back-btn">▶ ラウンジへ戻る</a>
 </body>
 </html>
