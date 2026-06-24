@@ -45,17 +45,17 @@
 <body>
 
     <div id="gate-screen">
-        <h1>G-Chaos Park 入国審査ゲート</h1>
+        <h1>G-Chaos Park 入国開始手続きゲート</h1>
         <div id="lico-container">
             <img src="LICO.png" id="lico-img" onerror="this.style.display='none';">
             <div id="speech-bubble">
                 <div id="lico-name" style="background:#ff00ff; padding:2px 10px; font-weight:bold;">Lico</div>
-                <p id="lico-text">……ゲートへようこそ。入国には審査が必要よ。</p>
+                <p id="lico-text">……ゲートへようこそ。入国には手続きが必要よ。</p>
                 <div id="name-input-area" style="display:none;">
                     <input type="text" id="user-name" placeholder="名前を入力して……" maxlength="10">
                     <button onclick="checkName()">送信</button>
                 </div>
-                <button id="start-btn" onclick="startProcess()">審査を開始する</button>
+                <button id="start-btn" onclick="startProcess()">手続きを開始する</button>
                 
                 <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none; color:#ff00ff; font-weight:bold; cursor:pointer;" onclick="showCompleteBtn()">規約を確認する</a>
                 
@@ -95,12 +95,12 @@
         }
 
         // ----------------------------------------------------
-        // 2. 動画終了時の分岐（検問システム）
+        // 2. 動画終了時の分岐（手続きシステム）
         // ----------------------------------------------------
         function hideMovie() {
             document.getElementById('opening-layer').style.display = 'none';
 
-            // 既にIDがある（永続記憶がある）場合は、審査をスキップしてラウンジへ直行！
+            // 既にIDがある（永続記憶がある）場合は、手続きをスキップしてラウンジへ直行！
             if (localStorage.getItem('userId')) {
                 window.location.href = 'lounge.html';
                 return;
@@ -111,7 +111,7 @@
         }
 
         // ----------------------------------------------------
-        // 3. Licoの審査プロセス
+        // 3. Licoの手続きプロセス
         // ----------------------------------------------------
         function startProcess() {
             document.getElementById('lico-text').innerText = "はじめてみる顔ね！あなたの名前は？";
