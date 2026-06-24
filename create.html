@@ -22,11 +22,12 @@
         /* フォーム共通 */
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #00ff41; font-weight: bold; font-size: 0.95rem; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #555; color: #fff; padding: 12px; border-radius: 5px; font-size: 16px; /* スマホズーム防止 */ font-family: sans-serif; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #555; color: #fff; padding: 12px; border-radius: 5px; font-size: 16px; font-family: sans-serif; }
         input:focus, textarea:focus { outline: none; border-color: #00ff41; }
         
-        /* 結果入力エリア（広くする） */
-        #diag-result { height: 250px; resize: vertical; line-height: 1.5; font-family: monospace; }
+        /* テキストエリアの高さ調整 */
+        #diag-base { height: 100px; resize: vertical; line-height: 1.5; }
+        #diag-result { height: 200px; resize: vertical; line-height: 1.5; font-family: monospace; }
         
         /* 入力サポートボタン */
         .helper-tools { display: flex; gap: 8px; margin-bottom: 8px; }
@@ -35,7 +36,7 @@
 
         /* 数字生成ツール */
         .magic-box { background: #1a1a1a; border: 1px dashed #00ff41; padding: 15px; margin-bottom: 25px; border-radius: 5px; }
-        .magic-box label { color: #aaa; margin-bottom: 10px; }
+        .magic-box label { color: #aaa; margin-bottom: 10px; margin-top: 0; }
         .magic-flex { display: flex; gap: 10px; }
         .magic-flex input { flex-grow: 1; }
         .magic-flex button { padding: 0 20px; background: #222; color: #00ff41; border: 1px solid #00ff41; border-radius: 5px; font-weight: bold; cursor: pointer; }
@@ -62,14 +63,6 @@
         <button class="template-btn" onclick="applyTemplate('prob')">🎰 確率</button>
     </div>
 
-    <div class="magic-box">
-        <label>🔢 数字リスト一括生成 (結果欄に上書きされます)</label>
-        <div class="magic-flex">
-            <input type="text" id="num-range" placeholder="例: 1-100">
-            <button onclick="generateNumberList()">生成</button>
-        </div>
-    </div>
-
     <div class="form-group">
         <label>📌 タイトル</label>
         <input type="text" id="diag-title" placeholder="狂気のタイトルを入力...">
@@ -77,16 +70,31 @@
     
     <div class="form-group">
         <label>📝 診断の説明</label>
-        <textarea id="diag-desc" rows="3" placeholder="この診断の概要や遊び方を入力..."></textarea>
+        <textarea id="diag-desc" rows="2" placeholder="この診断の概要や遊び方を入力..."></textarea>
     </div>
     
     <div class="form-group">
-        <label>🎲 結果パターン（改行で区切る）</label>
+        <label>💬 基本テキスト</label>
         <div class="helper-tools">
-            <button type="button" class="insert-btn" onclick="insertTag('[name]')">+ [name] を挿入</button>
-            <button type="button" class="insert-btn" onclick="insertTag('[数字]')">+ [数字] を挿入</button>
+            <button type="button" class="insert-btn" onclick="insertTag('diag-base', '[name]')">+ [name] を挿入</button>
+            <button type="button" class="insert-btn" onclick="insertTag('diag-base', '[結果]')">+ [結果] を挿入</button>
         </div>
-        <textarea id="diag-result" placeholder="例：[name]の戦闘力は[数字]！&#10;[name]は明日、すごいことになります。"></textarea>
+        <textarea id="diag-base" placeholder="例：[name]の戦闘力は...【[結果]】です！"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>🎲 結果リスト（改行で区切る）</label>
+        <p style="font-size: 0.8rem; color: #888; margin-top: 0;">※基本テキストの[結果]部分にランダムで代入されます。</p>
+        
+        <div class="magic-box">
+            <label style="color: #00ff41; font-size: 0.85rem;">🔢 数字リスト一括生成 (結果欄に上書きされます)</label>
+            <div class="magic-flex">
+                <input type="text" id="num-range" placeholder="例: 1-100">
+                <button onclick="generateNumberList()">生成</button>
+            </div>
+        </div>
+
+        <textarea id="diag-result" placeholder="例：&#10;たったの5&#10;53万&#10;計測不能"></textarea>
     </div>
 
     <div class="action-group">
@@ -117,9 +125,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // テキストエリアにタグを挿入するUX機能
-    window.insertTag = function(tag) {
-        const textarea = document.getElementById('diag-result');
+    // テキストエリアにタグを挿入するUX機能（対象のIDを指定可能に）
+    window.insertTag = function(targetId, tag) {
+        const textarea = document.getElementById(targetId);
         const startPos = textarea.selectionStart;
         const endPos = textarea.selectionEnd;
         const textBefore = textarea.value.substring(0, startPos);
@@ -131,24 +139,28 @@
         textarea.selectionEnd = startPos + tag.length;
     };
 
-    // テンプレート適用 ([name]に変更済み)
+    // テンプレート適用 (基本テキスト＋結果リストの分離構造に最適化)
     window.applyTemplate = function(type) {
         if(type === 'fruit') {
             document.getElementById('diag-title').value = "おすすめの果物診断";
             document.getElementById('diag-desc').value = "あなたに今必要な果物を診断します！";
-            document.getElementById('diag-result').value = "[name]には「リンゴ」がおすすめ！\n[name]には「バナナ」がおすすめ！\n[name]には「ぶどう」がおすすめ！\n[name]には「メロン」がおすすめ！";
+            document.getElementById('diag-base').value = "[name]におすすめの果物は「[結果]」だべ！";
+            document.getElementById('diag-result').value = "リンゴ\nバナナ\nぶどう\nメロン\nドリアン";
         } else if(type === 'weapon') {
             document.getElementById('diag-title').value = "武器3つ診断";
             document.getElementById('diag-desc').value = "あなたが戦場で持つべき武器はこれだべ！";
-            document.getElementById('diag-result').value = "[name]の武器は【剣・盾・ポーション】\n[name]の武器は【ピストル・ナイフ・無線機】\n[name]の武器は【素手・素手・素手】";
+            document.getElementById('diag-base').value = "[name]の初期装備は...【[結果]】に決定！";
+            document.getElementById('diag-result').value = "剣・盾・ポーション\nピストル・ナイフ・無線機\n素手・素手・素手\n伝説の剣・ひのきのぼう・石ころ";
         } else if(type === 'luck') {
             document.getElementById('diag-title').value = "今日の運勢";
             document.getElementById('diag-desc').value = "あなたの未来を観測するべ...";
-            document.getElementById('diag-result').value = "[name]は明日、大吉です！\n[name]は明日、中吉です。\n[name]は明日、小吉です。\n[name]は明日、凶です...気を付けて。";
+            document.getElementById('diag-base').value = "[name]の今日の運勢は『[結果]』です。";
+            document.getElementById('diag-result').value = "大吉\n中吉\n小吉\n末吉\n凶\n大凶（外出厳禁）";
         } else if(type === 'prob') {
             document.getElementById('diag-title').value = "推しと会える確率";
             document.getElementById('diag-desc').value = "どれくらいの確率か計算するべ！";
-            document.getElementById('diag-result').value = "[name]が推しと会える確率は [数字]% だべ！";
+            document.getElementById('diag-base').value = "[name]が推しと偶然出会う確率は...【[結果]%】だべ！";
+            document.getElementById('diag-result').value = "0\n1\n10\n50\n99\n100（うしろを振り返ってみろ）";
         }
     };
 
@@ -161,38 +173,43 @@
         document.getElementById('diag-result').value = list.trim();
     };
 
-    // プレビュー機能 ([name]と[数字]を置換)
+    // プレビュー機能 (基本テキストの[結果]を置換してから、[name]を置換)
     window.previewResult = function() {
         const userName = localStorage.getItem('userName') || "ゲスト";
-        const rawResult = document.getElementById('diag-result').value;
         const title = document.getElementById('diag-title').value || "無題の診断";
+        const baseText = document.getElementById('diag-base').value;
+        const rawResultList = document.getElementById('diag-result').value;
         
-        if (!rawResult) return alert("結果欄が空っぽだべ！");
+        if (!baseText) return alert("基本テキストが空っぽだべ！");
+        if (!rawResultList) return alert("結果リストが空っぽだべ！");
         
-        const patternsList = rawResult.split('\n').map(p => p.trim()).filter(p => p !== "");
-        const selected = patternsList[Math.floor(Math.random() * patternsList.length)];
+        // リストからランダムに1つ選択
+        const patternsList = rawResultList.split('\n').map(p => p.trim()).filter(p => p !== "");
+        const selectedResult = patternsList[Math.floor(Math.random() * patternsList.length)];
         
-        // [name] と [数字] を実際の値に変換
-        let final = selected
-            .replace(/\[name\]/gi, userName)
-            .replace(/\[数字\]/g, Math.floor(Math.random() * 100) + 1); // 1-100のランダム
+        // [結果]をリストの単語に置換し、その後[name]をユーザー名に置換
+        let final = baseText
+            .replace(/\[結果\]/g, selectedResult)
+            .replace(/\[name\]/gi, userName);
             
         alert(`【 プレビュー: ${title} 】\n\n${final}`);
     };
 
-    // 公開処理
+    // 公開処理 (データベースの構造も変更に合わせて修正)
     document.getElementById('publish-btn').onclick = async () => {
         const title = document.getElementById('diag-title').value;
         const desc = document.getElementById('diag-desc').value;
-        const result = document.getElementById('diag-result').value;
+        const baseText = document.getElementById('diag-base').value;
+        const resultList = document.getElementById('diag-result').value;
         
-        if(!title || !result) return alert("タイトルと結果は必須だべ！");
+        if(!title || !baseText || !resultList) return alert("タイトル・基本テキスト・結果リストは必須だべ！");
         
         try {
             await push(ref(db, 'diagnoses'), {
                 title, 
                 desc, 
-                resultPattern: result,
+                baseText, // 基本テキストを保存
+                resultList, // 結果リストを保存
                 authorName: localStorage.getItem('userName') || "ゲスト",
                 authorId: localStorage.getItem('userId') || "unknown",
                 createdAt: new Date().toISOString()
@@ -202,6 +219,7 @@
             // 入力欄をクリア
             document.getElementById('diag-title').value = '';
             document.getElementById('diag-desc').value = '';
+            document.getElementById('diag-base').value = '';
             document.getElementById('diag-result').value = '';
         } catch (error) {
             console.error("エラー:", error);
