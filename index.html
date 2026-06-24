@@ -2,156 +2,159 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Chaos Park</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G-Chaos Park | メインラウンジ</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #000; }
+        /* モバイルファーストの基礎リセット */
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background-color: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; overflow-x: hidden; position: relative; min-height: 100vh; }
+        
+        /* ヘッダー */
+        header { background: #111; border-bottom: 2px solid #ff00ff; padding: 12px 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+        .app-title { font-size: 1.2rem; font-weight: bold; color: #fff; margin: 0; letter-spacing: 1px; }
+        .app-title span { color: #ff00ff; }
+        .mypage-btn { background: #222; color: #00ff00; border: 1px solid #00ff00; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .mypage-btn:active { background: #00ff00; color: #000; }
 
-        #gate-screen {
-            margin: 0;
-            height: 100vh;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('mon.png') no-repeat center center/cover;
-            color: #fff;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
+        /* 💡 立ち絵コンテナ（左右固定配置） */
+        .character-bg { position: fixed; bottom: 0; z-index: -1; pointer-events: none; opacity: 0.3; /* スマホ時は半透明で背景化 */ transition: opacity 0.3s; }
+        .char-akari { left: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(0,255,0,0.5)); }
+        .char-lico { right: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); transform: scaleX(-1); /* Licoを内側に向かせる場合 */ }
+
+        /* メインコンテナ（中央配置） */
+        .container { max-width: 600px; /* 立ち絵のスペースを確保するため少し細めに */ margin: 10px auto; padding: 0 10px 80px 10px; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; }
+
+        /* 💬 雑談ルーム */
+        .section-box { background: rgba(26, 26, 26, 0.9); /* 背景を少し透かして立ち絵を馴染ませる */ border: 1px solid #333; padding: 10px; border-radius: 8px; backdrop-filter: blur(2px); }
+        .section-title { color: #fff; border-bottom: 1px solid #ff00ff; padding-bottom: 5px; margin-top: 0; margin-bottom: 10px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+        
+        .chat-container { display: flex; flex-direction: column; height: 35vh; }
+        .chat-room { flex-grow: 1; background: rgba(0, 0, 0, 0.8); border: 1px inset #555; border-radius: 5px; padding: 10px; overflow-y: auto; margin-bottom: 10px; font-family: monospace; font-size: 0.85rem; }
+        .chat-input-area { display: flex; gap: 8px; }
+        .chat-input { flex-grow: 1; padding: 10px; background: rgba(34, 34, 34, 0.9); border: 1px solid #555; color: #fff; border-radius: 5px; font-size: 16px; }
+        .chat-btn { padding: 10px 15px; background: #ff00ff; color: #fff; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 0.9rem; white-space: nowrap; }
+
+        /* 📱 アプリ風メニューグリッド */
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .menu-card { background: rgba(34, 34, 34, 0.9); border: 1px solid; border-radius: 8px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #fff; transition: background 0.2s; min-height: 80px; text-align: center; backdrop-filter: blur(2px); }
+        .menu-card:active { background: rgba(255,255,255,0.2); }
+        .menu-icon { font-size: 1.8rem; margin-bottom: 5px; }
+        .menu-title { font-size: 0.85rem; font-weight: bold; }
+        .menu-subtitle { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
+
+        .border-pink { border-color: #ff00ff; color: #ff00ff; }
+        .border-orange { border-color: #ff9900; color: #ff9900; }
+        .border-cyan { border-color: #00ffff; color: #00ffff; }
+        .border-yellow { border-color: #ffff00; color: #ffff00; }
+        .border-gray { border-color: #888; color: #ccc; }
+
+        /* PC等で画面が広い場合のメディアクエリ（立ち絵を完全表示） */
+        @media (min-width: 900px) {
+            .character-bg { opacity: 1; /* はっきり表示 */ }
+            .char-akari { left: 5%; height: 80vh; max-height: 800px; }
+            .char-lico { right: 5%; height: 80vh; max-height: 800px; transform: none; /* そのままの向き */ }
+            .container { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 20px; border: 1px solid #333; margin-top: 30px; }
         }
-        #lico-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            z-index: 100;
-            padding-left: 20px;
-        }
-        #lico-img { height: 60vh; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); }
-        #speech-bubble {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #ff00ff;
-            color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            width: 300px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
+
     </style>
 </head>
 <body>
 
-    <div id="gate-screen">
-        <h1>G-Chaos Park 入国開始手続きゲート</h1>
-        <div id="lico-container">
-            <img src="LICO.png" id="lico-img" onerror="this.style.display='none';">
-            <div id="speech-bubble">
-                <div id="lico-name" style="background:#ff00ff; padding:2px 10px; font-weight:bold;">Lico</div>
-                <p id="lico-text">……ゲートへようこそ。入国には手続きが必要よ。</p>
-                <div id="name-input-area" style="display:none;">
-                    <input type="text" id="user-name" placeholder="名前を入力して……" maxlength="10">
-                    <button onclick="checkName()">送信</button>
+    <img src="AKARI.png" alt="AKARI" class="character-bg char-akari" onerror="this.style.display='none';">
+    <img src="LICO.png" alt="Lico" class="character-bg char-lico" onerror="this.style.display='none';">
+
+    <header>
+        <h1 class="app-title">G-Chaos <span>Park</span></h1>
+        <div class="header-right">
+            <a href="mypage.html" class="mypage-btn">👤 マイページ</a>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="section-box">
+            <h2 class="section-title">💬 雑談ルーム</h2>
+            <div class="chat-container">
+                <div class="chat-room" id="chat-display">
+                    <div style="color: #888;">[System] 雑談ルームに接続しました。</div>
+                    <div style="color: #ff00ff;">[AKARI] ここは自由帳だよ！適当に喋ってこー！</div>
                 </div>
-                <button id="start-btn" onclick="startProcess()">手続きを開始する</button>
-                
-                <a href="terms.html" target="_blank" id="terms-link-btn" style="display:none; color:#ff00ff; font-weight:bold; cursor:pointer;" onclick="showCompleteBtn()">規約を確認する</a>
-                
-                <button id="complete-btn" style="display:none; margin-top:10px;" onclick="completeImmigration()">確認した。入国する！</button>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="メッセージ...">
+                    <button class="chat-btn" onclick="dummySend()">送信</button>
+                </div>
             </div>
+        </div>
+
+        <div class="menu-grid">
+            <a href="diagnosis.html" class="menu-card border-pink">
+                <span class="menu-icon">🧠</span>
+                <span class="menu-title" style="color:#fff;">診断製作所</span>
+                <span class="menu-subtitle">脳内イメージ診断</span>
+            </a>
+            
+            <a href="story_booth.html" class="menu-card border-orange">
+                <span class="menu-icon">✍️</span>
+                <span class="menu-title" style="color:#fff;">物書き</span>
+                <span class="menu-subtitle">1000文字ストーリー</span>
+            </a>
+
+            <a href="game.html" class="menu-card border-cyan">
+                <span class="menu-icon">🎮</span>
+                <span class="menu-title" style="color:#fff;">ゲームブース</span>
+                <span class="menu-subtitle">遊技場（準備中）</span>
+            </a>
+
+            <a href="ranking.html" class="menu-card border-yellow">
+                <span class="menu-icon">🏆</span>
+                <span class="menu-title" style="color:#fff;">各種ランキング</span>
+                <span class="menu-subtitle">ステータスボード</span>
+            </a>
+
+            <a href="notice.html" class="menu-card border-gray">
+                <span class="menu-icon">📢</span>
+                <span class="menu-title" style="color:#fff;">お知らせ</span>
+                <span class="menu-subtitle">運営から</span>
+            </a>
+
+            <a href="https://forms.google.com/your-form-link" target="_blank" class="menu-card border-gray">
+                <span class="menu-icon">🛠️</span>
+                <span class="menu-title" style="color:#fff;">お問い合わせ</span>
+                <span class="menu-subtitle">不具合・ご意見</span>
+            </a>
         </div>
     </div>
 
-    <div id="volume-warning" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:10000; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center;">
-        <p style="font-size: 1.5rem; color: #ff00ff; border: 1px solid #ff00ff; padding: 20px;">
-            ⚠️ 警告：この先、音が出ます。<br>音量にご注意ください。
-        </p>
-        <button onclick="startExperience()" style="padding: 15px 30px; background:#ff00ff; color:#fff; border:none; cursor:pointer; font-size:1.2rem;">
-            音量を確認して入国する
-        </button>
-    </div>
-
-    <div id="opening-layer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: #000;">
-        <video id="op-video" width="100%" height="100%" playsinline onended="hideMovie()">
-            <source src="opening.mp4" type="video/mp4">
-        </video>
-    </div>
-
     <script>
-        // ----------------------------------------------------
-        // 1. ページ開始＆動画再生
-        // ----------------------------------------------------
-        function startExperience() {
-            document.getElementById('volume-warning').style.display = 'none';
-            document.getElementById('opening-layer').style.display = 'block';
-            
-            const video = document.getElementById('op-video');
-            video.muted = false; 
-            video.play().catch(function(e) { 
-                console.log("再生ブロックされたべ: " + e); 
-            });
-        }
-
-        // ----------------------------------------------------
-        // 2. 動画終了時の分岐（手続きシステム）
-        // ----------------------------------------------------
-        function hideMovie() {
-            document.getElementById('opening-layer').style.display = 'none';
-
-            // 既にIDがある（永続記憶がある）場合は、手続きをスキップしてラウンジへ直行！
-            if (localStorage.getItem('userId')) {
-                window.location.href = 'lounge.html';
-                return;
+        document.addEventListener('DOMContentLoaded', () => {
+            const userName = localStorage.getItem('userName');
+            if(!userName) {
+                window.location.href = 'index.html';
             }
+        });
 
-            // IDがない人だけゲートを開く
-            document.getElementById('gate-screen').style.display = 'flex';
-        }
+        function dummySend() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
 
-        // ----------------------------------------------------
-        // 3. Licoの手続きプロセス
-        // ----------------------------------------------------
-        function startProcess() {
-            document.getElementById('lico-text').innerText = "はじめてみる顔ね！あなたの名前は？";
-            document.getElementById('start-btn').style.display = "none";
-            document.getElementById('name-input-area').style.display = "block";
-        }
-
-        // ----------------------------------------------------
-        // 4. 名前入力＆ID発行（永続化）
-        // ----------------------------------------------------
-        function checkName() {
-            let name = document.getElementById('user-name').value;
-            if (!name) return alert('名前をちょうだい。');
+            const userName = localStorage.getItem('userName') || 'ゲスト';
+            const chatDisplay = document.getElementById('chat-display');
             
-            // 永続IDを発行して記憶！（sessionStorage から localStorage に変更）
-            const uniqueId = 'uid_' + Date.now(); 
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userId', uniqueId); 
+            const msgDiv = document.createElement('div');
+            msgDiv.style.marginBottom = "5px";
+            msgDiv.innerHTML = `<strong style="color:#00ff00;">[${userName}]</strong> ${text}`;
+            chatDisplay.appendChild(msgDiv);
             
-            document.getElementById('lico-text').innerText = name + "さんね！まずは規約を読んでくれる？";
-            document.getElementById('name-input-area').style.display = "none";
-            document.getElementById('terms-link-btn').style.display = "block";
+            input.value = '';
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
         }
 
-        // ----------------------------------------------------
-        // 5. 規約確認＆ワープ
-        // ----------------------------------------------------
-        // 規約リンクをクリックしたら、「入国する」ボタンを表示させる
-        function showCompleteBtn() {
-            document.getElementById('lico-text').innerText = "確認できた？じゃあ、中へどうぞ。";
-            document.getElementById('terms-link-btn').style.display = "none";
-            document.getElementById('complete-btn').style.display = "block";
-        }
-
-        // 最後のワープ処理！
-        function completeImmigration() {
-            // ラウンジへワープだべ！
-            window.location.href = 'lounge.html';
-        }
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                dummySend();
+            }
+        });
     </script>
-
 </body>
 </html>
