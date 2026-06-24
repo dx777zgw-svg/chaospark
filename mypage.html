@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>G-Chaospark | My Page</title>
     <style>
         body { 
             margin: 0; background: #050505; color: #e0e0e0; 
-            font-family: 'Courier New', Courier, monospace; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
             display: flex; justify-content: center; align-items: flex-start; 
             min-height: 100vh; padding: 20px; box-sizing: border-box;
             background-image: radial-gradient(circle at center, #111 0%, #000 100%);
@@ -22,7 +23,7 @@
             position: relative; margin-top: 20px;
         }
 
-        h1 { margin-top: 0; color: #fff; font-size: 1.8em; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        h1 { margin-top: 0; color: #fff; font-size: 1.5em; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         
         /* アバターエリア */
         .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
@@ -42,7 +43,7 @@
             background: #0a0a0a; border: 1px solid #222; 
             padding: 20px; border-radius: 5px; text-align: center; 
         }
-        .status-title { font-size: 0.9em; color: #aaa; margin-bottom: 10px; }
+        .status-title { font-size: 0.9em; color: #aaa; margin-bottom: 10px; font-weight: bold; }
         .cp-val { font-size: 1.8em; font-weight: bold; color: #00ff41; }
         .cm-val { font-size: 1.8em; font-weight: bold; color: #ffd700; }
 
@@ -71,7 +72,7 @@
 
         /* 自分が作った診断リスト */
         .my-diagnoses-section { margin-top: 40px; border-top: 1px dashed #333; padding-top: 20px; }
-        .section-title { font-size: 1.2rem; color: #fff; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #00e5ff; }
+        .section-title { font-size: 1.1rem; color: #fff; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #00e5ff; font-weight: bold; }
         
         .diag-item {
             background: #0a0a0a; border: 1px solid #222; padding: 15px; border-radius: 8px;
@@ -82,13 +83,14 @@
         .diag-desc { font-size: 0.85rem; color: #aaa; margin: 0; word-break: break-all; }
 
         /* 操作ボタン */
-        .btn-area { display: flex; gap: 8px; flex-shrink: 0; }
+        .btn-area { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        @media (min-width: 480px) { .btn-area { flex-direction: row; } }
         .btn-edit { background: transparent; border: 1px solid #00e5ff; color: #00e5ff; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-edit:hover { background: #00e5ff; color: #000; }
         .btn-delete { background: transparent; border: 1px solid #ff003c; color: #ff003c; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-delete:hover { background: #ff003c; color: #fff; }
 
-        /* 修正用モーダル */
+        /* 修正用モーダル（最新スキーマ対応版） */
         #edit-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center;
@@ -97,7 +99,7 @@
         #edit-window {
             background: #111; border: 2px solid #00e5ff; border-radius: 10px;
             width: 100%; max-width: 500px; padding: 25px; box-sizing: border-box;
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); max-height: 90vh; overflow-y: auto;
         }
         #edit-window h2 { color: #00e5ff; margin-top: 0; text-align: center; font-size: 1.3rem; border-bottom: 1px dashed #333; padding-bottom: 10px; }
         
@@ -105,15 +107,16 @@
         label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; font-weight: bold; }
         input[type="text"], textarea {
             width: 100%; background: #000; border: 1px solid #444; color: #fff;
-            padding: 8px; box-sizing: border-box; font-family: inherit; border-radius: 4px;
+            padding: 10px; box-sizing: border-box; font-family: inherit; border-radius: 4px; font-size: 16px;
         }
         input[type="text"]:focus, textarea:focus { border-color: #00e5ff; outline: none; }
-        textarea { resize: vertical; height: 80px; }
+        #edit-base { height: 80px; resize: vertical; }
+        #edit-result-list { height: 120px; resize: vertical; font-family: monospace; }
 
         .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-save { flex: 1; background: #00ff41; color: #000; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-save { flex: 1; background: #00ff41; color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 1rem; }
         .btn-save:hover { background: #fff; }
-        .btn-cancel { flex: 1; background: #333; color: #ccc; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-cancel { flex: 1; background: #333; color: #ccc; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 1rem; }
         .btn-cancel:hover { background: #444; color: #fff; }
     </style>
 </head>
@@ -148,18 +151,24 @@
         <div id="edit-window">
             <h2>📝 診断内容の改変（システム干渉）</h2>
             <input type="hidden" id="edit-id">
+            
             <div class="form-group">
-                <label>診断タイトル</label>
+                <label>📌 診断タイトル</label>
                 <input type="text" id="edit-title">
             </div>
             <div class="form-group">
-                <label>説明文</label>
-                <textarea id="edit-desc"></textarea>
+                <label>📝 説明文</label>
+                <textarea id="edit-desc" style="height: 60px;"></textarea>
             </div>
             <div class="form-group">
-                <label>結果のパターン</label>
-                <textarea id="edit-result" placeholder="例：[名前]の戦闘力は53万だべ！"></textarea>
+                <label>💬 基本テキスト</label>
+                <textarea id="edit-base" placeholder="例：[name]の戦闘力は...【[結果]】です！"></textarea>
             </div>
+            <div class="form-group">
+                <label>🎲 結果リスト（改行で区切る）</label>
+                <textarea id="edit-result-list" placeholder="例：&#10;5&#10;53万&#10;計測不能"></textarea>
+            </div>
+            
             <div class="modal-btns">
                 <button class="btn-save" onclick="saveEdit()">データを上書き（保存）</button>
                 <button class="btn-cancel" onclick="closeEditModal()">キャンセル</button>
@@ -226,16 +235,14 @@
 
         const userRef = ref(db, 'users/' + userId);
 
-        // ☁️【超重要】開いた瞬間にまずクラウドから最新のポイントとアバターをダウンロード！
+        // クラウドから最新のポイントとアバターをダウンロード
         get(userRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 localStorage.setItem('chaosPoint', data.cp ?? 0);
                 localStorage.setItem('creatorMileage', data.cm ?? 0);
                 localStorage.setItem('userAvatar', data.avatar ?? '👤');
-                console.log("☁️ マイページ：クラウドからお財布データを復元したべ！");
             } else {
-                // 初回同期用
                 update(userRef, {
                     name: userName,
                     cp: parseInt(localStorage.getItem('chaosPoint')) || 0,
@@ -243,27 +250,19 @@
                     avatar: localStorage.getItem('userAvatar') || '👤'
                 });
             }
-            // 画面表示を最新に更新べ！
             document.getElementById('display-cp').innerText = localStorage.getItem('chaosPoint') || 0;
             document.getElementById('display-cm').innerText = localStorage.getItem('creatorMileage') || 0;
             document.getElementById('user-avatar').innerText = localStorage.getItem('userAvatar') || '👤';
         }).catch((error) => {
-            console.error("ユーザーデータ同期エラーだべ：", error);
-            // エラー時も一応ローカルから出すべ
+            console.error("ユーザーデータ同期エラー：", error);
             document.getElementById('display-cp').innerText = localStorage.getItem('chaosPoint') || 0;
             document.getElementById('display-cm').innerText = localStorage.getItem('creatorMileage') || 0;
             document.getElementById('user-avatar').innerText = localStorage.getItem('userAvatar') || '👤';
         });
 
-        // アバター変更モーダルの制御
-        window.openAvatarModal = function() {
-            document.getElementById('avatar-modal').style.display = 'flex';
-        };
-        window.closeAvatarModal = function() {
-            document.getElementById('avatar-modal').style.display = 'none';
-        };
-
-        // アバターを変更したら、クラウドとローカルを同時更新
+        // アバター制御
+        window.openAvatarModal = function() { document.getElementById('avatar-modal').style.display = 'flex'; };
+        window.closeAvatarModal = function() { document.getElementById('avatar-modal').style.display = 'none'; };
         window.setAvatar = function(emoji) {
             localStorage.setItem('userAvatar', emoji);
             document.getElementById('user-avatar').innerText = emoji;
@@ -271,7 +270,7 @@
             update(userRef, { avatar: emoji }); 
         };
 
-        // 【削除機能】
+        // 削除機能
         window.deleteDiag = function(diagId, title) {
             if (confirm(`本当に「${title}」をこの世から抹消するべか？\n（この操作は取り消せないべ！）`)) {
                 const diagRef = ref(db, 'diagnoses/' + diagId);
@@ -283,14 +282,22 @@
             }
         };
 
-        // 【修正モーダル起動】
+        // 修正モーダル起動（古いDB構造の互換性対応済み）
         window.openEditModal = function(diagId) {
             if (window.myDiagnosesData && window.myDiagnosesData[diagId]) {
                 const diag = window.myDiagnosesData[diagId];
                 document.getElementById('edit-id').value = diagId;
                 document.getElementById('edit-title').value = diag.title || '';
                 document.getElementById('edit-desc').value = diag.desc || '';
-                document.getElementById('edit-result').value = diag.resultPattern || '';
+                
+                // もし古い仕様（resultPattern）で作られたデータだった場合のフォールバック処理
+                if (diag.baseText !== undefined) {
+                    document.getElementById('edit-base').value = diag.baseText;
+                    document.getElementById('edit-result-list').value = diag.resultList;
+                } else {
+                    document.getElementById('edit-base').value = "[name]の診断結果は...【[結果]】です！"; // 仮のベース
+                    document.getElementById('edit-result-list').value = diag.resultPattern || '';
+                }
                 
                 document.getElementById('edit-modal').style.display = 'flex';
             }
@@ -300,15 +307,16 @@
             document.getElementById('edit-modal').style.display = 'none';
         };
 
-        // 【修正保存機能】
+        // 修正保存機能（新スキーマに対応）
         window.saveEdit = function() {
             const diagId = document.getElementById('edit-id').value;
             const newTitle = document.getElementById('edit-title').value;
             const newDesc = document.getElementById('edit-desc').value;
-            const newResult = document.getElementById('edit-result').value;
+            const newBase = document.getElementById('edit-base').value;
+            const newList = document.getElementById('edit-result-list').value;
 
-            if (newTitle.trim() === "" || newDesc.trim() === "" || newResult.trim() === "") {
-                alert("空欄のまま上書きはできないべ！");
+            if (newTitle.trim() === "" || newBase.trim() === "" || newList.trim() === "") {
+                alert("タイトル・基本テキスト・結果リストは空欄にできないべ！");
                 return;
             }
 
@@ -316,7 +324,9 @@
             update(diagRef, {
                 title: newTitle,
                 desc: newDesc,
-                resultPattern: newResult,
+                baseText: newBase,
+                resultList: newList,
+                resultPattern: null, // 古いデータ形式のキーがあればクラウドから消去（整理）
                 updatedAt: new Date().toISOString()
             }).then(() => {
                 alert("診断の改変（アップデート）が正常に完了したべ！✨");
@@ -326,7 +336,7 @@
             });
         };
 
-        // 🔥 Firebaseから「自分が作った診断」だけをリアルタイム抽出
+        // Firebaseから「自分が作った診断」だけをリアルタイム抽出
         const diagListRef = ref(db, 'diagnoses');
         onValue(diagListRef, (snapshot) => {
             const container = document.getElementById('diagnoses-container');
