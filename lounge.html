@@ -13,21 +13,23 @@
         header { background: #111; border-bottom: 2px solid #ff00ff; padding: 12px 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
         .app-title { font-size: 1.2rem; font-weight: bold; color: #fff; margin: 0; letter-spacing: 1px; }
         .app-title span { color: #ff00ff; }
-        .mypage-btn { background: #222; color: #00ff00; border: 1px solid #00ff00; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .header-right { display: flex; gap: 8px; }
+        .mypage-btn { background: #222; color: #00ff00; border: 1px solid #00ff00; padding: 6px 10px; border-radius: 20px; text-decoration: none; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 3px; }
         .mypage-btn:active { background: #00ff00; color: #000; }
+        .btn-logout { border-color: #ff9900; color: #ff9900; cursor: pointer; }
+        .btn-delete { border-color: #ff3333; color: #ff3333; cursor: pointer; }
 
-        /* 💡 立ち絵コンテナ（左右固定配置） */
-        .character-bg { position: fixed; bottom: 0; z-index: -1; pointer-events: none; opacity: 0.3; /* スマホ時は半透明で背景化 */ transition: opacity 0.3s; }
+        /* 💡 立ち絵コンテナ（通常時） */
+        .character-bg { position: fixed; bottom: 0; z-index: -1; pointer-events: none; opacity: 0.3; transition: opacity 0.3s; }
         .char-akari { left: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(0,255,0,0.5)); }
-        .char-lico { right: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); transform: scaleX(-1); /* Licoを内側に向かせる場合 */ }
+        .char-lico { right: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); transform: scaleX(-1); }
 
-        /* メインコンテナ（中央配置） */
-        .container { max-width: 600px; /* 立ち絵のスペースを確保するため少し細めに */ margin: 10px auto; padding: 0 10px 80px 10px; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; }
+        /* メインコンテナ */
+        .container { max-width: 600px; margin: 10px auto; padding: 0 10px 80px 10px; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; }
 
         /* 💬 雑談ルーム */
-        .section-box { background: rgba(26, 26, 26, 0.9); /* 背景を少し透かして立ち絵を馴染ませる */ border: 1px solid #333; padding: 10px; border-radius: 8px; backdrop-filter: blur(2px); }
+        .section-box { background: rgba(26, 26, 26, 0.9); border: 1px solid #333; padding: 10px; border-radius: 8px; backdrop-filter: blur(2px); }
         .section-title { color: #fff; border-bottom: 1px solid #ff00ff; padding-bottom: 5px; margin-top: 0; margin-bottom: 10px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-        
         .chat-container { display: flex; flex-direction: column; height: 35vh; }
         .chat-room { flex-grow: 1; background: rgba(0, 0, 0, 0.8); border: 1px inset #555; border-radius: 5px; padding: 10px; overflow-y: auto; margin-bottom: 10px; font-family: monospace; font-size: 0.85rem; }
         .chat-input-area { display: flex; gap: 8px; }
@@ -48,13 +50,25 @@
         .border-yellow { border-color: #ffff00; color: #ffff00; }
         .border-gray { border-color: #888; color: #ccc; }
 
-        /* PC等で画面が広い場合のメディアクエリ（立ち絵を完全表示） */
         @media (min-width: 900px) {
-            .character-bg { opacity: 1; /* はっきり表示 */ }
+            .character-bg { opacity: 1; }
             .char-akari { left: 5%; height: 80vh; max-height: 800px; }
-            .char-lico { right: 5%; height: 80vh; max-height: 800px; transform: none; /* そのままの向き */ }
+            .char-lico { right: 5%; height: 80vh; max-height: 800px; transform: none; }
             .container { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 20px; border: 1px solid #333; margin-top: 30px; }
         }
+
+        /* 🚪 退会演出用オーバーレイ */
+        .delete-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .delete-character { height: 50vh; max-height: 400px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)); animation: floatUp 0.5s ease-out; }
+        .dialog-box { background: rgba(20, 20, 20, 0.9); border: 2px solid #fff; border-radius: 10px; padding: 20px; width: 90%; max-width: 400px; color: #fff; font-size: 1.1rem; font-weight: bold; animation: fadeIn 0.8s ease-out; }
+        .dialog-btn-area { display: flex; justify-content: space-around; margin-top: 20px; }
+        .dialog-btn { padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; width: 40%; }
+        .btn-yes { background: #ff3333; color: #fff; }
+        .btn-no { background: #555; color: #fff; }
+        
+        /* 演出用のアニメーション */
+        @keyframes floatUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     </style>
 </head>
@@ -66,12 +80,13 @@
     <header>
         <h1 class="app-title">G-Chaos <span>Park</span></h1>
         <div class="header-right">
-            <a href="mypage.html" class="mypage-btn">👤 マイページ</a>
+            <a href="mypage.html" class="mypage-btn">👤</a>
+            <div onclick="logoutUser()" class="mypage-btn btn-logout">🚪退国</div>
+            <div onclick="startDeletionProcess()" class="mypage-btn btn-delete">💀退会</div>
         </div>
     </header>
 
     <div class="container">
-        
         <div class="section-box">
             <h2 class="section-title">💬 雑談ルーム</h2>
             <div class="chat-container">
@@ -92,31 +107,26 @@
                 <span class="menu-title" style="color:#fff;">診断製作所</span>
                 <span class="menu-subtitle">診断を作ろう</span>
             </a>
-            
             <a href="story_booth.html" class="menu-card border-orange">
                 <span class="menu-icon">✍️</span>
                 <span class="menu-title" style="color:#fff;">物書き</span>
                 <span class="menu-subtitle">1000文字ストーリー</span>
             </a>
-
             <a href="gamebooth.html" class="menu-card border-cyan">
                 <span class="menu-icon">🎮</span>
                 <span class="menu-title" style="color:#fff;">ゲームブース</span>
                 <span class="menu-subtitle">遊技場</span>
             </a>
-
             <a href="ranking.html" class="menu-card border-yellow">
                 <span class="menu-icon">🏆</span>
                 <span class="menu-title" style="color:#fff;">各種ランキング</span>
                 <span class="menu-subtitle">ステータスボード</span>
             </a>
-
             <a href="notice.html" class="menu-card border-gray">
                 <span class="menu-icon">📢</span>
                 <span class="menu-title" style="color:#fff;">お知らせ</span>
                 <span class="menu-subtitle">運営から</span>
             </a>
-
             <a href="https://forms.google.com/your-form-link" target="_blank" class="menu-card border-gray">
                 <span class="menu-icon">🛠️</span>
                 <span class="menu-title" style="color:#fff;">お問い合わせ</span>
@@ -125,14 +135,37 @@
         </div>
     </div>
 
+    <div id="delete-overlay" class="delete-overlay">
+        <img id="dialog-image" src="AKARI.png" alt="Character" class="delete-character" onerror="this.style.display='none';">
+        <div class="dialog-box">
+            <p id="dialog-text" style="margin: 0;"></p>
+            <div class="dialog-btn-area">
+                <button class="dialog-btn btn-yes" id="dialog-btn-yes">はい</button>
+                <button class="dialog-btn btn-no" onclick="cancelDeletion()">いいえ</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // 🧪 テスト用の初期化処理（index.html が無い時用）
         document.addEventListener('DOMContentLoaded', () => {
-            const userName = localStorage.getItem('userName');
-            if(!userName) {
-                window.location.href = 'index.html';
+            let userName = localStorage.getItem('userName');
+            
+            if (!userName) {
+                // 強制的に初期データをセット
+                localStorage.setItem('userName', 'テストユーザー');
+                localStorage.setItem('userUID', 'test_uid_12345');
+                localStorage.setItem('userCP', '100'); // テスト用CP
+                console.log("テスト用データを初期化しました。");
+                userName = 'テストユーザー';
             }
+            
+            // ラウンジにシステムメッセージで状態を表示
+            const chatDisplay = document.getElementById('chat-display');
+            chatDisplay.innerHTML += `<div style="color: #00ffff;">[System] ${userName} さんとして入国中。所持CP: ${localStorage.getItem('userCP')}</div>`;
         });
 
+        // 💬 ラウンジの送信処理
         function dummySend() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
@@ -151,10 +184,68 @@
         }
 
         document.getElementById('chat-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                dummySend();
-            }
+            if (e.key === 'Enter') dummySend();
         });
+
+        // 🚪 退国処理（ログアウト）
+        function logoutUser() {
+            if(confirm("一時的にパークから退国しますか？（データは保持されます）")) {
+                localStorage.clear();
+                location.reload(); // index.htmlがないのでリロードで初期化処理を走らせる
+            }
+        }
+
+        // 💀 退会処理の演出ロジック
+        const overlay = document.getElementById('delete-overlay');
+        const dialogImage = document.getElementById('dialog-image');
+        const dialogText = document.getElementById('dialog-text');
+        const btnYes = document.getElementById('dialog-btn-yes');
+
+        function startDeletionProcess() {
+            // 第1段階: AKARIの引き留め
+            overlay.style.display = 'flex';
+            dialogImage.src = 'AKARI.png';
+            dialogImage.style.filter = 'drop-shadow(0 0 20px rgba(0,255,0,0.5))';
+            dialogText.innerHTML = "えっ…<br>本当にいなくなっちゃうの…？";
+            dialogText.style.color = "#00ff00";
+            
+            // 「はい」を押した時の動作を上書き
+            btnYes.onclick = showLicoWarning;
+        }
+
+        function showLicoWarning() {
+            // 第2段階: LICOの警告
+            dialogImage.src = 'LICO.png';
+            dialogImage.style.filter = 'drop-shadow(0 0 20px rgba(255,0,0,0.8))';
+            dialogImage.style.transform = 'scaleX(-1)'; // 向きを反転
+            
+            dialogText.innerHTML = "…よろしいですか。<br><br>退会した場合、あなたの所持CPや役職など、今までのデータは全て電子の海へ消滅します。<br>後悔しませんね？";
+            dialogText.style.color = "#ff3333";
+            
+            // 「はい」を押した時の動作を最終処理へ
+            btnYes.onclick = executeDeletion;
+        }
+
+        function executeDeletion() {
+            // 第3段階: 削除実行
+            localStorage.clear();
+            // ※ここで将来的にFirebaseの remove() 処理を呼ぶ
+            
+            dialogText.innerHTML = "データを消去しました。<br>さようなら。";
+            dialogText.style.color = "#888";
+            btnYes.style.display = 'none';
+            document.querySelector('.btn-no').style.display = 'none';
+
+            // 2秒後に画面をリロード（またはindex.htmlへ遷移）
+            setTimeout(() => {
+                location.reload(); 
+            }, 2000);
+        }
+
+        function cancelDeletion() {
+            // 「いいえ」を選んだら元に戻る
+            overlay.style.display = 'none';
+        }
     </script>
 </body>
 </html>
