@@ -3,156 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>G-Chaos Park | メインラウンジ</title>
+    <title>G-Chaos Park | 入国ゲート</title>
     <style>
-        /* モバイルファーストの基礎リセット */
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; background-color: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; overflow-x: hidden; position: relative; min-height: 100vh; }
-        
-        /* ヘッダー */
-        header { background: #111; border-bottom: 2px solid #ff00ff; padding: 12px 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
-        .app-title { font-size: 1.2rem; font-weight: bold; color: #fff; margin: 0; letter-spacing: 1px; }
-        .app-title span { color: #ff00ff; }
-        .mypage-btn { background: #222; color: #00ff00; border: 1px solid #00ff00; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .mypage-btn:active { background: #00ff00; color: #000; }
-
-        /* 💡 立ち絵コンテナ（左右固定配置） */
-        .character-bg { position: fixed; bottom: 0; z-index: -1; pointer-events: none; opacity: 0.3; /* スマホ時は半透明で背景化 */ transition: opacity 0.3s; }
-        .char-akari { left: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(0,255,0,0.5)); }
-        .char-lico { right: -20px; height: 60vh; max-height: 500px; filter: drop-shadow(0 0 10px rgba(255,0,255,0.5)); transform: scaleX(-1); /* Licoを内側に向かせる場合 */ }
-
-        /* メインコンテナ（中央配置） */
-        .container { max-width: 600px; /* 立ち絵のスペースを確保するため少し細めに */ margin: 10px auto; padding: 0 10px 80px 10px; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 10; }
-
-        /* 💬 雑談ルーム */
-        .section-box { background: rgba(26, 26, 26, 0.9); /* 背景を少し透かして立ち絵を馴染ませる */ border: 1px solid #333; padding: 10px; border-radius: 8px; backdrop-filter: blur(2px); }
-        .section-title { color: #fff; border-bottom: 1px solid #ff00ff; padding-bottom: 5px; margin-top: 0; margin-bottom: 10px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-        
-        .chat-container { display: flex; flex-direction: column; height: 35vh; }
-        .chat-room { flex-grow: 1; background: rgba(0, 0, 0, 0.8); border: 1px inset #555; border-radius: 5px; padding: 10px; overflow-y: auto; margin-bottom: 10px; font-family: monospace; font-size: 0.85rem; }
-        .chat-input-area { display: flex; gap: 8px; }
-        .chat-input { flex-grow: 1; padding: 10px; background: rgba(34, 34, 34, 0.9); border: 1px solid #555; color: #fff; border-radius: 5px; font-size: 16px; }
-        .chat-btn { padding: 10px 15px; background: #ff00ff; color: #fff; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 0.9rem; white-space: nowrap; }
-
-        /* 📱 アプリ風メニューグリッド */
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .menu-card { background: rgba(34, 34, 34, 0.9); border: 1px solid; border-radius: 8px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #fff; transition: background 0.2s; min-height: 80px; text-align: center; backdrop-filter: blur(2px); }
-        .menu-card:active { background: rgba(255,255,255,0.2); }
-        .menu-icon { font-size: 1.8rem; margin-bottom: 5px; }
-        .menu-title { font-size: 0.85rem; font-weight: bold; }
-        .menu-subtitle { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
-
-        .border-pink { border-color: #ff00ff; color: #ff00ff; }
-        .border-orange { border-color: #ff9900; color: #ff9900; }
-        .border-cyan { border-color: #00ffff; color: #00ffff; }
-        .border-yellow { border-color: #ffff00; color: #ffff00; }
-        .border-gray { border-color: #888; color: #ccc; }
-
-        /* PC等で画面が広い場合のメディアクエリ（立ち絵を完全表示） */
-        @media (min-width: 900px) {
-            .character-bg { opacity: 1; /* はっきり表示 */ }
-            .char-akari { left: 5%; height: 80vh; max-height: 800px; }
-            .char-lico { right: 5%; height: 80vh; max-height: 800px; transform: none; /* そのままの向き */ }
-            .container { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 20px; border: 1px solid #333; margin-top: 30px; }
-        }
-
+        body { margin: 0; padding: 0; background-color: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .gate-box { background: rgba(26, 26, 26, 0.9); border: 2px solid #ff00ff; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); width: 80%; max-width: 400px; }
+        h1 { color: #fff; font-size: 1.5rem; margin-bottom: 5px; }
+        h1 span { color: #ff00ff; }
+        p { font-size: 0.9rem; margin-bottom: 20px; color: #aaa; }
+        input[type="text"] { width: 100%; padding: 10px; background: #222; border: 1px solid #555; color: #fff; border-radius: 5px; margin-bottom: 15px; font-size: 1rem; box-sizing: border-box; }
+        button { background: #ff00ff; color: #fff; border: none; padding: 12px 20px; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; }
+        button:hover { background: #cc00cc; }
+        .error-msg { color: #ff3333; font-size: 0.8rem; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
-    <img src="AKARI.png" alt="AKARI" class="character-bg char-akari" onerror="this.style.display='none';">
-    <img src="LICO.png" alt="Lico" class="character-bg char-lico" onerror="this.style.display='none';">
-
-    <header>
-        <h1 class="app-title">G-Chaos <span>Park</span></h1>
-        <div class="header-right">
-            <a href="mypage.html" class="mypage-btn">👤 マイページ</a>
-        </div>
-    </header>
-
-    <div class="container">
+    <div class="gate-box">
+        <h1>G-Chaos <span>Park</span></h1>
+        <p>パークへようこそ。入国手続きを行います。</p>
         
-        <div class="section-box">
-            <h2 class="section-title">💬 雑談ルーム</h2>
-            <div class="chat-container">
-                <div class="chat-room" id="chat-display">
-                    <div style="color: #888;">[System] 雑談ルームに接続しました。</div>
-                    <div style="color: #ff00ff;">[AKARI] ここは自由帳だよ！適当に喋ってこー！</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="chat-input" class="chat-input" placeholder="メッセージ...">
-                    <button class="chat-btn" onclick="dummySend()">送信</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="menu-grid">
-            <a href="diagnosis.html" class="menu-card border-pink">
-                <span class="menu-icon">🧠</span>
-                <span class="menu-title" style="color:#fff;">診断製作所</span>
-                <span class="menu-subtitle">脳内イメージ診断</span>
-            </a>
-            
-            <a href="story_booth.html" class="menu-card border-orange">
-                <span class="menu-icon">✍️</span>
-                <span class="menu-title" style="color:#fff;">物書き</span>
-                <span class="menu-subtitle">1000文字ストーリー</span>
-            </a>
-
-            <a href="game.html" class="menu-card border-cyan">
-                <span class="menu-icon">🎮</span>
-                <span class="menu-title" style="color:#fff;">ゲームブース</span>
-                <span class="menu-subtitle">遊技場（準備中）</span>
-            </a>
-
-            <a href="ranking.html" class="menu-card border-yellow">
-                <span class="menu-icon">🏆</span>
-                <span class="menu-title" style="color:#fff;">各種ランキング</span>
-                <span class="menu-subtitle">ステータスボード</span>
-            </a>
-
-            <a href="notice.html" class="menu-card border-gray">
-                <span class="menu-icon">📢</span>
-                <span class="menu-title" style="color:#fff;">お知らせ</span>
-                <span class="menu-subtitle">運営から</span>
-            </a>
-
-            <a href="https://forms.google.com/your-form-link" target="_blank" class="menu-card border-gray">
-                <span class="menu-icon">🛠️</span>
-                <span class="menu-title" style="color:#fff;">お問い合わせ</span>
-                <span class="menu-subtitle">不具合・ご意見</span>
-            </a>
-        </div>
+        <input type="text" id="username-input" placeholder="あなたの名前を入力（最大10文字）" maxlength="10">
+        <button id="enter-btn">入国する</button>
+        <div id="error-msg" class="error-msg">名前を入力してください。</div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userName = localStorage.getItem('userName');
-            if(!userName) {
-                window.location.href = 'index.html';
-            }
-        });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        function dummySend() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if(!text) return;
+        // Firebaseの設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
+            authDomain: "g-chaospark.firebaseapp.com",
+            databaseURL: "https://g-chaospark-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "g-chaospark",
+            storageBucket: "g-chaospark.firebasestorage.app",
+            messagingSenderId: "256664886136",
+            appId: "1:256664886136:web:e87bbe307a654331c1468d"
+        };
 
-            const userName = localStorage.getItem('userName') || 'ゲスト';
-            const chatDisplay = document.getElementById('chat-display');
-            
-            const msgDiv = document.createElement('div');
-            msgDiv.style.marginBottom = "5px";
-            msgDiv.innerHTML = `<strong style="color:#00ff00;">[${userName}]</strong> ${text}`;
-            chatDisplay.appendChild(msgDiv);
-            
-            input.value = '';
-            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 簡易的な一意のID生成関数（Firebase Authを使わない場合の代替策）
+        function generateUID() {
+            return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
         }
 
-        document.getElementById('chat-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                dummySend();
+        document.getElementById('enter-btn').addEventListener('click', async () => {
+            const nameInput = document.getElementById('username-input').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!nameInput) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // 既にlocalStorageにUIDがあるか確認（二重入国防止）
+            let uid = localStorage.getItem('userUID');
+            
+            if (!uid) {
+                // 新規入国の場合
+                uid = generateUID();
+                
+                // Firebase DBに初期データを書き込む
+                const userRef = ref(db, 'users/' + uid);
+                
+                try {
+                    await set(userRef, {
+                        name: nameInput,
+                        avatar: "🧑",         // 初期アイコン
+                        role: "none",        // 役職なし
+                        style: "default",    // 装飾なし
+                        points: {
+                            cp: 100,         // 初回入国ボーナス100CP
+                            cm: 0            // CMは0からスタート
+                        },
+                        createdAt: new Date().toISOString()
+                    });
+
+                    // 成功したらローカルストレージに保存
+                    localStorage.setItem('userUID', uid);
+                    localStorage.setItem('userName', nameInput);
+                    localStorage.setItem('userAvatar', "🧑");
+
+                    // メイン画面へ遷移
+                    window.location.href = 'main.html'; // 送ってくれた画面のファイル名に合わせる
+
+                } catch (error) {
+                    console.error("DB書き込みエラー:", error);
+                    errorMsg.innerText = "通信エラーが発生しました。";
+                    errorMsg.style.display = 'block';
+                }
+            } else {
+                // 既にUIDを持っている場合（名前変更などの処理は後日拡張可能）
+                // とりあえず今回はそのままメインへ飛ばす
+                localStorage.setItem('userName', nameInput);
+                window.location.href = 'main.html';
             }
         });
     </script>
