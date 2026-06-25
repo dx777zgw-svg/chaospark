@@ -147,105 +147,101 @@
     </div>
 
     <script>
-        // 🧪 テスト用の初期化処理（index.html が無い時用）
-        document.addEventListener('DOMContentLoaded', () => {
-            let userName = localStorage.getItem('userName');
-            
-            if (!userName) {
-                // 強制的に初期データをセット
-                localStorage.setItem('userName', 'テストユーザー');
-                localStorage.setItem('userUID', 'test_uid_12345');
-                localStorage.setItem('userCP', '100'); // テスト用CP
-                console.log("テスト用データを初期化しました。");
-                userName = 'テストユーザー';
-            }
-            
-            // ラウンジにシステムメッセージで状態を表示
-            const chatDisplay = document.getElementById('chat-display');
-            chatDisplay.innerHTML += `<div style="color: #00ffff;">[System] ${userName} さんとして入国中。所持CP: ${localStorage.getItem('userCP')}</div>`;
-        });
+        // 🧪 ロード時の入国チェック
+document.addEventListener('DOMContentLoaded', () => {
+    let userName = localStorage.getItem('userName');
+    
+    // 記憶がない（未入国・退国済み・退会済み）場合は、問答無用で入国ゲートへ強制送還
+    if (!userName) {
+        window.location.href = 'index.html';
+        return; // ここで処理を止める
+    }
+    
+    // ラウンジにシステムメッセージで状態を表示
+    const chatDisplay = document.getElementById('chat-display');
+    const userCP = localStorage.getItem('userCP') || '不明';
+    chatDisplay.innerHTML += `<div style="color: #00ffff;">[System] ${userName} さんとして入国中。</div>`;
+});
 
-        // 💬 ラウンジの送信処理
-        function dummySend() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if(!text) return;
+// 💬 ラウンジの送信処理
+function dummySend() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if(!text) return;
 
-            const userName = localStorage.getItem('userName') || 'ゲスト';
-            const chatDisplay = document.getElementById('chat-display');
-            
-            const msgDiv = document.createElement('div');
-            msgDiv.style.marginBottom = "5px";
-            msgDiv.innerHTML = `<strong style="color:#00ff00;">[${userName}]</strong> ${text}`;
-            chatDisplay.appendChild(msgDiv);
-            
-            input.value = '';
-            chatDisplay.scrollTop = chatDisplay.scrollHeight;
-        }
+    const userName = localStorage.getItem('userName') || 'ゲスト';
+    const chatDisplay = document.getElementById('chat-display');
+    
+    const msgDiv = document.createElement('div');
+    msgDiv.style.marginBottom = "5px";
+    msgDiv.innerHTML = `<strong style="color:#00ff00;">[${userName}]</strong> ${text}`;
+    chatDisplay.appendChild(msgDiv);
+    
+    input.value = '';
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+}
 
-        document.getElementById('chat-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') dummySend();
-        });
+document.getElementById('chat-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') dummySend();
+});
 
-        // 🚪 退国処理（ログアウト）
-        function logoutUser() {
-            if(confirm("一時的にパークから退国しますか？（データは保持されます）")) {
-                localStorage.clear();
-                location.reload(); // index.htmlがないのでリロードで初期化処理を走らせる
-            }
-        }
+// 🚪 退国処理（ログアウト）
+function logoutUser() {
+    if(confirm("一時的にパークから退国しますか？（データは保持されます）")) {
+        localStorage.clear(); // 記憶を消す
+        window.location.href = 'index.html'; // 入国ゲートへ飛ばす！
+    }
+}
 
-        // 💀 退会処理の演出ロジック
-        const overlay = document.getElementById('delete-overlay');
-        const dialogImage = document.getElementById('dialog-image');
-        const dialogText = document.getElementById('dialog-text');
-        const btnYes = document.getElementById('dialog-btn-yes');
+// 💀 退会処理の演出ロジック
+const overlay = document.getElementById('delete-overlay');
+const dialogImage = document.getElementById('dialog-image');
+const dialogText = document.getElementById('dialog-text');
+const btnYes = document.getElementById('dialog-btn-yes');
 
-        function startDeletionProcess() {
-            // 第1段階: AKARIの引き留め
-            overlay.style.display = 'flex';
-            dialogImage.src = 'AKARI.png';
-            dialogImage.style.filter = 'drop-shadow(0 0 20px rgba(0,255,0,0.5))';
-            dialogText.innerHTML = "えっ…<br>本当にいなくなっちゃうの…？";
-            dialogText.style.color = "#00ff00";
-            
-            // 「はい」を押した時の動作を上書き
-            btnYes.onclick = showLicoWarning;
-        }
+function startDeletionProcess() {
+    // 第1段階: AKARIの引き留め
+    overlay.style.display = 'flex';
+    dialogImage.src = 'AKARI.png';
+    dialogImage.style.filter = 'drop-shadow(0 0 20px rgba(0,255,0,0.5))';
+    dialogText.innerHTML = "えっ…<br>本当にいなくなっちゃうの…？";
+    dialogText.style.color = "#00ff00";
+    
+    btnYes.onclick = showLicoWarning;
+}
 
-        function showLicoWarning() {
-            // 第2段階: LICOの警告
-            dialogImage.src = 'LICO.png';
-            dialogImage.style.filter = 'drop-shadow(0 0 20px rgba(255,0,0,0.8))';
-            dialogImage.style.transform = 'scaleX(-1)'; // 向きを反転
-            
-            dialogText.innerHTML = "…よろしいですか。<br><br>退会した場合、あなたの所持CPや役職など、今までのデータは全て電子の海へ消滅します。<br>後悔しませんね？";
-            dialogText.style.color = "#ff3333";
-            
-            // 「はい」を押した時の動作を最終処理へ
-            btnYes.onclick = executeDeletion;
-        }
+function showLicoWarning() {
+    // 第2段階: LICOの警告
+    dialogImage.src = 'LICO.png';
+    dialogImage.style.filter = 'drop-shadow(0 0 20px rgba(255,0,0,0.8))';
+    dialogImage.style.transform = 'scaleX(-1)';
+    
+    dialogText.innerHTML = "…よろしいですか。<br><br>退会した場合、あなたの所持CPや役職など、今までのデータは全て電子の海へ消滅します。<br>後悔しませんね？";
+    dialogText.style.color = "#ff3333";
+    
+    btnYes.onclick = executeDeletion;
+}
 
-        function executeDeletion() {
-            // 第3段階: 削除実行
-            localStorage.clear();
-            // ※ここで将来的にFirebaseの remove() 処理を呼ぶ
-            
-            dialogText.innerHTML = "データを消去しました。<br>さようなら。";
-            dialogText.style.color = "#888";
-            btnYes.style.display = 'none';
-            document.querySelector('.btn-no').style.display = 'none';
+function executeDeletion() {
+    // 第3段階: 削除実行
+    localStorage.clear(); // 記憶を完全に消去
+    // ※ここで将来的にFirebaseの remove() 処理を呼ぶ
+    
+    dialogText.innerHTML = "データを消去しました。<br>さようなら。";
+    dialogText.style.color = "#888";
+    btnYes.style.display = 'none';
+    document.querySelector('.btn-no').style.display = 'none';
 
-            // 2秒後に画面をリロード（またはindex.htmlへ遷移）
-            setTimeout(() => {
-                location.reload(); 
-            }, 2000);
-        }
+    // 2秒後に入国ゲートへ強制送還！
+    setTimeout(() => {
+        window.location.href = 'index.html'; 
+    }, 2000);
+}
 
-        function cancelDeletion() {
-            // 「いいえ」を選んだら元に戻る
-            overlay.style.display = 'none';
-        }
+function cancelDeletion() {
+    overlay.style.display = 'none';
+}
+    
     </script>
 </body>
 </html>
