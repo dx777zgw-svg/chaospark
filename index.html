@@ -5,61 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>G-Chaos Park | 開園</title>
     <style>
-        body { margin: 0; background: #000; color: #fff; overflow: hidden; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #opening-video { width: 100vw; height: 100vh; object-fit: cover; display: none; }
         
-        /* 動画を全画面表示 */
-        #opening-video { width: 100vw; height: 100vh; object-fit: cover; }
+        /* 1. 音声警告用オーバーレイ */
+        #audio-notice { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+        .btn-start { padding: 20px 40px; background: #ff00ff; color: #fff; border: none; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+
+        /* 共通のUIボックス設定 */
+        .ui-box { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(20, 20, 20, 0.95); padding: 30px; border-radius: 12px; width: 85%; max-width: 400px; }
+        .lico-img { height: 20vh; margin-bottom: 20px; }
+        .speech-text { font-size: 1rem; margin-bottom: 25px; font-weight: bold; line-height: 1.5; }
         
-        /* ゲートUI（最初は非表示） */
-        #gate-ui { 
-            display: none; 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            text-align: center; 
-            background: rgba(20, 20, 20, 0.9); 
-            padding: 30px; 
-            border: 2px solid #ff00ff; 
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
-            width: 90%;
-            max-width: 400px;
-        }
-        
-        .lico-img { height: 25vh; max-height: 200px; filter: drop-shadow(0 0 15px rgba(255,0,255,0.6)); margin-bottom: 15px; }
-        .speech-text { font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; font-weight: bold; }
-        
-        .terms-link { color: #00ffff; text-decoration: underline; display: block; margin-bottom: 20px; font-size: 0.9rem; }
-        
-        input[type="text"] { width: 100%; padding: 12px; background: #222; border: 1px solid #555; color: #fff; border-radius: 5px; margin-bottom: 20px; font-size: 1rem; box-sizing: border-box; }
-        
-        .btn-enter { background: #ff00ff; color: #fff; padding: 12px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; font-size: 1rem; }
-        .btn-enter:hover { background: #cc00cc; }
+        /* 3 & 4. ゲートUI（ピンク基調） */
+        #gate-ui { border: 2px solid #ff00ff; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); }
+        #gate-ui .lico-img { filter: drop-shadow(0 0 15px rgba(255,0,255,0.6)); }
+        input[type="text"] { width: 100%; padding: 14px; background: #222; border: 1px solid #555; color: #fff; border-radius: 8px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
+        .btn-enter { width: 100%; padding: 16px; background: #ff00ff; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-enter:disabled { background: #555; cursor: not-allowed; }
+
+        /* 5. 報酬付与UI（グリーン基調で"完了"を演出） */
+        #reward-ui { border: 2px solid #00ff00; box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); }
+        #reward-ui .lico-img { filter: drop-shadow(0 0 15px rgba(0,255,0,0.6)); }
+        .btn-lounge { width: 100%; padding: 16px; background: #00ff00; color: #000; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
     </style>
 </head>
 <body>
 
-    <video id="opening-video" src="opening.mp4" autoplay playsinline muted></video>
+    <div id="audio-notice">
+        <p>当パークのオープニングには<br>音声が含まれています。</p>
+        <button class="btn-start" onclick="startPark()">入園する</button>
+    </div>
 
-    <div id="gate-ui">
+    <video id="opening-video" src="opening.mp4" playsinline muted></video>
+
+    <div id="gate-ui" class="ui-box">
         <img src="LICO.png" alt="LICO" class="lico-img" onerror="this.style.display='none';">
         <div class="speech-text">
             「ようこそ、G-Chaos Parkへ。<br>まずは利用規約を確認し、<br>同意の署名をお願いします。」
         </div>
-        
-        <a href="terms.html" class="terms-link">📄 利用規約を確認する</a>
-        
-        <input type="text" id="username" placeholder="住民名を入力（最大10文字）" maxlength="10">
+        <a href="terms.html" style="color:#00ffff; display:block; margin-bottom:20px;">📄 利用規約を確認</a>
+        <input type="text" id="username" placeholder="住民名を入力（10文字以内）" maxlength="10">
         <button id="enter-btn" class="btn-enter">規約に同意して入園する</button>
+    </div>
+
+    <div id="reward-ui" class="ui-box">
+        <img src="LICO.png" alt="LICO" class="lico-img" onerror="this.style.display='none';">
+        <div class="speech-text" style="color: #00ff00;">
+            「署名を確認しました。<br>これよりあなたは当パークの住民です。<br><br>入園IDと初期費用として<br>【100 CP】を付与いたしました。」
+        </div>
+        <button id="go-lounge-btn" class="btn-lounge">メインラウンジへ進む</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebaseの設定
+        // FIXME: 本番用の設定に書き換えること
         const firebaseConfig = {
             apiKey: "AIzaSyCfmebBH61qeXPLbo-X5n2D7quDitXXIEA",
             authDomain: "g-chaospark.firebaseapp.com",
@@ -69,73 +71,68 @@
             messagingSenderId: "256664886136",
             appId: "1:256664886136:web:e87bbe307a654331c1468d"
         };
+        const db = getDatabase(initializeApp(firebaseConfig));
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // 動画とUIの制御
         const video = document.getElementById('opening-video');
+        const notice = document.getElementById('audio-notice');
         const gateUi = document.getElementById('gate-ui');
+        const rewardUi = document.getElementById('reward-ui');
 
+        // ステップ1 → 2: 音声許可タップで動画開始
+        window.startPark = () => {
+            notice.style.display = 'none';
+            video.muted = false; // ここでミュート解除して音を出す
+            video.style.display = 'block';
+            video.play();
+        };
+
+        // ステップ2 → 3: 動画終了で案内UI表示
         video.onended = () => {
             video.style.display = 'none';
             gateUi.style.display = 'block';
         };
 
-        // 万が一動画が読み込めない/ブロックされた場合のフェイルセーフ（5秒後にUI強制表示）
-        setTimeout(() => {
-            if (gateUi.style.display !== 'block') {
-                video.style.display = 'none';
-                gateUi.style.display = 'block';
-            }
-        }, 5000);
-
-        // 入園ボタンの処理
+        // ステップ4 → 5: 署名してDB登録、完了後に報酬UI表示
         document.getElementById('enter-btn').addEventListener('click', async () => {
             const name = document.getElementById('username').value.trim();
             const btn = document.getElementById('enter-btn');
-            
-            if(!name) { 
-                alert("名前の署名が必要です。"); 
-                return; 
-            }
 
-            // 連打防止のボタンロック
+            if(!name) { alert("名前を入力してね！"); return; }
+            
+            // 処理中のボタンロック
             btn.disabled = true;
             btn.innerText = "戸籍を登録中...";
 
-            // 被りにくいUIDを生成
-            const uid = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            const uid = 'user_' + Date.now();
             
             try {
-                // Firebase DBへ書き込み
-                await set(ref(db, 'users/' + uid), {
-                    name: name,
-                    avatar: "🧑",         // 初期アイコン
-                    role: "none",        // 役職なし
-                    style: "default",    // 装飾なし
-                    points: {
-                        cp: 100,         // 初回ボーナス
-                        cm: 0
-                    },
+                // DBへ書き込み
+                await set(ref(db, 'users/' + uid), { 
+                    name: name, 
+                    points: { cp: 100, cm: 0 },
+                    role: "none",
                     createdAt: new Date().toISOString()
                 });
                 
-                // localStorageにセッション情報を保持
+                // ローカルに記憶
                 localStorage.setItem('userUID', uid);
                 localStorage.setItem('userName', name);
                 
-                // メインラウンジへ遷移
-                window.location.href = 'lounge.html';
-                
-            } catch (error) {
-                alert("通信エラーが発生しました。電波の良い場所で再度お試しください。");
-                console.error("DB書き込みエラー:", error);
-                
-                // エラー時はボタンを復活させる
+                // ゲートUIを消して、報酬UI（ステップ5）を表示！
+                gateUi.style.display = 'none';
+                rewardUi.style.display = 'block';
+
+            } catch(e) {
+                alert("通信エラーが発生しました。");
+                console.error(e);
                 btn.disabled = false;
                 btn.innerText = "規約に同意して入園する";
             }
+        });
+
+        // ステップ6: 報酬を受け取ってメインラウンジへ
+        document.getElementById('go-lounge-btn').addEventListener('click', () => {
+            window.location.href = 'lounge.html';
         });
     </script>
 </body>
