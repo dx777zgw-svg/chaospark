@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G-Chaos Park | 物語一覧</title>
+    <style>
+        body { background: #fff; color: #1a1a1a; padding: 15px; font-family: sans-serif; margin: 0; }
+        
+        /* シンプル共通ナビ */
+        .nav-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid #000; 
+            padding-bottom: 15px; 
+            padding-top: 10px;
+        }
+        .nav-bar a { 
+            color: #000; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 0.95rem;
+        }
+        
+        /* タブデザイン */
+        .tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+        }
+        .tab-btn { 
+            padding: 10px 20px; 
+            border: 2px solid #000; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 0.9rem; 
+            font-weight: bold; 
+            background: #fff; 
+            color: #000; 
+            transition: 0.2s;
+        }
+        .tab-btn.active { 
+            background: #000; 
+            color: #fff; 
+        }
+        
+        /* 空のリスト表示エリア */
+        #story-list { 
+            text-align: center; 
+            padding: 60px 20px; 
+            color: #666; 
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 共通ナビゲーション -->
+    <nav class="nav-bar">
+        <a href="story.html">✍️ 物語を書く</a>
+        <a href="lounge.html">🏠 ラウンジへ</a>
+    </nav>
+
+    <!-- 切り替えタブ -->
+    <div class="tabs">
+        <div class="tab-btn active" id="tab-new" onclick="switchTab('new')">新着順</div>
+        <div class="tab-btn" id="tab-popular" onclick="switchTab('popular')">人気作品</div>
+    </div>
+
+    <!-- リスト表示エリア（現在はプレースホルダー） -->
+    <div id="story-list">
+        作品はまだありません
+    </div>
+
+    <script>
+        // タブの見た目だけを切り替えるダミー関数
+        function switchTab(tabName) {
+            // アクティブ状態のリセット
+            document.getElementById('tab-new').classList.remove('active');
+            document.getElementById('tab-popular').classList.remove('active');
+            
+            // 選択されたタブをアクティブに
+            if (tabName === 'new') {
+                document.getElementById('tab-new').classList.add('active');
+            } else {
+                document.getElementById('tab-popular').classList.add('active');
+            }
+            
+            // どちらを選んでも、今は「作品なし」を表示
+            document.getElementById('story-list').innerText = "作品はまだありません";
+        }
+    </script>
+
+</body>
+</html>
