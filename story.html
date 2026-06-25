@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G-Chaos Story | 執筆</title>
+    <style>
+        /* 白背景・黒文字で視認性を最大化 */
+        body { background: #ffffff; color: #1a1a1a; padding: 20px; font-family: sans-serif; }
+        
+        h2 { color: #000; border-bottom: 2px solid #00ff00; display: inline-block; }
+        
+        input, textarea { 
+            width: 100%; 
+            background: #f9f9f9; 
+            border: 1px solid #ccc; 
+            color: #000; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; /* スマホの自動ズーム防止 */
+        }
+        textarea { height: 350px; resize: none; line-height: 1.6; }
+        
+        /* カウンターのデザイン */
+        #counter { text-align: right; font-size: 0.9rem; color: #666; margin-bottom: 10px; }
+        
+        .btn-post { width: 100%; padding: 15px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #error-msg { color: #cc0000; font-size: 0.85rem; margin-top: -5px; margin-bottom: 10px; display: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>物語を紡ぐ</h2>
+    
+    <input type="text" id="title" placeholder="タイトル（30文字以内）" maxlength="30">
+    <textarea id="body" placeholder="ここに100〜1000文字で物語を執筆..." oninput="updateCount()"></textarea>
+    
+    <div id="counter">現在: 0 / 1000文字</div>
+    <div id="error-msg"></div>
+    
+    <button class="btn-post" onclick="postStory()">投稿する</button>
+
+    <script type="module">
+        // Firebase等のインポートは環境に合わせて記述
+        
+        // 文字数カウンターの更新
+        window.updateCount = () => {
+            const len = document.getElementById('body').value.length;
+            const counter = document.getElementById('counter');
+            counter.innerText = `現在: ${len} / 1000文字`;
+            
+            // 文字数による色変化
+            if(len < 100) counter.style.color = "#cc0000";
+            else if(len > 1000) counter.style.color = "#ff0000";
+            else counter.style.color = "#008800";
+        };
+
+        window.postStory = async () => {
+            const body = document.getElementById('body').value;
+            const error = document.getElementById('error-msg');
+            
+            // バリデーション
+            if (body.length < 100 || body.length > 1000) {
+                error.innerText = "本文は100〜1000文字で入力してください。";
+                error.style.display = 'block';
+                return;
+            }
+            // 簡易的な「意味不明な文字列」チェック（連続する特殊文字）
+            if (/(.)\1{4,}/.test(body)) {
+                error.innerText = "不適切な文字列が含まれています（文字の連続は禁止です）。";
+                error.style.display = 'block';
+                return;
+            }
+
+            alert("物語がパークに刻まれました！");
+            // window.location.href = 'lounge.html';
+        };
+    </script>
+</body>
+</html>
