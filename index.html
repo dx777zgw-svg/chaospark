@@ -3,33 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>G-Chaos Park | 入国ゲート</title>
+    <title>G-Chaos Park | 開園</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #0a0a0a; color: #d1d1d1; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .gate-box { background: rgba(26, 26, 26, 0.9); border: 2px solid #ff00ff; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); width: 80%; max-width: 400px; }
-        h1 { color: #fff; font-size: 1.5rem; margin-bottom: 5px; }
-        h1 span { color: #ff00ff; }
-        p { font-size: 0.9rem; margin-bottom: 20px; color: #aaa; }
-        input[type="text"] { width: 100%; padding: 10px; background: #222; border: 1px solid #555; color: #fff; border-radius: 5px; margin-bottom: 15px; font-size: 1rem; box-sizing: border-box; }
-        button { background: #ff00ff; color: #fff; border: none; padding: 12px 20px; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; }
-        button:hover { background: #cc00cc; }
-        .error-msg { color: #ff3333; font-size: 0.8rem; margin-top: 10px; display: none; }
+        body { margin: 0; background: #000; color: #fff; overflow: hidden; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        
+        /* 動画を全画面表示 */
+        #opening-video { width: 100vw; height: 100vh; object-fit: cover; }
+        
+        /* ゲートUI（最初は非表示） */
+        #gate-ui { 
+            display: none; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            background: rgba(20, 20, 20, 0.9); 
+            padding: 30px; 
+            border: 2px solid #ff00ff; 
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .lico-img { height: 25vh; max-height: 200px; filter: drop-shadow(0 0 15px rgba(255,0,255,0.6)); margin-bottom: 15px; }
+        .speech-text { font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; font-weight: bold; }
+        
+        .terms-link { color: #00ffff; text-decoration: underline; display: block; margin-bottom: 20px; font-size: 0.9rem; }
+        
+        input[type="text"] { width: 100%; padding: 12px; background: #222; border: 1px solid #555; color: #fff; border-radius: 5px; margin-bottom: 20px; font-size: 1rem; box-sizing: border-box; }
+        
+        .btn-enter { background: #ff00ff; color: #fff; padding: 12px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s; font-size: 1rem; }
+        .btn-enter:hover { background: #cc00cc; }
+        .btn-enter:disabled { background: #555; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-    <div class="gate-box">
-        <h1>G-Chaos <span>Park</span></h1>
-        <p>パークへようこそ。入国手続きを行います。</p>
+    <video id="opening-video" src="opening.mp4" autoplay playsinline muted></video>
+
+    <div id="gate-ui">
+        <img src="LICO.png" alt="LICO" class="lico-img" onerror="this.style.display='none';">
+        <div class="speech-text">
+            「ようこそ、G-Chaos Parkへ。<br>まずは利用規約を確認し、<br>同意の署名をお願いします。」
+        </div>
         
-        <input type="text" id="username-input" placeholder="あなたの名前を入力（最大10文字）" maxlength="10">
-        <button id="enter-btn">入国する</button>
-        <div id="error-msg" class="error-msg">名前を入力してください。</div>
+        <a href="terms.html" class="terms-link">📄 利用規約を確認する</a>
+        
+        <input type="text" id="username" placeholder="住民名を入力（最大10文字）" maxlength="10">
+        <button id="enter-btn" class="btn-enter">規約に同意して入園する</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         // Firebaseの設定
         const firebaseConfig = {
@@ -45,61 +73,68 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 簡易的な一意のID生成関数（Firebase Authを使わない場合の代替策）
-        function generateUID() {
-            return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        }
+        // 動画とUIの制御
+        const video = document.getElementById('opening-video');
+        const gateUi = document.getElementById('gate-ui');
 
+        video.onended = () => {
+            video.style.display = 'none';
+            gateUi.style.display = 'block';
+        };
+
+        // 万が一動画が読み込めない/ブロックされた場合のフェイルセーフ（5秒後にUI強制表示）
+        setTimeout(() => {
+            if (gateUi.style.display !== 'block') {
+                video.style.display = 'none';
+                gateUi.style.display = 'block';
+            }
+        }, 5000);
+
+        // 入園ボタンの処理
         document.getElementById('enter-btn').addEventListener('click', async () => {
-            const nameInput = document.getElementById('username-input').value.trim();
-            const errorMsg = document.getElementById('error-msg');
-
-            if (!nameInput) {
-                errorMsg.style.display = 'block';
-                return;
+            const name = document.getElementById('username').value.trim();
+            const btn = document.getElementById('enter-btn');
+            
+            if(!name) { 
+                alert("名前の署名が必要です。"); 
+                return; 
             }
 
-            // 既にlocalStorageにUIDがあるか確認（二重入国防止）
-            let uid = localStorage.getItem('userUID');
+            // 連打防止のボタンロック
+            btn.disabled = true;
+            btn.innerText = "戸籍を登録中...";
+
+            // 被りにくいUIDを生成
+            const uid = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             
-            if (!uid) {
-                // 新規入国の場合
-                uid = generateUID();
+            try {
+                // Firebase DBへ書き込み
+                await set(ref(db, 'users/' + uid), {
+                    name: name,
+                    avatar: "🧑",         // 初期アイコン
+                    role: "none",        // 役職なし
+                    style: "default",    // 装飾なし
+                    points: {
+                        cp: 100,         // 初回ボーナス
+                        cm: 0
+                    },
+                    createdAt: new Date().toISOString()
+                });
                 
-                // Firebase DBに初期データを書き込む
-                const userRef = ref(db, 'users/' + uid);
+                // localStorageにセッション情報を保持
+                localStorage.setItem('userUID', uid);
+                localStorage.setItem('userName', name);
                 
-                try {
-                    await set(userRef, {
-                        name: nameInput,
-                        avatar: "🧑",         // 初期アイコン
-                        role: "none",        // 役職なし
-                        style: "default",    // 装飾なし
-                        points: {
-                            cp: 100,         // 初回入国ボーナス100CP
-                            cm: 0            // CMは0からスタート
-                        },
-                        createdAt: new Date().toISOString()
-                    });
-
-                    // 成功したらローカルストレージに保存
-                    localStorage.setItem('userUID', uid);
-                    localStorage.setItem('userName', nameInput);
-                    localStorage.setItem('userAvatar', "🧑");
-
-                    // メイン画面へ遷移
-                    window.location.href = 'main.html'; // 送ってくれた画面のファイル名に合わせる
-
-                } catch (error) {
-                    console.error("DB書き込みエラー:", error);
-                    errorMsg.innerText = "通信エラーが発生しました。";
-                    errorMsg.style.display = 'block';
-                }
-            } else {
-                // 既にUIDを持っている場合（名前変更などの処理は後日拡張可能）
-                // とりあえず今回はそのままメインへ飛ばす
-                localStorage.setItem('userName', nameInput);
-                window.location.href = 'main.html';
+                // メインラウンジへ遷移
+                window.location.href = 'lounge.html';
+                
+            } catch (error) {
+                alert("通信エラーが発生しました。電波の良い場所で再度お試しください。");
+                console.error("DB書き込みエラー:", error);
+                
+                // エラー時はボタンを復活させる
+                btn.disabled = false;
+                btn.innerText = "規約に同意して入園する";
             }
         });
     </script>
